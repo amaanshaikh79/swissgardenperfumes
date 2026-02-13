@@ -1,0 +1,139 @@
+/* ═══════════════════════════════════════════════════════════
+   Auth Pages — Production CSS
+   ═══════════════════════════════════════════════════════════ */
+
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl);
+    background: var(--gradient-hero);
+}
+
+/* ─── Card Container ──────────────────────────────────────── */
+.auth-card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl) var(--space-2xl) var(--space-xl);
+    box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.5), var(--shadow-lg);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+}
+
+.auth-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+}
+
+.auth-title {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.auth-subtitle {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+}
+
+/* ─── Input Styles ────────────────────────────────────────── */
+.auth-input-wrapper {
+    position: relative;
+}
+
+.auth-input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.auth-input {
+    padding-left: 40px !important;
+}
+
+.auth-toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.auth-toggle-password:hover {
+    color: var(--accent);
+}
+
+/* ─── Name Row ────────────────────────────────────────────── */
+.auth-name-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+}
+
+/* ─── Submit Button ───────────────────────────────────────── */
+.auth-submit-btn {
+    width: 100%;
+    margin-top: var(--space-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.auth-submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ─── Footer ──────────────────────────────────────────────── */
+.auth-footer {
+    text-align: center;
+    margin-top: var(--space-xl);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.auth-link {
+    color: var(--accent);
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+    opacity: 0.85;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 520px) {
+    .auth-card {
+        padding: var(--space-xl) var(--space-lg) var(--space-lg);
+        border-radius: var(--radius-lg);
+    }
+
+    .auth-name-row {
+        grid-template-columns: 1fr;
+    }
+}

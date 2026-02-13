@@ -1,0 +1,14 @@
+{
+    "name": "goldberg-perfumes",
+    "version": "1.0.0",
+    "description": "GoldBerg Perfumes - Monorepo for Render Deployment",
+    "main": "server/server.js",
+    "scripts": {
+        "start": "node server/server.js",
+        "build": "npm install && npm install --prefix server && npm install --prefix client && npm run build --prefix client"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "license": "ISC"
+}

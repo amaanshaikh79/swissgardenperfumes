@@ -1,0 +1,488 @@
+/* ─── Checkout ────────────────────────────────────────────── */
+.checkout-page {
+    padding-top: 120px;
+    padding-bottom: var(--space-4xl);
+    min-height: 100vh;
+}
+
+.checkout-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+/* Steps */
+.checkout-steps {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2xl);
+    margin-bottom: var(--space-3xl);
+}
+
+.checkout-step {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    position: relative;
+}
+
+.checkout-step.active {
+    color: var(--accent);
+}
+
+.checkout-step.done {
+    color: var(--success);
+}
+
+.checkout-step::after {
+    content: '';
+    position: absolute;
+    right: -30px;
+    width: 20px;
+    height: 1px;
+    background: var(--divider);
+}
+
+.checkout-step:last-child::after {
+    display: none;
+}
+
+.checkout-step.done::after {
+    background: var(--success);
+}
+
+.checkout-step-num {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.checkout-step.active .checkout-step-num {
+    background: var(--accent);
+    color: var(--black);
+    border-color: var(--accent);
+}
+
+.checkout-step.done .checkout-step-num {
+    background: var(--success);
+    color: #fff;
+    border-color: var(--success);
+}
+
+/* Grid */
+.checkout-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: var(--space-2xl);
+    align-items: start;
+}
+
+.checkout-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl);
+}
+
+.checkout-section-title {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    margin-bottom: var(--space-xl);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.form-optional {
+    font-weight: 400;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.form-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.checkout-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+}
+
+/* ─── Payment Method Cards ────────────────────────────────── */
+.payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.payment-method-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-lg) var(--space-xl);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    background: var(--bg-card);
+}
+
+.payment-method-card:hover {
+    border-color: var(--accent-border);
+    background: var(--bg-tertiary);
+}
+
+.payment-method-card.selected {
+    border-color: var(--accent);
+    background: var(--accent-subtle);
+    box-shadow: 0 0 0 1px var(--accent), var(--shadow-gold);
+}
+
+.payment-method-radio {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: border-color 0.25s ease;
+}
+
+.payment-method-card.selected .payment-method-radio {
+    border-color: var(--accent);
+}
+
+.radio-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: transparent;
+    transition: background 0.25s ease;
+}
+
+.radio-dot.active {
+    background: var(--accent);
+}
+
+.payment-method-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    background: var(--bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+}
+
+.payment-method-card.selected .payment-method-icon {
+    background: var(--accent);
+    color: var(--black);
+}
+
+.payment-method-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.payment-method-info h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.payment-method-info p {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+
+/* Payment Info Boxes */
+.payment-info-box {
+    padding: var(--space-md) var(--space-lg);
+    background: var(--accent-subtle);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-xl);
+}
+
+.payment-info-box p {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.payment-info-box strong {
+    color: var(--text-primary);
+}
+
+.payment-info-cod {
+    background: rgba(46, 204, 113, 0.06);
+    border-color: rgba(46, 204, 113, 0.2);
+}
+
+/* Navigation Buttons */
+.checkout-nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+/* ─── Step 3: Review Boxes ────────────────────────────────── */
+.checkout-review-box {
+    padding: var(--space-lg);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-lg);
+    position: relative;
+}
+
+.checkout-review-box-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-sm);
+}
+
+.checkout-review-box-header h3 {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.checkout-review-box p {
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+.checkout-landmark {
+    font-size: 0.82rem !important;
+    color: var(--text-muted) !important;
+    font-style: italic;
+}
+
+.checkout-payment-selected {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    color: var(--accent);
+}
+
+.checkout-payment-selected strong {
+    display: block;
+    font-size: 0.92rem;
+    color: var(--text-primary);
+}
+
+.checkout-payment-selected p {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Place Order Button */
+.checkout-place-btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    padding: var(--space-lg) var(--space-2xl);
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--space-md);
+}
+
+.checkout-btn-loading {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.checkout-secure-text {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
+/* ─── Items Review ────────────────────────────────────────── */
+.checkout-items-review {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.checkout-review-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+}
+
+.checkout-review-item img {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+}
+
+.checkout-review-item h4 {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+}
+
+.checkout-review-item p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.checkout-review-item div {
+    flex: 1;
+}
+
+.checkout-review-price {
+    font-weight: 600;
+    color: var(--accent);
+}
+
+/* Payment info (kept for backward compat) */
+.checkout-payment-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: var(--accent-subtle);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-xl);
+    color: var(--accent);
+}
+
+.checkout-payment-info p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* ─── Summary ─────────────────────────────────────────────── */
+.checkout-summary {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    position: sticky;
+    top: 100px;
+}
+
+.checkout-summary-title {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    margin-bottom: var(--space-lg);
+}
+
+.checkout-summary-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-sm);
+}
+
+.checkout-summary-divider {
+    height: 1px;
+    background: var(--divider);
+    margin: var(--space-md) 0;
+}
+
+.checkout-summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xs);
+}
+
+.checkout-summary-total {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent);
+    font-family: var(--font-heading);
+}
+
+.checkout-summary-method {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--divider);
+}
+
+/* ─── Responsive ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .checkout-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .checkout-row {
+        grid-template-columns: 1fr;
+    }
+
+    .checkout-steps {
+        gap: var(--space-lg);
+    }
+
+    .checkout-step span {
+        display: none;
+    }
+
+    .checkout-step::after {
+        right: -14px;
+        width: 8px;
+    }
+
+    .payment-method-card {
+        padding: var(--space-md);
+        gap: var(--space-md);
+    }
+
+    .payment-method-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .checkout-nav-buttons {
+        flex-direction: column-reverse;
+    }
+}
