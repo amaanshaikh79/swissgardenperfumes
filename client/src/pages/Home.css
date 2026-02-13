@@ -492,3 +492,19 @@
         display: none;
     }
 }
+
+/* ─── Large Screens & TVs (≥1600px) ───────────────────────── */
+@media (min-width: 1600px) {
+    .hero-title {
+        font-size: 5.5rem;
+    }
+
+    .hero-image-wrapper {
+        width: 500px;
+        height: 650px;
+    }
+
+    .hero-content {
+        gap: var(--space-4xl);
+    }
+}
