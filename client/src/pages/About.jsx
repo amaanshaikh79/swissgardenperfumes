@@ -14,26 +14,26 @@ const About = () => {
     return (
         <>
             <Helmet>
-                <title>Our Story | GoldBerg Perfumes</title>
-                <meta name="description" content="Discover the story behind GoldBerg Perfumes — a legacy of luxury fragrance since 1987." />
+                <title>Our Story | GoldenBuck Perfumes</title>
+                <meta name="description" content="Discover the story behind GoldenBuck Perfumes — a legacy of luxury fragrance since 1987." />
             </Helmet>
             <div className="about-page">
                 <div className="container-sm">
                     <div className="about-hero">
                         <span className="section-label">Our Story</span>
-                        <h1 className="section-title">The Art of GoldBerg</h1>
+                        <h1 className="section-title">The Art of GoldenBuck</h1>
                         <div className="gold-divider" />
                     </div>
 
                     <div className="about-content">
                         <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                            Founded in 1987 in the heart of New York City, GoldBerg Perfumes was born from a singular vision: to create fragrances that transcend the ordinary and touch the soul. Our founder, Alexander GoldBerg, a third-generation perfumer, believed that scent is the most intimate form of self-expression.
+                            Founded in 1987 in the heart of New York City, GoldenBuck Perfumes was born from a singular vision: to create fragrances that transcend the ordinary and touch the soul. Our founder, Alexander GoldenBuck, a third-generation perfumer, believed that scent is the most intimate form of self-expression.
                         </motion.p>
                         <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}>
                             Today, our master perfumers travel the world to source the rarest ingredients — from the ancient agarwood forests of Southeast Asia to the lavender fields of Provence, the rose valleys of Bulgaria to the vanilla plantations of Madagascar. Every ingredient is carefully selected and tested before it earns a place in our compositions.
                         </motion.p>
                         <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}>
-                            Our philosophy is simple: luxury should be an experience, not just a product. Each GoldBerg fragrance is a masterwork — blended with precision, patience, and an unwavering commitment to excellence. We don't follow trends; we create timeless signatures that become an extension of who you are.
+                            Our philosophy is simple: luxury should be an experience, not just a product. Each GoldenBuck fragrance is a masterwork — blended with precision, patience, and an unwavering commitment to excellence. We don't follow trends; we create timeless signatures that become an extension of who you are.
                         </motion.p>
                     </div>
 

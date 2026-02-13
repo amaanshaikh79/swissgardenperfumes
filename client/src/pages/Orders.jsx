@@ -36,7 +36,7 @@ const Orders = () => {
 
     return (
         <>
-            <Helmet><title>My Orders | GoldBerg Perfumes</title></Helmet>
+            <Helmet><title>My Orders | GoldenBuck Perfumes</title></Helmet>
             <div className="orders-page">
                 <div className="container-sm">
                     <h1 className="page-title">My Orders</h1>

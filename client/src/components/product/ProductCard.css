@@ -142,3 +142,72 @@
     color: var(--text-muted);
     text-decoration: line-through;
 }
+
+/* ─── ProductCard Mobile ──────────────────────────────────── */
+@media (hover: none) and (pointer: coarse) {
+    .product-card-actions {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .product-card:hover {
+        transform: none;
+    }
+
+    .product-card:active {
+        transform: scale(0.98);
+    }
+}
+
+@media (max-width: 768px) {
+    .product-card-body {
+        padding: var(--space-md);
+    }
+
+    .product-card-name {
+        font-size: 1rem;
+    }
+
+    .product-card-action-btn {
+        width: 34px;
+        height: 34px;
+    }
+
+    .product-card:hover {
+        transform: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-card-body {
+        padding: var(--space-sm) var(--space-md);
+    }
+
+    .product-card-brand {
+        font-size: 0.58rem;
+        letter-spacing: 2px;
+    }
+
+    .product-card-name {
+        font-size: 0.88rem;
+        margin: 2px 0;
+    }
+
+    .product-card-category {
+        font-size: 0.7rem;
+        margin-bottom: 4px;
+    }
+
+    .product-card-current-price {
+        font-size: 1rem;
+    }
+
+    .product-card-compare-price {
+        font-size: 0.75rem;
+    }
+
+    .product-card-rating {
+        font-size: 0.7rem;
+        margin-bottom: 4px;
+    }
+}

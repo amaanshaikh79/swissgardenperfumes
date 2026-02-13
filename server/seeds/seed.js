@@ -9,7 +9,7 @@ dotenv.config();
 const products = [
     {
         name: 'Royal Oud Noir',
-        brand: 'GoldBerg',
+        brand: 'GoldenBuck',
         description:
             'An opulent masterpiece that opens with a burst of Italian bergamot and pink pepper, flowing into a heart of rare Laotian oud and Damascus rose. The base rests on a foundation of aged sandalwood, amber, and Venezuelan tonka bean. This is a fragrance that commands attention and leaves an indelible impression — a true symbol of luxury and refinement.',
         shortDescription: 'A majestic oud fragrance with rose, sandalwood, and amber',
@@ -38,7 +38,7 @@ const products = [
     },
     {
         name: 'Velvet Rose & Iris',
-        brand: 'GoldBerg',
+        brand: 'GoldenBuck',
         description:
             'A sophisticated floral symphony that captures the essence of an English garden at twilight. Velvety Turkish rose petals intertwine with powdery Florentine iris, while a whisper of violet leaf adds depth and mystery. The dry-down reveals rich suede, musk, and a touch of patchouli, creating a scent that is both romantic and modern.',
         shortDescription: 'Elegant rose and iris blend with suede undertones',
@@ -66,7 +66,7 @@ const products = [
     },
     {
         name: 'Midnight Amber Absolute',
-        brand: 'GoldBerg',
+        brand: 'GoldenBuck',
         description:
             'Step into the mystique of the night with this captivating amber fragrance. Rich labdanum and fossilized amber meld with exotic spices — cardamom, nutmeg, and star anise — creating an intoxicating warmth. The base reveals smoky benzoin, vanilla absolute, and a whisper of leather, evoking moonlit soirées and whispered secrets.',
         shortDescription: 'Deep amber with exotic spices and smoky warmth',
@@ -95,7 +95,7 @@ const products = [
     },
     {
         name: 'Côte d\'Azur Aqua',
-        brand: 'GoldBerg',
+        brand: 'GoldenBuck',
         description:
             'Inspired by the sun-drenched coastline of the French Riviera, this refreshing scent evokes lazy summer days on a private yacht. Sparkling Sicilian lemon and marine accord dance with aromatic lavender and geranium. A base of white cedarwood and ambergris provides a clean, sophisticated finish that lingers like a sea breeze.',
         shortDescription: 'Fresh aquatic fragrance inspired by the French Riviera',
@@ -123,7 +123,7 @@ const products = [
     },
     {
         name: 'Noir de Nuit',
-        brand: 'GoldBerg',
+        brand: 'GoldenBuck',
         description:
             'A dark and seductive fragrance for the modern gentleman. Italian bergamot and black pepper create a powerful opening, giving way to a heart of oud, vetiver, and dark chocolate. The base notes of Indonesian patchouli, castoreum, and civet create an animalic warmth that is both dangerous and irresistible.',
         shortDescription: 'Dark, seductive blend of oud, chocolate, and vetiver',
@@ -152,7 +152,7 @@ const products = [
     },
     {
         name: 'Jardin de Versailles',
-        brand: 'GoldBerg',
+        brand: 'GoldenBuck',
         description:
             'A regal floral masterpiece inspired by the gardens of Versailles. Dewy lily of the valley and hyacinth open the composition, leading to a voluptuous heart of Grasse tuberose and gardenia. The velvety base of orris butter, white musk, and cashmere wood creates an aura of refined aristocratic elegance.',
         shortDescription: 'A regal floral journey through the gardens of Versailles',
@@ -180,7 +180,7 @@ const products = [
     },
     {
         name: 'Santal Sacré',
-        brand: 'GoldBerg',
+        brand: 'GoldenBuck',
         description:
             'A meditative journey to ancient temples, where sacred Indian sandalwood has been burned for centuries. Creamy Australian sandalwood is enriched with warm cardamom and smoky incense. The base reveals liquid gold — a blend of Mysore sandalwood, cedarwood, and a touch of vanilla that creates an almost spiritual serenity.',
         shortDescription: 'Sacred sandalwood meditation with incense and vanilla',
@@ -208,7 +208,7 @@ const products = [
     },
     {
         name: 'Champagne & Cassis',
-        brand: 'GoldBerg',
+        brand: 'GoldenBuck',
         description:
             'Celebrate life with this effervescent and joyful fragrance. Fizzy champagne accord and blackcurrant burst forth like a toast at midnight, while a heart of peach blossom and pink peppercorn adds playful sophistication. The dry-down of musks, praline, and blonde wood is sheer indulgence — a fragrance for those who love the finer things.',
         shortDescription: 'Effervescent champagne notes with blackcurrant and peach',
@@ -236,7 +236,7 @@ const products = [
     },
     {
         name: 'Tobacco & Vanilla Royale',
-        brand: 'GoldBerg',
+        brand: 'GoldenBuck',
         description:
             'An indulgent gourmand fragrance that wraps you in pure luxury. Rich Virginia tobacco leaf and Madagascar vanilla create an addictive combination, enhanced by honey, cinnamon bark, and dried fruit. The base of amber, benzoin, and rare woods provides a warm, sensual cocoon that lasts well into the night.',
         shortDescription: 'Indulgent tobacco and vanilla with honey warmth',
@@ -265,7 +265,7 @@ const products = [
     },
     {
         name: 'Citrus Soleil d\'Or',
-        brand: 'GoldBerg',
+        brand: 'GoldenBuck',
         description:
             'Capture the golden rays of the Mediterranean sun in a bottle. This vibrant citrus composition opens with juicy blood orange, Amalfi lemon, and kumquat, leading to an aromatic heart of neroli, petitgrain, and white tea. The clean base of vetiver, white musk, and ambrette seed ensures this sunny fragrance feels refined and sophisticated.',
         shortDescription: 'Golden Mediterranean citrus with neroli and white tea',
@@ -292,15 +292,15 @@ const products = [
         season: ['Spring', 'Summer'],
     },
     {
-        name: 'The GoldBerg Collection',
-        brand: 'GoldBerg',
+        name: 'The GoldenBuck Collection',
+        brand: 'GoldenBuck',
         description:
-            'Experience the finest of GoldBerg Perfumes with this exquisite gift set. Contains carefully curated miniatures of our five signature fragrances: Royal Oud Noir (10ml), Velvet Rose & Iris (10ml), Midnight Amber Absolute (10ml), Noir de Nuit (10ml), and Santal Sacré (10ml). Presented in a luxurious gold and black lacquered box — the perfect gift for the discerning fragrance lover.',
+            'Experience the finest of GoldenBuck Perfumes with this exquisite gift set. Contains carefully curated miniatures of our five signature fragrances: Royal Oud Noir (10ml), Velvet Rose & Iris (10ml), Midnight Amber Absolute (10ml), Noir de Nuit (10ml), and Santal Sacré (10ml). Presented in a luxurious gold and black lacquered box — the perfect gift for the discerning fragrance lover.',
         shortDescription: 'Luxury collection of 5 signature miniatures in a gift box',
         price: 185.0,
         compareAtPrice: 220.0,
         images: [
-            { url: 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=800', alt: 'The GoldBerg Collection' },
+            { url: 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=800', alt: 'The GoldenBuck Collection' },
         ],
         category: 'Gift Set',
         gender: 'Unisex',
@@ -322,7 +322,7 @@ const products = [
     },
     {
         name: 'Pétale de Magnolia',
-        brand: 'GoldBerg',
+        brand: 'GoldenBuck',
         description:
             'A delicate and ethereal white floral fragrance that captures the beauty of magnolia in full bloom. Fresh bergamot and lychee create a luminous opening, while the magnolia heart is enriched with white lily and freesia. A soft landing of white cedarwood, sheer musk, and a touch of blonde amber creates a fragrance that is pure, feminine, and utterly enchanting.',
         shortDescription: 'Ethereal white magnolia with lychee and sheer musk',
@@ -352,7 +352,7 @@ const products = [
 
 const adminUser = {
     firstName: 'Admin',
-    lastName: 'GoldBerg',
+    lastName: 'GoldenBuck',
     email: 'adnanshaikh07@gmail.com',
     password: 'Admin@123',
     role: 'admin',
@@ -368,7 +368,7 @@ const demoUser = {
 
 const seedDatabase = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/goldberg-perfumes');
+        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/goldenbuck-perfumes');
         console.log('✨ Connected to MongoDB');
 
         // Clear existing data

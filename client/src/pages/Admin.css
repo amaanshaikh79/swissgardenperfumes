@@ -647,3 +647,103 @@
         flex-direction: column;
     }
 }
+
+/* ─── Order Details ────────────────────────────────────────── */
+.admin-order-details {
+    background: var(--bg-tertiary);
+    padding: var(--space-lg) var(--space-xl);
+    border-top: 1px solid var(--divider);
+}
+
+.admin-order-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-xl);
+}
+
+.admin-order-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.admin-order-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--divider);
+}
+
+.admin-order-item:last-child {
+    border-bottom: none;
+}
+
+.admin-order-item-thumb {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    border: 1px solid var(--border-color);
+}
+
+.admin-order-item-info {
+    flex: 1;
+}
+
+.admin-order-item-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    display: block;
+}
+
+.admin-order-item-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.admin-order-item-price {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.admin-order-summary {
+    background: var(--bg-card);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+}
+
+.admin-summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.admin-summary-total {
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--divider);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--accent);
+}
+
+.admin-order-address {
+    margin-top: var(--space-lg);
+}
+
+.admin-address-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .admin-order-grid {
+        grid-template-columns: 1fr;
+    }
+}

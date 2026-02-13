@@ -35,8 +35,8 @@ const Home = () => {
     return (
         <>
             <Helmet>
-                <title>GoldBerg Perfumes — Luxury Fragrances | Home</title>
-                <meta name="description" content="Discover exquisite luxury fragrances crafted for the discerning connoisseur. GoldBerg Perfumes — where every scent tells a story." />
+                <title>GoldenBuck Perfumes — Luxury Fragrances | Home</title>
+                <meta name="description" content="Discover exquisite luxury fragrances crafted for the discerning connoisseur. GoldenBuck Perfumes — where every scent tells a story." />
             </Helmet>
 
             {/* ─── Hero Section ──────────────────────────────────── */}
@@ -187,7 +187,7 @@ const Home = () => {
                             </h2>
                             <div className="gold-divider" style={{ margin: '1.5rem 0' }} />
                             <p className="story-text">
-                                Since 1987, GoldBerg Perfumes has been at the forefront of luxury fragrance creation.
+                                Since 1987, GoldenBuck Perfumes has been at the forefront of luxury fragrance creation.
                                 Our master perfumers travel the world to source the rarest ingredients — from the ancient
                                 oud forests of Laos to the rose fields of Grasse, France.
                             </p>
@@ -251,7 +251,7 @@ const Home = () => {
                         viewport={{ once: true }}
                     >
                         <span className="section-label">Stay Connected</span>
-                        <h2 className="section-title">Join the GoldBerg Circle</h2>
+                        <h2 className="section-title">Join the GoldenBuck Circle</h2>
                         <p className="section-subtitle">
                             Be the first to discover new launches, exclusive offers, and the stories behind our most coveted creations.
                         </p>

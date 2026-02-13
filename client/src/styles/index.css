@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   GoldBerg Perfumes — Global Design System
+   GoldenBuck Perfumes — Global Design System
    Premium luxury aesthetic with gold, black, and white palette
    ═══════════════════════════════════════════════════════════════ */
 
@@ -164,6 +164,8 @@ html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 body {
@@ -174,12 +176,16 @@ body {
     background-color: var(--bg-primary);
     transition: background-color var(--transition-base), color var(--transition-base);
     overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 a {
     text-decoration: none;
     color: inherit;
     transition: color var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
 }
 
 img {
@@ -194,13 +200,18 @@ button {
     border: none;
     background: none;
     font-size: inherit;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 input,
 textarea,
 select {
     font-family: inherit;
-    font-size: inherit;
+    font-size: max(16px, 1rem);
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 0;
 }
 
 ul,
@@ -243,7 +254,7 @@ ol {
 
 .section-title {
     font-family: var(--font-display);
-    font-size: clamp(2rem, 4vw, 3rem);
+    font-size: clamp(1.6rem, 4vw, 3rem);
     font-weight: 400;
     color: var(--text-primary);
     line-height: 1.2;
@@ -251,7 +262,7 @@ ol {
 }
 
 .section-subtitle {
-    font-size: 1.05rem;
+    font-size: clamp(0.9rem, 2.5vw, 1.05rem);
     color: var(--text-secondary);
     max-width: 600px;
     margin: 0 auto;
@@ -274,6 +285,8 @@ ol {
     white-space: nowrap;
     position: relative;
     overflow: hidden;
+    min-height: 44px;
+    touch-action: manipulation;
 }
 
 .btn::after {
@@ -331,6 +344,7 @@ ol {
 .btn-sm {
     padding: 0.5rem 1.2rem;
     font-size: 0.75rem;
+    min-height: 36px;
 }
 
 .btn-icon {
@@ -371,8 +385,9 @@ ol {
     border: 1px solid var(--input-border);
     border-radius: var(--radius-md);
     color: var(--text-primary);
-    font-size: 0.95rem;
+    font-size: max(16px, 0.95rem);
     transition: all var(--transition-fast);
+    min-height: 48px;
 }
 
 .form-input:focus {
@@ -398,10 +413,12 @@ ol {
 
 .form-select {
     appearance: none;
+    -webkit-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 1rem center;
     padding-right: 2.5rem;
+    border-radius: var(--radius-md);
 }
 
 /* ─── Cards ───────────────────────────────────────────────── */
@@ -630,7 +647,11 @@ ol {
     animation: slideDown 0.4s ease forwards;
 }
 
-/* ─── Responsive ──────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   Mobile-First Responsive Design
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── Tablet (≤768px) ─────────────────────────────────────── */
 @media (max-width: 768px) {
 
     .container,
@@ -642,15 +663,91 @@ ol {
         padding: var(--space-2xl) 0;
     }
 
+    .section-header {
+        margin-bottom: var(--space-xl);
+    }
+
     .grid-products {
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
         gap: var(--space-md);
+    }
+
+    .btn-lg {
+        padding: 0.9rem 2rem;
+        font-size: 0.85rem;
+    }
+
+    /* Disable hover transforms on touch devices */
+    .card:hover {
+        transform: none;
     }
 }
 
+/* ─── Mobile (≤480px) ─────────────────────────────────────── */
 @media (max-width: 480px) {
+
+    .container,
+    .container-sm {
+        padding: 0 var(--space-sm);
+    }
+
+    .grid-products {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-sm);
+    }
+
+    .section-label {
+        font-size: 0.65rem;
+        letter-spacing: 3px;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.78rem;
+        letter-spacing: 1px;
+    }
+
+    .btn-lg {
+        padding: 0.85rem 1.8rem;
+        font-size: 0.82rem;
+    }
+}
+
+/* ─── Small Mobile (≤360px) ───────────────────────────────── */
+@media (max-width: 360px) {
     .grid-products {
         grid-template-columns: 1fr;
+    }
+
+    .container,
+    .container-sm {
+        padding: 0 12px;
+    }
+}
+
+/* ─── Touch Device Optimizations ──────────────────────────── */
+@media (hover: none) and (pointer: coarse) {
+    .card:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-primary:hover {
+        transform: none;
+    }
+
+    .btn-outline:hover {
+        transform: none;
+    }
+
+    .btn:active {
+        transform: scale(0.97);
+        opacity: 0.9;
+    }
+
+    ::-webkit-scrollbar {
+        width: 0;
+        display: none;
     }
 }
 

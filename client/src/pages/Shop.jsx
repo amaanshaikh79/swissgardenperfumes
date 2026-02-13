@@ -83,7 +83,7 @@ const Shop = () => {
     return (
         <>
             <Helmet>
-                <title>Shop Luxury Fragrances | GoldBerg Perfumes</title>
+                <title>Shop Luxury Fragrances | GoldenBuck Perfumes</title>
                 <meta name="description" content="Browse our curated collection of luxury perfumes. Filter by category, gender, and fragrance family." />
             </Helmet>
 

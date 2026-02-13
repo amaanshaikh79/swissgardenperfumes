@@ -27,8 +27,8 @@ const Contact = () => {
     return (
         <>
             <Helmet>
-                <title>Contact Us | GoldBerg Perfumes</title>
-                <meta name="description" content="Get in touch with GoldBerg Perfumes. We'd love to hear from you." />
+                <title>Contact Us | GoldenBuck Perfumes</title>
+                <meta name="description" content="Get in touch with GoldenBuck Perfumes. We'd love to hear from you." />
             </Helmet>
             <div className="contact-page">
                 <div className="container-sm">
@@ -92,7 +92,7 @@ const Contact = () => {
                                 <div className="contact-info-icon"><FiMail size={20} /></div>
                                 <div>
                                     <h4>Email Us</h4>
-                                    <p>hello@goldbergperfumes.com</p>
+                                    <p>hello@goldenbuckperfumes.com</p>
                                 </div>
                             </div>
                             <div className="contact-hours">

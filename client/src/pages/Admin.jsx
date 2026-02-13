@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import {
     FiPackage, FiUsers, FiShoppingBag, FiDollarSign, FiTrendingUp,
     FiTrash2, FiMail, FiCalendar, FiPhone, FiMapPin, FiShield,
     FiUserCheck, FiUserX, FiRefreshCw, FiMessageSquare, FiEye,
-    FiChevronDown, FiChevronUp
+    FiChevronDown, FiChevronUp, FiPlus, FiEdit2
 } from 'react-icons/fi';
 import { adminAPI, productsAPI, ordersAPI, contactAPI } from '../services/api';
 import toast from 'react-hot-toast';
+import ProductModal from '../components/admin/ProductModal';
 import './Admin.css';
 
 const AdminDashboard = () => {
@@ -20,6 +21,9 @@ const AdminDashboard = () => {
     const [contacts, setContacts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [expandedUser, setExpandedUser] = useState(null);
+    const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+    const [editingProduct, setEditingProduct] = useState(null);
+    const [expandedOrder, setExpandedOrder] = useState(null);
 
     const fetchData = async (tab) => {
         setLoading(true);
@@ -66,6 +70,33 @@ const AdminDashboard = () => {
     };
 
     // Product actions
+    const openAddProduct = () => {
+        setEditingProduct(null);
+        setIsProductModalOpen(true);
+    };
+
+    const openEditProduct = (product) => {
+        setEditingProduct(product);
+        setIsProductModalOpen(true);
+    };
+
+    const handleSaveProduct = async (productData) => {
+        try {
+            if (editingProduct) {
+                await productsAPI.update(editingProduct._id, productData);
+                toast.success('Product updated successfully');
+            } else {
+                await productsAPI.create(productData);
+                toast.success('Product created successfully');
+            }
+            fetchData('products');
+            setIsProductModalOpen(false);
+        } catch (error) {
+            console.error(error);
+            toast.error(error.response?.data?.message || 'Failed to save product');
+        }
+    };
+
     const deleteProduct = async (productId) => {
         if (!window.confirm('Are you sure you want to delete this product?')) return;
         try {
@@ -129,7 +160,7 @@ const AdminDashboard = () => {
 
     return (
         <>
-            <Helmet><title>Admin Dashboard | GoldBerg Perfumes</title></Helmet>
+            <Helmet><title>Admin Dashboard | GoldenBuck Perfumes</title></Helmet>
             <div className="admin-page">
                 <div className="container">
                     <div className="admin-header">
@@ -389,6 +420,9 @@ const AdminDashboard = () => {
                                         <h3 className="admin-section-title">
                                             All Products <span className="admin-count-badge">{products.length}</span>
                                         </h3>
+                                        <button className="btn btn-sm btn-primary" onClick={openAddProduct}>
+                                            <FiPlus size={16} /> Add Product
+                                        </button>
                                     </div>
                                     <div className="admin-table-wrap">
                                         <table className="admin-table">
@@ -419,6 +453,9 @@ const AdminDashboard = () => {
                                                         <td>{p.sold || 0}</td>
                                                         <td>
                                                             <div className="admin-actions">
+                                                                <button className="admin-action-btn" onClick={() => openEditProduct(p)} title="Edit">
+                                                                    <FiEdit2 size={14} />
+                                                                </button>
                                                                 <button className="admin-action-btn admin-action-danger" onClick={() => deleteProduct(p._id)} title="Delete">
                                                                     <FiTrash2 size={14} />
                                                                 </button>
@@ -453,23 +490,79 @@ const AdminDashboard = () => {
                                                 </thead>
                                                 <tbody>
                                                     {orders.map((o) => (
-                                                        <tr key={o._id}>
-                                                            <td className="admin-accent">{o.orderNumber}</td>
-                                                            <td>{o.user?.firstName} {o.user?.lastName}</td>
-                                                            <td className="admin-muted">{o.user?.email}</td>
-                                                            <td>{o.orderItems?.length || 0}</td>
-                                                            <td className="admin-accent">${o.totalPrice?.toFixed(2)}</td>
-                                                            <td>
-                                                                <select className="admin-status-select" value={o.orderStatus}
-                                                                    onChange={(e) => updateOrderStatus(o._id, e.target.value)}>
-                                                                    {['Processing', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'].map((s) => (
-                                                                        <option key={s} value={s}>{s}</option>
-                                                                    ))}
-                                                                </select>
-                                                            </td>
-                                                            <td><span className={`badge ${o.isPaid ? 'badge-success' : 'badge-warning'}`}>{o.isPaid ? 'Paid' : 'Pending'}</span></td>
-                                                            <td className="admin-muted">{formatDate(o.createdAt)}</td>
-                                                        </tr>
+                                                        <React.Fragment key={o._id}>
+                                                            <tr className="admin-order-row" onClick={() => setExpandedOrder(expandedOrder === o._id ? null : o._id)} style={{ cursor: 'pointer' }}>
+                                                                <td className="admin-accent">
+                                                                    {o.orderNumber}
+                                                                    {expandedOrder === o._id ? <FiChevronUp size={14} style={{ marginLeft: '5px' }} /> : <FiChevronDown size={14} style={{ marginLeft: '5px' }} />}
+                                                                </td>
+                                                                <td>{o.user?.firstName} {o.user?.lastName}</td>
+                                                                <td className="admin-muted">{o.user?.email}</td>
+                                                                <td>{o.orderItems?.length || 0} items</td>
+                                                                <td className="admin-accent">${o.totalPrice?.toFixed(2)}</td>
+                                                                <td onClick={(e) => e.stopPropagation()}>
+                                                                    <select className="admin-status-select" value={o.orderStatus}
+                                                                        onChange={(e) => updateOrderStatus(o._id, e.target.value)}>
+                                                                        {['Processing', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'].map((s) => (
+                                                                            <option key={s} value={s}>{s}</option>
+                                                                        ))}
+                                                                    </select>
+                                                                </td>
+                                                                <td><span className={`badge ${o.isPaid ? 'badge-success' : 'badge-warning'}`}>{o.isPaid ? 'Paid' : 'Pending'}</span></td>
+                                                                <td className="admin-muted">{formatDate(o.createdAt)}</td>
+                                                            </tr>
+                                                            {expandedOrder === o._id && (
+                                                                <tr>
+                                                                    <td colSpan="8" style={{ padding: 0 }}>
+                                                                        <motion.div
+                                                                            initial={{ opacity: 0, height: 0 }}
+                                                                            animate={{ opacity: 1, height: 'auto' }}
+                                                                            className="admin-order-details"
+                                                                        >
+                                                                            <div className="admin-order-grid">
+                                                                                <div className="admin-order-items">
+                                                                                    <h4 className="admin-detail-label">Order Items</h4>
+                                                                                    {o.orderItems.map((item, idx) => (
+                                                                                        <div key={idx} className="admin-order-item">
+                                                                                            <img src={item.image} alt={item.name} className="admin-order-item-thumb" />
+                                                                                            <div className="admin-order-item-info">
+                                                                                                <span className="admin-order-item-name">{item.name}</span>
+                                                                                                <span className="admin-order-item-meta">{item.size} · x{item.quantity}</span>
+                                                                                            </div>
+                                                                                            <span className="admin-order-item-price">${(item.price * item.quantity).toFixed(2)}</span>
+                                                                                        </div>
+                                                                                    ))}
+                                                                                </div>
+                                                                                <div className="admin-order-sidebar">
+                                                                                    <div className="admin-order-summary">
+                                                                                        <h4 className="admin-detail-label">Order Summary</h4>
+                                                                                        <div className="admin-summary-row"><span>Subtotal</span> <span>${o.itemsPrice?.toFixed(2)}</span></div>
+                                                                                        <div className="admin-summary-row"><span>Tax</span> <span>${o.taxPrice?.toFixed(2)}</span></div>
+                                                                                        <div className="admin-summary-row"><span>Shipping</span> <span>${o.shippingPrice?.toFixed(2)}</span></div>
+                                                                                        <div className="admin-summary-row admin-summary-total"><span>Total</span> <span>${o.totalPrice?.toFixed(2)}</span></div>
+                                                                                    </div>
+                                                                                    <div className="admin-order-address">
+                                                                                        <h4 className="admin-detail-label">Shipping Address</h4>
+                                                                                        <div className="admin-address-text">
+                                                                                            <p>{o.shippingAddress?.street}</p>
+                                                                                            <p>{o.shippingAddress?.city}, {o.shippingAddress?.state} {o.shippingAddress?.zipCode}</p>
+                                                                                            <p>{o.shippingAddress?.country}</p>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div className="admin-order-address">
+                                                                                        <h4 className="admin-detail-label">Payment</h4>
+                                                                                        <div className="admin-address-text">
+                                                                                            <p>Method: {o.paymentMethod.toUpperCase()}</p>
+                                                                                            <p>Status: {o.isPaid ? 'Paid' : 'Unpaid'}</p>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </motion.div>
+                                                                    </td>
+                                                                </tr>
+                                                            )}
+                                                        </React.Fragment>
                                                     ))}
                                                 </tbody>
                                             </table>
@@ -531,6 +624,12 @@ const AdminDashboard = () => {
                     )}
                 </div>
             </div>
+            <ProductModal
+                isOpen={isProductModalOpen}
+                onClose={() => setIsProductModalOpen(false)}
+                product={editingProduct}
+                onSave={handleSaveProduct}
+            />
         </>
     );
 };

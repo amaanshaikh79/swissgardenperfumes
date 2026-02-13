@@ -195,4 +195,59 @@
     .profile-form-row {
         grid-template-columns: 1fr;
     }
+
+    .orders-page,
+    .profile-page,
+    .wishlist-page,
+    .contact-page,
+    .about-page {
+        padding-top: 90px;
+    }
+
+    .page-title {
+        font-size: 1.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .order-card {
+        padding: var(--space-md);
+    }
+
+    .order-card-header {
+        flex-direction: column;
+        gap: var(--space-xs);
+    }
+
+    .order-number {
+        font-size: 0.95rem;
+    }
+
+    .order-item-mini {
+        gap: var(--space-sm);
+    }
+
+    .order-item-mini img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .profile-avatar {
+        width: 64px;
+        height: 64px;
+        font-size: 1.5rem;
+    }
+
+    .profile-main {
+        padding: var(--space-lg);
+    }
+
+    .profile-sidebar {
+        padding: var(--space-lg);
+    }
+
+    .page-title {
+        font-size: 1.4rem;
+        margin-bottom: var(--space-lg);
+    }
 }

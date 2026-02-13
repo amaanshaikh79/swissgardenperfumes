@@ -1,7 +1,7 @@
 {
-    "name": "goldberg-perfumes",
+    "name": "goldenbuck-perfumes",
     "version": "1.0.0",
-    "description": "GoldBerg Perfumes - Luxury Ecommerce Platform",
+    "description": "GoldenBuck Perfumes - Luxury Ecommerce Platform",
     "main": "server/server.js",
     "scripts": {
         "postinstall": "npm install --prefix server && npm install --prefix client && npm run build --prefix client",

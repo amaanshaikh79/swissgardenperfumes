@@ -94,7 +94,7 @@ const ProductDetail = () => {
     return (
         <>
             <Helmet>
-                <title>{product.name} | GoldBerg Perfumes</title>
+                <title>{product.name} | GoldenBuck Perfumes</title>
                 <meta name="description" content={product.shortDescription || product.description.slice(0, 160)} />
             </Helmet>
 

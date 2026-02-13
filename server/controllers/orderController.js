@@ -73,7 +73,7 @@ export const createOrder = async (req, res, next) => {
         // Send confirmation email (non-blocking)
         sendEmail({
             email: req.user.email,
-            subject: `Order Confirmed - ${order.orderNumber} | GoldBerg Perfumes`,
+            subject: `Order Confirmed - ${order.orderNumber} | GoldenBuck Perfumes`,
             html: orderConfirmationEmail(populatedOrder, req.user),
         }).catch((err) => console.error('Email send failed:', err));
 

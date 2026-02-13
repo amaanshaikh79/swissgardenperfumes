@@ -41,12 +41,12 @@ const Login = () => {
 
     return (
         <>
-            <Helmet><title>Sign In | GoldBerg Perfumes</title></Helmet>
+            <Helmet><title>Sign In | GoldenBuck Perfumes</title></Helmet>
             <div className="auth-page">
                 <motion.div className="auth-card" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                     <div className="auth-header">
                         <Link to="/" className="auth-logo">
-                            <span className="logo-text">GOLDBERG</span>
+                            <span className="logo-text">GOLDENBUCK</span>
                             <span className="logo-sub">PERFUMES</span>
                         </Link>
                         <h1 className="auth-title">Welcome Back</h1>
@@ -124,16 +124,16 @@ const Register = () => {
 
     return (
         <>
-            <Helmet><title>Create Account | GoldBerg Perfumes</title></Helmet>
+            <Helmet><title>Create Account | GoldenBuck Perfumes</title></Helmet>
             <div className="auth-page">
                 <motion.div className="auth-card" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                     <div className="auth-header">
                         <Link to="/" className="auth-logo">
-                            <span className="logo-text">GOLDBERG</span>
+                            <span className="logo-text">GOLDENBUCK</span>
                             <span className="logo-sub">PERFUMES</span>
                         </Link>
                         <h1 className="auth-title">Create Account</h1>
-                        <p className="auth-subtitle">Join the GoldBerg experience</p>
+                        <p className="auth-subtitle">Join the GoldenBuck experience</p>
                     </div>
 
                     <form className="auth-form" onSubmit={handleSubmit}>

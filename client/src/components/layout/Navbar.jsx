@@ -61,7 +61,7 @@ const Navbar = () => {
 
                     {/* Logo */}
                     <Link to="/" className="navbar-logo">
-                        <span className="logo-text">GOLDBERG</span>
+                        <span className="logo-text">GOLDENBUCK</span>
                         <span className="logo-sub">PERFUMES</span>
                     </Link>
 
