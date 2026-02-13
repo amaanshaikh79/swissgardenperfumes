@@ -183,7 +183,7 @@ const Navbar = () => {
                             transition={{ type: 'tween', duration: 0.3 }}
                         >
                             <div className="mobile-menu-header">
-                                <span className="logo-text">GOLDBERG</span>
+                                <span className="logo-text">GOLDENBUCK</span>
                                 <button onClick={() => setMobileOpen(false)}>
                                     <FiX size={22} />
                                 </button>

@@ -251,3 +251,18 @@
         margin-bottom: var(--space-lg);
     }
 }
+
+@media (max-width: 360px) {
+    .order-card-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+
+    .order-total {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+}

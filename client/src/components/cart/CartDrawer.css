@@ -129,8 +129,8 @@
 }
 
 .cart-qty-controls button {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -149,7 +149,8 @@
 .cart-qty-controls span {
     font-size: 0.85rem;
     font-weight: 600;
-    min-width: 24px;
+    font-weight: 600;
+    min-width: 32px;
     text-align: center;
     color: var(--text-primary);
 }

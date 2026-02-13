@@ -180,34 +180,35 @@
 
 @media (max-width: 480px) {
     .product-card-body {
-        padding: var(--space-sm) var(--space-md);
+        padding: var(--space-md) var(--space-sm);
     }
 
     .product-card-brand {
-        font-size: 0.58rem;
-        letter-spacing: 2px;
+        font-size: 0.7rem;
+        letter-spacing: 1.5px;
     }
 
     .product-card-name {
-        font-size: 0.88rem;
-        margin: 2px 0;
+        font-size: 0.95rem;
+        margin: 4px 0;
+        line-height: 1.25;
     }
 
     .product-card-category {
-        font-size: 0.7rem;
-        margin-bottom: 4px;
+        font-size: 0.75rem;
+        margin-bottom: 6px;
     }
 
     .product-card-current-price {
-        font-size: 1rem;
+        font-size: 1.1rem;
     }
 
     .product-card-compare-price {
-        font-size: 0.75rem;
+        font-size: 0.8rem;
     }
 
     .product-card-rating {
-        font-size: 0.7rem;
-        margin-bottom: 4px;
+        font-size: 0.75rem;
+        margin-bottom: 6px;
     }
 }
