@@ -382,7 +382,7 @@
     }
 
     .hero-content {
-        padding-top: 80px;
+        padding-top: 130px;
     }
 
     .hero-label {
@@ -430,7 +430,7 @@
 
 @media (max-width: 480px) {
     .hero-content {
-        padding-top: 70px;
+        padding-top: 120px;
     }
 
     .hero-title {
