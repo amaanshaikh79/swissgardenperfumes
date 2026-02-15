@@ -44,6 +44,9 @@ connectDB();
 
 const app = express();
 
+// Trust proxy for Render/Heroku load balancers
+app.set('trust proxy', 1);
+
 // ─── Security Middleware ────────────────────────────────────────
 app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
