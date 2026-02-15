@@ -12,6 +12,16 @@ if (!process.env.JWT_SECRET) {
     process.env.JWT_SECRET = 'fallback_secret_for_dev_deployment_only_123';
 }
 
+if (!process.env.JWT_EXPIRE) {
+    console.warn('WARNING: JWT_EXPIRE is not defined. Using default 30d.');
+    process.env.JWT_EXPIRE = '30d';
+}
+
+if (!process.env.JWT_COOKIE_EXPIRE) {
+    console.warn('WARNING: JWT_COOKIE_EXPIRE is not defined. Using default 30.');
+    process.env.JWT_COOKIE_EXPIRE = '30';
+}
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
