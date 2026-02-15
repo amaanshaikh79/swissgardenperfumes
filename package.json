@@ -4,7 +4,9 @@
     "description": "GoldenBuck Perfumes - Luxury Ecommerce Platform",
     "main": "server/server.js",
     "scripts": {
-        "postinstall": "npm install --prefix server && npm install --prefix client && npm run build --prefix client",
+        "install": "npm install --prefix server && npm install --prefix client",
+        "build": "npm install --prefix server && npm install --prefix client && npm run build --prefix client",
+        "postinstall": "npm run build",
         "start": "node server/server.js"
     },
     "engines": {
