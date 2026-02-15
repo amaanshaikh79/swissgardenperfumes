@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
-import { FiArrowRight, FiStar, FiTruck, FiShield, FiGift } from 'react-icons/fi';
+import {
+    FiArrowRight, FiStar, FiCheck, FiShield, FiClock,
+    FiTruck, FiDroplet, FiHeart, FiSend, FiPhoneCall
+} from 'react-icons/fi';
 import ProductCard from '../components/product/ProductCard';
 import { productsAPI } from '../services/api';
 import './Home.css';
@@ -10,6 +13,8 @@ import './Home.css';
 const Home = () => {
     const [featured, setFeatured] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [email, setEmail] = useState('');
+    const [emailSubmitted, setEmailSubmitted] = useState(false);
 
     useEffect(() => {
         const fetchFeatured = async () => {
@@ -25,116 +30,156 @@ const Home = () => {
         fetchFeatured();
     }, []);
 
-    const perks = [
-        { icon: <FiTruck size={24} />, title: 'Free Shipping', desc: 'On orders over $200' },
-        { icon: <FiShield size={24} />, title: 'Authenticity', desc: '100% genuine products' },
-        { icon: <FiGift size={24} />, title: 'Luxury Packaging', desc: 'Gift-ready presentation' },
-        { icon: <FiStar size={24} />, title: 'Exclusive Access', desc: 'Limited edition releases' },
+    const handleEmailSubmit = (e) => {
+        e.preventDefault();
+        if (email.trim()) {
+            setEmailSubmitted(true);
+            setEmail('');
+            setTimeout(() => setEmailSubmitted(false), 5000);
+        }
+    };
+
+    const categories = [
+        { name: 'For Him', emoji: '🧔', link: '/shop?gender=Men', desc: 'Bold & commanding' },
+        { name: 'For Her', emoji: '👩', link: '/shop?gender=Women', desc: 'Elegant & graceful' },
+        { name: 'Unisex', emoji: '✨', link: '/shop?gender=Unisex', desc: 'For everyone' },
+        { name: 'Office', emoji: '💼', link: '/shop?occasion=Office', desc: 'Professional charm' },
+        { name: 'Date Night', emoji: '🌙', link: '/shop?occasion=Date Night', desc: 'Irresistible allure' },
+        { name: 'Party', emoji: '🎉', link: '/shop?occasion=Party', desc: 'Life of the party' },
+        { name: 'Oud Collection', emoji: '🏺', link: '/shop?fragranceFamily=Oriental', desc: 'Rich & exotic' },
+    ];
+
+    const comparisonItems = [
+        { designer: '₹7,500 – ₹12,000', ours: '₹499 – ₹1,299', label: 'Price' },
+        { designer: 'Imported pricing', ours: 'Indian optimized', label: 'Pricing Model' },
+        { designer: '~20% oil concentration', ours: 'High concentration oils', label: 'Concentration' },
+        { designer: 'Expensive branding', ours: 'Smart pricing', label: 'Value' },
+    ];
+
+    const combos = [
+        {
+            title: 'Buy 2, Save ₹200',
+            desc: 'Pick any 2 fragrances and save instantly',
+            savings: '₹200',
+            tag: 'Most Popular',
+            link: '/shop?tag=combo',
+        },
+        {
+            title: 'Buy 3, Save ₹400',
+            desc: 'Build your collection with bigger savings',
+            savings: '₹400',
+            tag: 'Best Value',
+            link: '/shop?tag=combo',
+        },
+        {
+            title: 'Gift Sets',
+            desc: 'Ready-wrapped premium gift sets',
+            savings: 'From ₹999',
+            tag: 'Gift Ready',
+            link: '/shop?category=Gift Set',
+        },
+    ];
+
+    const reviews = [
+        {
+            name: 'Rahul S.',
+            location: 'Mumbai',
+            rating: 5,
+            text: 'Honestly shocked at the quality for this price. The oud one lasts 10+ hours on me. Already ordered 3 more.',
+            tag: 'Repeat Buyer',
+        },
+        {
+            name: 'Priya M.',
+            location: 'Delhi',
+            rating: 5,
+            text: 'Got the combo deal — best decision ever. My friends thought I was wearing a designer brand! 🤫',
+            tag: 'Most Helpful',
+        },
+        {
+            name: 'Arjun K.',
+            location: 'Bangalore',
+            rating: 5,
+            text: 'COD made it easy to try. Now I\'m a regular. The date night one is literally a compliment magnet.',
+            tag: 'Verified Purchase',
+        },
+        {
+            name: 'Sneha R.',
+            location: 'Hyderabad',
+            rating: 4,
+            text: 'The scent profile is incredibly close to the inspirations. Amazing value for the quality — reordered within a week!',
+            tag: 'Verified Purchase',
+        },
+    ];
+
+    const trustFeatures = [
+        { icon: <FiClock size={28} />, title: '8–10 Hr Lasting', desc: 'High oil concentration formula' },
+        { icon: <FiDroplet size={28} />, title: 'Skin Safe', desc: 'Dermatologically tested' },
+        { icon: <FiTruck size={28} />, title: 'COD Available', desc: 'Cash on delivery pan-India' },
+        { icon: <FiShield size={28} />, title: 'Secure Payments', desc: 'UPI, Cards, Net Banking' },
+        { icon: <FiPhoneCall size={28} />, title: '7 Day Support', desc: 'WhatsApp + Phone support' },
     ];
 
     return (
         <>
             <Helmet>
-                <title>GoldenBuck Perfumes — Luxury Fragrances | Home</title>
-                <meta name="description" content="Discover exquisite luxury fragrances crafted for the discerning connoisseur. GoldenBuck Perfumes — where every scent tells a story." />
+                <title>ScentGold — Luxury Inspired Scents at Smart Prices | India</title>
+                <meta name="description" content="Premium fragrance profiles inspired by iconic scents — crafted for everyday wear in India. Shop bestsellers from ₹499. COD Available. 8–10 hour lasting." />
             </Helmet>
 
             {/* ─── Hero Section ──────────────────────────────────── */}
             <section className="hero">
-                <div className="hero-bg" />
-                <div className="hero-particles">
-                    {[...Array(20)].map((_, i) => (
-                        <div key={i} className="particle" style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            animationDelay: `${Math.random() * 5}s`,
-                            animationDuration: `${3 + Math.random() * 4}s`,
-                        }} />
-                    ))}
-                </div>
-                <div className="container hero-content">
+                <div className="container">
                     <motion.div
-                        className="hero-text"
-                        initial={{ opacity: 0, y: 40 }}
+                        className="hero-content"
+                        initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
+                        transition={{ duration: 0.6 }}
                     >
-                        <span className="hero-label">The Art of Perfumery</span>
+                        <span className="hero-badge">🇮🇳 Made in India</span>
                         <h1 className="hero-title">
-                            Discover Your
-                            <span className="hero-title-accent"> Signature </span>
-                            Scent
+                            Luxury Inspired Scents.
+                            <br />
+                            <span className="hero-title-accent">Smart Prices.</span>
                         </h1>
                         <p className="hero-subtitle">
-                            Immerse yourself in a world of exquisite luxury fragrances,
-                            meticulously crafted from the finest ingredients sourced across the globe.
+                            Premium fragrance profiles inspired by iconic scents — crafted for everyday wear in India.
                         </p>
                         <div className="hero-buttons">
                             <Link to="/shop" className="btn btn-primary btn-lg">
-                                Explore Collection <FiArrowRight size={16} />
+                                Shop Now <FiArrowRight size={16} />
                             </Link>
-                            <Link to="/about" className="btn btn-outline btn-lg">
-                                Our Story
+                            <Link to="/shop?tag=combo" className="btn btn-outline btn-lg">
+                                Explore Combos
                             </Link>
                         </div>
-                    </motion.div>
-
-                    <motion.div
-                        className="hero-visual"
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 1, delay: 0.3 }}
-                    >
-                        <div className="hero-image-wrapper">
-                            <img
-                                src="https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&q=80"
-                                alt="Luxury Perfume"
-                                className="hero-image"
-                            />
-                            <div className="hero-image-glow" />
+                        <div className="hero-price-tag">
+                            Starting at <span className="hero-price">₹499</span>
                         </div>
                     </motion.div>
                 </div>
 
-                <div className="hero-scroll-indicator">
-                    <div className="scroll-line" />
-                </div>
-            </section>
-
-            {/* ─── Perks Strip ───────────────────────────────────── */}
-            <section className="perks-section">
-                <div className="container">
-                    <div className="perks-grid">
-                        {perks.map((perk, i) => (
-                            <motion.div
-                                key={perk.title}
-                                className="perk-item"
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.1 }}
-                            >
-                                <div className="perk-icon">{perk.icon}</div>
-                                <div>
-                                    <h4 className="perk-title">{perk.title}</h4>
-                                    <p className="perk-desc">{perk.desc}</p>
-                                </div>
-                            </motion.div>
-                        ))}
+                {/* Trust Strip */}
+                <div className="hero-trust-strip">
+                    <div className="container">
+                        <div className="trust-strip">
+                            <span className="trust-strip-item"><FiTruck size={14} /> COD Available</span>
+                            <span className="trust-strip-divider" />
+                            <span className="trust-strip-item"><FiClock size={14} /> 8–10 Hr Lasting</span>
+                            <span className="trust-strip-divider" />
+                            <span className="trust-strip-item">🇮🇳 Made in India</span>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* ─── Featured Products ─────────────────────────────── */}
-            <section className="section">
+            {/* ─── Bestsellers Section ─────────────────────────────── */}
+            <section className="section" id="bestsellers">
                 <div className="container">
                     <div className="section-header">
-                        <span className="section-label">Curated Selection</span>
-                        <h2 className="section-title">Featured Fragrances</h2>
-                        <div className="gold-divider" />
+                        <span className="section-label">Most Loved</span>
+                        <h2 className="section-title">Bestsellers</h2>
                         <p className="section-subtitle">
-                            Discover our most coveted creations — masterfully blended compositions
-                            that embody luxury, elegance, and timeless sophistication.
+                            Our most reordered scents — trusted by thousands of smart buyers across India.
                         </p>
                     </div>
 
@@ -144,7 +189,7 @@ const Home = () => {
                         </div>
                     ) : (
                         <div className="grid-products">
-                            {featured.slice(0, 8).map((product, i) => (
+                            {featured.slice(0, 4).map((product, i) => (
                                 <ProductCard key={product._id} product={product} index={i} />
                             ))}
                         </div>
@@ -158,82 +203,27 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* ─── Brand Story Section ───────────────────────────── */}
-            <section className="story-section">
-                <div className="container">
-                    <div className="story-grid">
-                        <motion.div
-                            className="story-image"
-                            initial={{ opacity: 0, x: -40 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.7 }}
-                        >
-                            <img
-                                src="https://images.unsplash.com/photo-1615634260167-c8cdede054de?w=600&q=80"
-                                alt="The Art of Perfumery"
-                            />
-                        </motion.div>
-                        <motion.div
-                            className="story-content"
-                            initial={{ opacity: 0, x: 40 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.7 }}
-                        >
-                            <span className="section-label">Our Heritage</span>
-                            <h2 className="section-title" style={{ textAlign: 'left' }}>
-                                A Legacy of Luxury
-                            </h2>
-                            <div className="gold-divider" style={{ margin: '1.5rem 0' }} />
-                            <p className="story-text">
-                                Since 1987, GoldenBuck Perfumes has been at the forefront of luxury fragrance creation.
-                                Our master perfumers travel the world to source the rarest ingredients — from the ancient
-                                oud forests of Laos to the rose fields of Grasse, France.
-                            </p>
-                            <p className="story-text">
-                                Each fragrance in our collection is a work of art, painstakingly composed over months to
-                                achieve perfect harmony between notes. We believe that scent is the most intimate form
-                                of self-expression — a silent signature that speaks volumes.
-                            </p>
-                            <Link to="/about" className="btn btn-outline">
-                                Discover Our Story <FiArrowRight size={14} />
-                            </Link>
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
-
-            {/* ─── Categories ────────────────────────────────────── */}
-            <section className="section">
+            {/* ─── Shop by Category ───────────────────────────────── */}
+            <section className="section section-gray">
                 <div className="container">
                     <div className="section-header">
                         <span className="section-label">Collections</span>
                         <h2 className="section-title">Shop by Category</h2>
-                        <div className="gold-divider" />
                     </div>
                     <div className="categories-grid">
-                        {[
-                            { name: 'For Her', image: 'https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=400&q=80', link: '/shop?gender=Women' },
-                            { name: 'For Him', image: 'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=400&q=80', link: '/shop?gender=Men' },
-                            { name: 'Gift Sets', image: 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=400&q=80', link: '/shop?category=Gift Set' },
-                            { name: 'Unisex', image: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=400&q=80', link: '/shop?gender=Unisex' },
-                        ].map((cat, i) => (
+                        {categories.map((cat, i) => (
                             <motion.div
                                 key={cat.name}
-                                initial={{ opacity: 0, y: 30 }}
+                                initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: i * 0.1 }}
+                                transition={{ delay: i * 0.06 }}
                             >
-                                <Link to={cat.link} className="category-card">
-                                    <img src={cat.image} alt={cat.name} />
-                                    <div className="category-card-overlay">
-                                        <h3 className="category-card-title">{cat.name}</h3>
-                                        <span className="category-card-cta">
-                                            Shop Now <FiArrowRight size={14} />
-                                        </span>
-                                    </div>
+                                <Link to={cat.link} className="category-tile">
+                                    <span className="category-tile-emoji">{cat.emoji}</span>
+                                    <h3 className="category-tile-name">{cat.name}</h3>
+                                    <p className="category-tile-desc">{cat.desc}</p>
+                                    <FiArrowRight className="category-tile-arrow" size={16} />
                                 </Link>
                             </motion.div>
                         ))}
@@ -241,30 +231,211 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* ─── Newsletter ────────────────────────────────────── */}
-            <section className="newsletter-section">
+            {/* ─── Comparison Section (High Conversion) ───────────── */}
+            <section className="section comparison-section">
+                <div className="container">
+                    <div className="section-header">
+                        <span className="section-label">Smart Comparison</span>
+                        <h2 className="section-title">Why Pay ₹8,000?</h2>
+                        <p className="section-subtitle">
+                            Same quality fragrance profiles. Fraction of the price. Made for India.
+                        </p>
+                    </div>
+
+                    <div className="comparison-table">
+                        <div className="comparison-header">
+                            <div className="comparison-label-col"></div>
+                            <div className="comparison-col comparison-col--designer">
+                                <span className="comparison-col-title">Designer Brands</span>
+                            </div>
+                            <div className="comparison-col comparison-col--ours">
+                                <span className="comparison-col-title">ScentGold ✨</span>
+                            </div>
+                        </div>
+                        {comparisonItems.map((item, i) => (
+                            <motion.div
+                                key={item.label}
+                                className="comparison-row"
+                                initial={{ opacity: 0, x: -20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.1 }}
+                            >
+                                <div className="comparison-label-col">
+                                    <span className="comparison-label">{item.label}</span>
+                                </div>
+                                <div className="comparison-col comparison-col--designer">
+                                    <span className="comparison-value comparison-value--bad">{item.designer}</span>
+                                </div>
+                                <div className="comparison-col comparison-col--ours">
+                                    <span className="comparison-value comparison-value--good">
+                                        <FiCheck size={14} /> {item.ours}
+                                    </span>
+                                </div>
+                            </motion.div>
+                        ))}
+                        <div className="comparison-cta">
+                            <Link to="/shop" className="btn btn-primary btn-lg">
+                                Shop Smart Now <FiArrowRight size={16} />
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── Combo Deals Section ─────────────────────────────── */}
+            <section className="section section-gray" id="combos">
+                <div className="container">
+                    <div className="section-header">
+                        <span className="section-label">Save More</span>
+                        <h2 className="section-title">Combo Deals</h2>
+                        <p className="section-subtitle">
+                            Build your fragrance collection and save big. More you buy, more you save.
+                        </p>
+                    </div>
+                    <div className="combos-grid">
+                        {combos.map((combo, i) => (
+                            <motion.div
+                                key={combo.title}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.1 }}
+                            >
+                                <Link to={combo.link} className="combo-card">
+                                    <span className="combo-tag">{combo.tag}</span>
+                                    <h3 className="combo-title">{combo.title}</h3>
+                                    <p className="combo-desc">{combo.desc}</p>
+                                    <div className="combo-savings">
+                                        <span className="combo-savings-label">SAVE</span>
+                                        <span className="combo-savings-amount">{combo.savings}</span>
+                                    </div>
+                                    <span className="combo-cta">
+                                        Shop Now <FiArrowRight size={14} />
+                                    </span>
+                                </Link>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── Social Proof Section ────────────────────────────── */}
+            <section className="section" id="reviews">
+                <div className="container">
+                    <div className="section-header">
+                        <div className="rating-display">
+                            <span className="rating-number">4.7</span>
+                            <div className="rating-stars">
+                                {[1, 2, 3, 4, 5].map((s) => (
+                                    <FiStar key={s} size={18} fill={s <= 4 ? 'currentColor' : 'none'} />
+                                ))}
+                            </div>
+                            <span className="rating-count">2,400+ Reviews</span>
+                        </div>
+                        <h2 className="section-title">What Customers Say</h2>
+                        <div className="reorder-tag">
+                            <FiHeart size={14} /> Most Reordered Scents
+                        </div>
+                    </div>
+
+                    <div className="reviews-grid">
+                        {reviews.map((review, i) => (
+                            <motion.div
+                                key={i}
+                                className="review-card"
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.08 }}
+                            >
+                                <div className="review-card-top">
+                                    <div className="review-stars">
+                                        {[1, 2, 3, 4, 5].map((s) => (
+                                            <FiStar
+                                                key={s}
+                                                size={14}
+                                                fill={s <= review.rating ? 'currentColor' : 'none'}
+                                            />
+                                        ))}
+                                    </div>
+                                    <span className="review-tag">{review.tag}</span>
+                                </div>
+                                <p className="review-text">"{review.text}"</p>
+                                <div className="review-author">
+                                    <div className="review-avatar">
+                                        {review.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <span className="review-name">{review.name}</span>
+                                        <span className="review-location">{review.location}</span>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── Trust Section ───────────────────────────────────── */}
+            <section className="section section-dark">
+                <div className="container">
+                    <div className="trust-grid">
+                        {trustFeatures.map((feature, i) => (
+                            <motion.div
+                                key={feature.title}
+                                className="trust-feature"
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.08 }}
+                            >
+                                <div className="trust-feature-icon">{feature.icon}</div>
+                                <h4 className="trust-feature-title">{feature.title}</h4>
+                                <p className="trust-feature-desc">{feature.desc}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── Email Capture Section ───────────────────────────── */}
+            <section className="section email-capture-section">
                 <div className="container">
                     <motion.div
-                        className="newsletter-content"
+                        className="email-capture"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                     >
-                        <span className="section-label">Stay Connected</span>
-                        <h2 className="section-title">Join the GoldenBuck Circle</h2>
-                        <p className="section-subtitle">
-                            Be the first to discover new launches, exclusive offers, and the stories behind our most coveted creations.
+                        <span className="email-capture-badge">🎁 EXCLUSIVE OFFER</span>
+                        <h2 className="email-capture-title">
+                            Get <span className="email-capture-highlight">10% OFF</span> Your First Order
+                        </h2>
+                        <p className="email-capture-desc">
+                            Join 15,000+ smart fragrance lovers. Get exclusive deals, early access & more.
                         </p>
-                        <form className="newsletter-form" onSubmit={(e) => e.preventDefault()}>
-                            <input
-                                type="email"
-                                className="newsletter-input"
-                                placeholder="Enter your email address"
-                            />
-                            <button type="submit" className="btn btn-primary">
-                                Subscribe
-                            </button>
-                        </form>
+                        {emailSubmitted ? (
+                            <div className="email-capture-success">
+                                <FiCheck size={20} />
+                                <span>Welcome! Check your email for your 10% discount code.</span>
+                            </div>
+                        ) : (
+                            <form className="email-capture-form" onSubmit={handleEmailSubmit}>
+                                <input
+                                    type="email"
+                                    className="email-capture-input"
+                                    placeholder="Enter your email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                                <button type="submit" className="btn btn-primary">
+                                    Get 10% Off <FiSend size={14} />
+                                </button>
+                            </form>
+                        )}
+                        <p className="email-capture-privacy">No spam. Unsubscribe anytime.</p>
                     </motion.div>
                 </div>
             </section>

@@ -6,34 +6,37 @@ import { Toaster } from 'react-hot-toast';
 import App from './App';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
-import { ThemeProvider } from './context/ThemeContext';
 import './styles/index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <HelmetProvider>
             <BrowserRouter>
-                <ThemeProvider>
-                    <AuthProvider>
-                        <CartProvider>
-                            <App />
-                            <Toaster
-                                position="top-right"
-                                toastOptions={{
-                                    duration: 3000,
-                                    style: {
-                                        background: '#1a1a2e',
-                                        color: '#fff',
-                                        border: '1px solid rgba(212, 175, 55, 0.3)',
-                                    },
-                                    success: {
-                                        iconTheme: { primary: '#D4AF37', secondary: '#1a1a2e' },
-                                    },
-                                }}
-                            />
-                        </CartProvider>
-                    </AuthProvider>
-                </ThemeProvider>
+                <AuthProvider>
+                    <CartProvider>
+                        <App />
+                        <Toaster
+                            position="top-center"
+                            toastOptions={{
+                                duration: 2500,
+                                style: {
+                                    background: '#111111',
+                                    color: '#fff',
+                                    borderRadius: '8px',
+                                    fontSize: '0.85rem',
+                                    fontWeight: '500',
+                                    padding: '12px 20px',
+                                },
+                                success: {
+                                    iconTheme: { primary: '#22C55E', secondary: '#111' },
+                                },
+                                error: {
+                                    iconTheme: { primary: '#EF4444', secondary: '#111' },
+                                },
+                            }}
+                        />
+                    </CartProvider>
+                </AuthProvider>
             </BrowserRouter>
         </HelmetProvider>
     </React.StrictMode>

@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiShoppingBag, FiHeart, FiUser, FiMenu, FiX, FiSun, FiMoon, FiSearch, FiLogOut, FiGrid } from 'react-icons/fi';
+import { FiSearch, FiUser, FiShoppingBag, FiMenu, FiX, FiChevronDown, FiLogOut, FiGrid, FiPackage, FiHeart } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
-import { useTheme } from '../../context/ThemeContext';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -12,14 +11,15 @@ const Navbar = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
+    const shopDropdownRef = useRef(null);
     const { user, isAuthenticated, isAdmin, logout } = useAuth();
     const { cartCount, setIsCartOpen } = useCart();
-    const { isDark, toggleTheme } = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
 
     useEffect(() => {
-        const handleScroll = () => setScrolled(window.scrollY > 50);
+        const handleScroll = () => setScrolled(window.scrollY > 30);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
@@ -27,7 +27,18 @@ const Navbar = () => {
     useEffect(() => {
         setMobileOpen(false);
         setSearchOpen(false);
+        setShopDropdownOpen(false);
     }, [location]);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (shopDropdownRef.current && !shopDropdownRef.current.contains(e.target)) {
+                setShopDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -44,14 +55,46 @@ const Navbar = () => {
     };
 
     const navLinks = [
-        { to: '/', label: 'Home' },
-        { to: '/shop', label: 'Shop' },
+        { to: '/shop', label: 'Shop', hasDropdown: true },
+        { to: '/shop?tag=bestseller', label: 'Bestsellers' },
+        { to: '/shop?gender=Men', label: 'For Him' },
+        { to: '/shop?gender=Women', label: 'For Her' },
+        { to: '/shop?tag=combo', label: 'Combo Deals' },
         { to: '/about', label: 'About' },
-        { to: '/contact', label: 'Contact' },
     ];
+
+    const shopCategories = {
+        'By Gender': [
+            { label: 'For Him', to: '/shop?gender=Men' },
+            { label: 'For Her', to: '/shop?gender=Women' },
+            { label: 'Unisex', to: '/shop?gender=Unisex' },
+        ],
+        'By Type': [
+            { label: 'Eau De Parfum', to: '/shop?category=Eau de Parfum' },
+            { label: 'Attar Roll-On', to: '/shop?category=Parfum' },
+        ],
+        'By Occasion': [
+            { label: 'Office', to: '/shop?occasion=Office' },
+            { label: 'Date Night', to: '/shop?occasion=Date Night' },
+            { label: 'Party', to: '/shop?occasion=Party' },
+            { label: 'Daily Wear', to: '/shop?occasion=Day' },
+        ],
+        'By Price': [
+            { label: 'Under ₹499', to: '/shop?maxPrice=499' },
+            { label: '₹500 – ₹999', to: '/shop?minPrice=500&maxPrice=999' },
+            { label: '₹1,000+', to: '/shop?minPrice=1000' },
+        ],
+    };
 
     return (
         <>
+            {/* Announcement Bar */}
+            <div className="announcement-bar">
+                <div className="container">
+                    <p>🎉 <strong>FREE SHIPPING</strong> on orders above ₹999 &nbsp;|&nbsp; COD Available across India</p>
+                </div>
+            </div>
+
             <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}>
                 <div className="navbar-container">
                     {/* Mobile Menu Toggle */}
@@ -61,20 +104,65 @@ const Navbar = () => {
 
                     {/* Logo */}
                     <Link to="/" className="navbar-logo">
-                        <span className="logo-text">GOLDENBUCK</span>
-                        <span className="logo-sub">PERFUMES</span>
+                        <span className="logo-text">SCENTGOLD</span>
+                        <span className="logo-sub">Premium Fragrances</span>
                     </Link>
 
                     {/* Desktop Nav Links */}
                     <div className="navbar-links">
                         {navLinks.map((link) => (
-                            <Link
-                                key={link.to}
-                                to={link.to}
-                                className={`navbar-link ${location.pathname === link.to ? 'active' : ''}`}
-                            >
-                                {link.label}
-                            </Link>
+                            link.hasDropdown ? (
+                                <div key={link.to} className="navbar-link-wrapper" ref={shopDropdownRef}>
+                                    <button
+                                        className={`navbar-link ${location.pathname === '/shop' ? 'active' : ''}`}
+                                        onClick={() => setShopDropdownOpen(!shopDropdownOpen)}
+                                    >
+                                        {link.label} <FiChevronDown size={14} />
+                                    </button>
+                                    <AnimatePresence>
+                                        {shopDropdownOpen && (
+                                            <motion.div
+                                                className="shop-mega-dropdown"
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: 10 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                {Object.entries(shopCategories).map(([group, items]) => (
+                                                    <div key={group} className="mega-dropdown-column">
+                                                        <h4 className="mega-dropdown-heading">{group}</h4>
+                                                        {items.map((item) => (
+                                                            <Link
+                                                                key={item.label}
+                                                                to={item.to}
+                                                                className="mega-dropdown-link"
+                                                            >
+                                                                {item.label}
+                                                            </Link>
+                                                        ))}
+                                                    </div>
+                                                ))}
+                                                <div className="mega-dropdown-column mega-dropdown-cta">
+                                                    <div className="mega-cta-box">
+                                                        <span className="mega-cta-label">🔥 Trending</span>
+                                                        <h4>Buy 2, Save ₹200</h4>
+                                                        <p>Build your combo & save big</p>
+                                                        <Link to="/shop?tag=combo" className="btn btn-primary btn-sm">Shop Combos</Link>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            ) : (
+                                <Link
+                                    key={link.to}
+                                    to={link.to}
+                                    className={`navbar-link ${location.pathname + location.search === link.to ? 'active' : ''}`}
+                                >
+                                    {link.label}
+                                </Link>
+                            )
                         ))}
                     </div>
 
@@ -82,21 +170,6 @@ const Navbar = () => {
                     <div className="navbar-actions">
                         <button className="navbar-action-btn" onClick={() => setSearchOpen(!searchOpen)} aria-label="Search">
                             <FiSearch size={18} />
-                        </button>
-
-                        <button className="navbar-action-btn" onClick={toggleTheme} aria-label="Toggle theme">
-                            {isDark ? <FiSun size={18} /> : <FiMoon size={18} />}
-                        </button>
-
-                        {isAuthenticated && (
-                            <Link to="/wishlist" className="navbar-action-btn" aria-label="Wishlist">
-                                <FiHeart size={18} />
-                            </Link>
-                        )}
-
-                        <button className="navbar-action-btn cart-btn" onClick={() => setIsCartOpen(true)} aria-label="Cart">
-                            <FiShoppingBag size={18} />
-                            {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
                         </button>
 
                         {isAuthenticated ? (
@@ -114,7 +187,10 @@ const Navbar = () => {
                                         <FiUser size={14} /> My Profile
                                     </Link>
                                     <Link to="/orders" className="user-dropdown-item">
-                                        <FiShoppingBag size={14} /> My Orders
+                                        <FiPackage size={14} /> My Orders
+                                    </Link>
+                                    <Link to="/wishlist" className="user-dropdown-item">
+                                        <FiHeart size={14} /> Wishlist
                                     </Link>
                                     {isAdmin && (
                                         <Link to="/admin" className="user-dropdown-item">
@@ -128,15 +204,20 @@ const Navbar = () => {
                                 </div>
                             </div>
                         ) : (
-                            <Link to="/login" className="btn btn-outline btn-sm navbar-login-btn">
-                                Sign In
+                            <Link to="/login" className="navbar-action-btn" aria-label="Account">
+                                <FiUser size={18} />
                             </Link>
                         )}
+
+                        <button className="navbar-action-btn cart-btn" onClick={() => setIsCartOpen(true)} aria-label="Cart">
+                            <FiShoppingBag size={18} />
+                            {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+                        </button>
                     </div>
                 </div>
             </nav>
 
-            {/* Search Bar Overlay */}
+            {/* Search Overlay */}
             <AnimatePresence>
                 {searchOpen && (
                     <motion.div
@@ -144,14 +225,14 @@ const Navbar = () => {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.3 }}
+                        transition={{ duration: 0.25 }}
                     >
                         <form className="search-form" onSubmit={handleSearch}>
                             <FiSearch size={20} className="search-icon" />
                             <input
                                 type="text"
                                 className="search-input"
-                                placeholder="Search luxury fragrances..."
+                                placeholder="Search fragrances..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 autoFocus
@@ -183,23 +264,41 @@ const Navbar = () => {
                             transition={{ type: 'tween', duration: 0.3 }}
                         >
                             <div className="mobile-menu-header">
-                                <span className="logo-text">GOLDENBUCK</span>
+                                <span className="logo-text">SCENTGOLD</span>
                                 <button onClick={() => setMobileOpen(false)}>
                                     <FiX size={22} />
                                 </button>
                             </div>
                             <div className="mobile-menu-links">
-                                {navLinks.map((link) => (
-                                    <Link key={link.to} to={link.to} className="mobile-menu-link">
-                                        {link.label}
-                                    </Link>
-                                ))}
+                                <Link to="/shop" className="mobile-menu-link">Shop All</Link>
+                                <Link to="/shop?tag=bestseller" className="mobile-menu-link">Bestsellers</Link>
+                                <Link to="/shop?gender=Men" className="mobile-menu-link">For Him</Link>
+                                <Link to="/shop?gender=Women" className="mobile-menu-link">For Her</Link>
+                                <Link to="/shop?gender=Unisex" className="mobile-menu-link">Unisex</Link>
+                                <Link to="/shop?tag=combo" className="mobile-menu-link mobile-menu-link--highlight">
+                                    🔥 Combo Deals
+                                </Link>
+                                <div className="mobile-menu-divider" />
+                                <Link to="/about" className="mobile-menu-link">About Us</Link>
+                                <Link to="/contact" className="mobile-menu-link">Contact</Link>
                                 {isAuthenticated && (
                                     <>
-                                        <Link to="/profile" className="mobile-menu-link">Profile</Link>
-                                        <Link to="/orders" className="mobile-menu-link">Orders</Link>
+                                        <div className="mobile-menu-divider" />
+                                        <Link to="/profile" className="mobile-menu-link">My Profile</Link>
+                                        <Link to="/orders" className="mobile-menu-link">My Orders</Link>
                                         <Link to="/wishlist" className="mobile-menu-link">Wishlist</Link>
-                                        {isAdmin && <Link to="/admin" className="mobile-menu-link">Admin</Link>}
+                                        {isAdmin && <Link to="/admin" className="mobile-menu-link">Admin Dashboard</Link>}
+                                        <button className="mobile-menu-link mobile-logout-btn" onClick={handleLogout}>
+                                            Logout
+                                        </button>
+                                    </>
+                                )}
+                                {!isAuthenticated && (
+                                    <>
+                                        <div className="mobile-menu-divider" />
+                                        <Link to="/login" className="btn btn-primary btn-block mobile-menu-cta">
+                                            Sign In / Register
+                                        </Link>
                                     </>
                                 )}
                             </div>

@@ -72,9 +72,20 @@ export const CartProvider = ({ children }) => {
 
     const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
     const cartTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-    const taxAmount = Math.round(cartTotal * 0.08 * 100) / 100;
-    const shippingAmount = cartTotal > 200 ? 0 : 15;
-    const orderTotal = Math.round((cartTotal + taxAmount + shippingAmount) * 100) / 100;
+
+    // Indian pricing: GST 18% included in product price, no separate tax
+    // Free shipping above ₹999, else ₹49 flat
+    const shippingAmount = cartTotal >= 999 ? 0 : 49;
+
+    // Calculate combo discount
+    const getComboDiscount = () => {
+        if (cartCount >= 3) return 400;
+        if (cartCount >= 2) return 200;
+        return 0;
+    };
+
+    const comboDiscount = getComboDiscount();
+    const orderTotal = Math.max(0, cartTotal - comboDiscount + shippingAmount);
 
     return (
         <CartContext.Provider
@@ -88,8 +99,8 @@ export const CartProvider = ({ children }) => {
                 clearCart,
                 cartCount,
                 cartTotal,
-                taxAmount,
                 shippingAmount,
+                comboDiscount,
                 orderTotal,
             }}
         >

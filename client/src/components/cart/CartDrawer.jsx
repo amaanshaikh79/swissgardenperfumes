@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiX, FiMinus, FiPlus, FiTrash2, FiShoppingBag } from 'react-icons/fi';
+import { FiX, FiMinus, FiPlus, FiTrash2, FiShoppingBag, FiTag } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import './CartDrawer.css';
@@ -13,6 +13,9 @@ const CartDrawer = () => {
         updateQuantity,
         cartTotal,
         cartCount,
+        shippingAmount,
+        comboDiscount,
+        orderTotal,
     } = useCart();
     const navigate = useNavigate();
 
@@ -37,12 +40,12 @@ const CartDrawer = () => {
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
-                        transition={{ type: 'tween', duration: 0.35 }}
+                        transition={{ type: 'tween', duration: 0.3 }}
                     >
                         <div className="cart-header">
                             <h3 className="cart-title">
-                                <FiShoppingBag size={20} />
-                                Shopping Bag ({cartCount})
+                                <FiShoppingBag size={18} />
+                                Cart ({cartCount})
                             </h3>
                             <button className="cart-close" onClick={() => setIsCartOpen(false)}>
                                 <FiX size={22} />
@@ -52,19 +55,40 @@ const CartDrawer = () => {
                         {cartItems.length === 0 ? (
                             <div className="cart-empty">
                                 <FiShoppingBag size={48} />
-                                <p>Your bag is empty</p>
+                                <p className="cart-empty-title">Your cart is empty</p>
+                                <p className="cart-empty-desc">Add items to start building your collection</p>
                                 <button
-                                    className="btn btn-outline"
+                                    className="btn btn-primary"
                                     onClick={() => {
                                         setIsCartOpen(false);
                                         navigate('/shop');
                                     }}
                                 >
-                                    Explore Fragrances
+                                    Shop Now
                                 </button>
                             </div>
                         ) : (
                             <>
+                                {/* Combo upsell */}
+                                {cartCount === 1 && (
+                                    <div className="cart-upsell">
+                                        <FiTag size={14} />
+                                        <span>Add 1 more to save <strong>₹200!</strong></span>
+                                    </div>
+                                )}
+                                {cartCount === 2 && (
+                                    <div className="cart-upsell cart-upsell--success">
+                                        <FiTag size={14} />
+                                        <span>🎉 Combo discount applied! Add 1 more to save <strong>₹400!</strong></span>
+                                    </div>
+                                )}
+                                {cartCount >= 3 && (
+                                    <div className="cart-upsell cart-upsell--success">
+                                        <FiTag size={14} />
+                                        <span>🎉 You're saving ₹400 with combo discount!</span>
+                                    </div>
+                                )}
+
                                 <div className="cart-items">
                                     {cartItems.map((item) => (
                                         <motion.div
@@ -95,7 +119,7 @@ const CartDrawer = () => {
                                                         </button>
                                                     </div>
                                                     <span className="cart-item-price">
-                                                        ${(item.price * item.quantity).toFixed(2)}
+                                                        ₹{(item.price * item.quantity).toLocaleString('en-IN')}
                                                     </span>
                                                 </div>
                                             </div>
@@ -110,20 +134,38 @@ const CartDrawer = () => {
                                 </div>
 
                                 <div className="cart-footer">
-                                    <div className="cart-subtotal">
-                                        <span>Subtotal</span>
-                                        <span className="cart-subtotal-price">${cartTotal.toFixed(2)}</span>
+                                    <div className="cart-summary">
+                                        <div className="cart-summary-row">
+                                            <span>Subtotal</span>
+                                            <span>₹{cartTotal.toLocaleString('en-IN')}</span>
+                                        </div>
+                                        {comboDiscount > 0 && (
+                                            <div className="cart-summary-row cart-summary-row--save">
+                                                <span>🎁 Combo Discount</span>
+                                                <span>-₹{comboDiscount}</span>
+                                            </div>
+                                        )}
+                                        <div className="cart-summary-row">
+                                            <span>Shipping</span>
+                                            <span>{shippingAmount === 0 ? 'FREE' : `₹${shippingAmount}`}</span>
+                                        </div>
+                                        <div className="cart-summary-row cart-summary-row--total">
+                                            <span>Total</span>
+                                            <span>₹{orderTotal.toLocaleString('en-IN')}</span>
+                                        </div>
                                     </div>
-                                    <p className="cart-shipping-note">
-                                        {cartTotal > 200
-                                            ? '✨ You qualify for free shipping!'
-                                            : `Add $${(200 - cartTotal).toFixed(2)} more for free shipping`}
-                                    </p>
-                                    <button className="btn btn-primary btn-lg cart-checkout-btn" onClick={handleCheckout}>
-                                        Proceed to Checkout
+
+                                    {cartTotal < 999 && (
+                                        <p className="cart-shipping-note">
+                                            Add ₹{(999 - cartTotal).toLocaleString('en-IN')} more for <strong>free shipping!</strong>
+                                        </p>
+                                    )}
+
+                                    <button className="btn btn-primary btn-lg btn-block cart-checkout-btn" onClick={handleCheckout}>
+                                        Checkout — ₹{orderTotal.toLocaleString('en-IN')}
                                     </button>
                                     <button
-                                        className="btn btn-ghost cart-continue-btn"
+                                        className="btn btn-ghost btn-block cart-continue-btn"
                                         onClick={() => setIsCartOpen(false)}
                                     >
                                         Continue Shopping
