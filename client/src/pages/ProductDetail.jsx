@@ -14,6 +14,30 @@ const ProductDetail = () => {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
+
+    const getLongevityWidth = (val) => {
+        if (!val) return '70%';
+        if (val.includes('12+')) return '100%';
+        if (val.includes('8-12')) return '85%';
+        if (val.includes('6-8')) return '65%';
+        return '50%';
+    };
+
+    const getSillageWidth = (val) => {
+        if (!val) return '50%';
+        if (val === 'Enormous') return '100%';
+        if (val === 'Strong') return '80%';
+        if (val === 'Moderate') return '60%';
+        return '40%';
+    };
+
+    const getIntensityWidth = (val) => {
+        if (!val) return '60%';
+        if (val === 'Intense') return '100%';
+        if (val === 'Strong') return '80%';
+        if (val === 'Moderate') return '60%';
+        return '40%';
+    };
     const [activeTab, setActiveTab] = useState('description');
     const [reviewForm, setReviewForm] = useState({ rating: 5, title: '', comment: '' });
     const [submitting, setSubmitting] = useState(false);
@@ -243,19 +267,53 @@ const ProductDetail = () => {
                                 </button>
                             </div>
 
-                            {/* Meta Info */}
+                            {/* Performance Meter */}
+                            <div className="product-performance-meter">
+                                <h4 className="meter-title">Performance & Sillage</h4>
+                                <div className="meter-grid">
+                                    <div className="meter-item">
+                                        <div className="meter-label">
+                                            <span>Longevity</span>
+                                            <span className="meter-value">{product.longevity || '8-10 Hours'}</span>
+                                        </div>
+                                        <div className="meter-bar-bg">
+                                            <div
+                                                className="meter-bar-fill"
+                                                style={{ width: getLongevityWidth(product.longevity) }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="meter-item">
+                                        <div className="meter-label">
+                                            <span>Sillage</span>
+                                            <span className="meter-value">{product.sillage || 'Moderate'}</span>
+                                        </div>
+                                        <div className="meter-bar-bg">
+                                            <div
+                                                className="meter-bar-fill"
+                                                style={{ width: getSillageWidth(product.sillage) }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="meter-item">
+                                        <div className="meter-label">
+                                            <span>Intensity</span>
+                                            <span className="meter-value">{product.concentration || 'Strong'}</span>
+                                        </div>
+                                        <div className="meter-bar-bg">
+                                            <div
+                                                className="meter-bar-fill"
+                                                style={{ width: getIntensityWidth(product.concentration) }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Meta Info (Simplified) */}
                             <div className="product-detail-meta">
                                 {product.fragranceFamily && (
                                     <div className="meta-item"><span>Family:</span> {product.fragranceFamily}</div>
-                                )}
-                                {product.concentration && (
-                                    <div className="meta-item"><span>Intensity:</span> {product.concentration}</div>
-                                )}
-                                {product.longevity && (
-                                    <div className="meta-item"><span>Longevity:</span> {product.longevity}</div>
-                                )}
-                                {product.sillage && (
-                                    <div className="meta-item"><span>Sillage:</span> {product.sillage}</div>
                                 )}
                                 {product.stock > 0 ? (
                                     <div className="meta-item">
@@ -266,6 +324,31 @@ const ProductDetail = () => {
                                 )}
                             </div>
                         </motion.div>
+                    </div>
+                </div>
+
+                {/* FAQ Section */}
+                <div className="container" style={{ marginBottom: 'var(--space-3xl)' }}>
+                    <div className="product-faq-section" style={{ maxWidth: '800px', margin: '0 auto' }}>
+                        <h3 className="section-title" style={{ fontSize: '1.5rem', marginBottom: '20px', textAlign: 'center' }}>Scale & Common Questions</h3>
+                        <div className="faq-grid" style={{ display: 'grid', gap: '16px' }}>
+                            <details className="faq-item">
+                                <summary>How long does shipping take?</summary>
+                                <p>We usually ship within 24 hours. Delivery takes 3-5 business days across India.</p>
+                            </details>
+                            <details className="faq-item">
+                                <summary>Is Cash on Delivery available?</summary>
+                                <p>Yes! We offer COD on all orders across 20,000+ pincodes in India.</p>
+                            </details>
+                            <details className="faq-item">
+                                <summary>What is the return policy?</summary>
+                                <p>We offer a 7-day return policy for damaged or incorrect items. Please record an unboxing video for smooth processing.</p>
+                            </details>
+                            <details className="faq-item">
+                                <summary>Are these original perfumes?</summary>
+                                <p>These are high-quality <strong>inspired</strong> fragrances. We use premium imported oils to match the scent profile of expensive designer brands at a fraction of the cost.</p>
+                            </details>
+                        </div>
                     </div>
                 </div>
 
@@ -344,9 +427,14 @@ const ProductDetail = () => {
                                                 onChange={(e) => setReviewForm((p) => ({ ...p, comment: e.target.value }))}
                                                 required
                                             />
-                                            <button className="btn btn-primary" type="submit" disabled={submitting}>
-                                                {submitting ? 'Submitting...' : 'Submit Review'}
-                                            </button>
+                                            <div className="review-form-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
+                                                <button type="button" className="btn btn-outline btn-sm" onClick={() => toast('Photo upload coming soon!')}>
+                                                    <span style={{ marginRight: '8px' }}>📷</span> Add Photo
+                                                </button>
+                                                <button className="btn btn-primary" type="submit" disabled={submitting}>
+                                                    {submitting ? 'Submitting...' : 'Submit Review'}
+                                                </button>
+                                            </div>
                                         </form>
                                     )}
 

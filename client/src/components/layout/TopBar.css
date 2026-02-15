@@ -1,0 +1,43 @@
+/* TopBar.css */
+.top-bar {
+    background-color: var(--text-primary);
+    /* Black usually */
+    color: var(--white);
+    padding: 8px 0;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 1001;
+}
+
+.top-bar-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+}
+
+.top-bar-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.top-bar-divider {
+    width: 1px;
+    height: 14px;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+    .top-bar-content {
+        gap: 16px;
+        font-size: 0.65rem;
+    }
+
+    .top-bar-item:last-child {
+        display: none;
+        /* Hide 'Made for Indian Weather' on small screens */
+    }
+}

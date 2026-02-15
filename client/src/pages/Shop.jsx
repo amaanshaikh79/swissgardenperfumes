@@ -7,9 +7,10 @@ import ProductCard from '../components/product/ProductCard';
 import { productsAPI } from '../services/api';
 import './Shop.css';
 
-const CATEGORIES = ['All', 'Eau de Parfum', 'Eau de Toilette', 'Eau de Cologne', 'Parfum', 'Body Mist', 'Gift Set'];
+const CATEGORIES = ['All', 'Eau de Parfum', 'Attar', 'Eau de Toilette', 'Parfum', 'Body Mist', 'Gift Set'];
 const GENDERS = ['All', 'Men', 'Women', 'Unisex'];
 const FAMILIES = ['All', 'Floral', 'Oriental', 'Woody', 'Fresh', 'Citrus', 'Aquatic', 'Gourmand'];
+const OCCASIONS = ['All', 'Office', 'Party', 'Date Night', 'Daily Wear', 'Travel'];
 const SORT_OPTIONS = [
     { value: 'newest', label: 'Newest' },
     { value: 'price_asc', label: 'Price: Low to High' },
@@ -32,6 +33,7 @@ const Shop = () => {
     const category = searchParams.get('category') || 'All';
     const gender = searchParams.get('gender') || 'All';
     const family = searchParams.get('fragranceFamily') || 'All';
+    const occasion = searchParams.get('occasion') || 'All';
     const sort = searchParams.get('sort') || 'newest';
     const search = searchParams.get('search') || '';
     const minPrice = searchParams.get('minPrice') || '';
@@ -45,6 +47,7 @@ const Shop = () => {
                 if (category !== 'All') params.category = category;
                 if (gender !== 'All') params.gender = gender;
                 if (family !== 'All') params.fragranceFamily = family;
+                if (occasion !== 'All') params.occasion = occasion;
                 if (search) params.search = search;
                 if (minPrice) params.minPrice = minPrice;
                 if (maxPrice) params.maxPrice = maxPrice;
@@ -60,7 +63,7 @@ const Shop = () => {
             }
         };
         fetchProducts();
-    }, [category, gender, family, sort, search, minPrice, maxPrice, page]);
+    }, [category, gender, family, occasion, sort, search, minPrice, maxPrice, page]);
 
     const updateFilter = (key, value) => {
         const newParams = new URLSearchParams(searchParams);
@@ -78,7 +81,7 @@ const Shop = () => {
         setPage(1);
     };
 
-    const hasActiveFilters = category !== 'All' || gender !== 'All' || family !== 'All' || search || minPrice || maxPrice;
+    const hasActiveFilters = category !== 'All' || gender !== 'All' || family !== 'All' || occasion !== 'All' || search || minPrice || maxPrice;
 
     return (
         <>
@@ -152,6 +155,21 @@ const Shop = () => {
                                             onClick={() => updateFilter('gender', g)}
                                         >
                                             {g}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="filter-group">
+                                <h4 className="filter-group-title">Occasion</h4>
+                                <div className="filter-options">
+                                    {OCCASIONS.map((occ) => (
+                                        <button
+                                            key={occ}
+                                            className={`filter-chip ${occasion === occ ? 'active' : ''}`}
+                                            onClick={() => updateFilter('occasion', occ)}
+                                        >
+                                            {occ}
                                         </button>
                                     ))}
                                 </div>

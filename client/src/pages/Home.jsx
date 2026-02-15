@@ -39,14 +39,13 @@ const Home = () => {
         }
     };
 
-    const categories = [
-        { name: 'For Him', emoji: '🧔', link: '/shop?gender=Men', desc: 'Bold & commanding' },
-        { name: 'For Her', emoji: '👩', link: '/shop?gender=Women', desc: 'Elegant & graceful' },
-        { name: 'Unisex', emoji: '✨', link: '/shop?gender=Unisex', desc: 'For everyone' },
-        { name: 'Office', emoji: '💼', link: '/shop?occasion=Office', desc: 'Professional charm' },
-        { name: 'Date Night', emoji: '🌙', link: '/shop?occasion=Date Night', desc: 'Irresistible allure' },
-        { name: 'Party', emoji: '🎉', link: '/shop?occasion=Party', desc: 'Life of the party' },
-        { name: 'Oud Collection', emoji: '🏺', link: '/shop?fragranceFamily=Oriental', desc: 'Rich & exotic' },
+    const moods = [
+        { name: 'Fresh & Clean', emoji: '🍋', link: '/shop?family=Fresh', desc: 'Crisp & energetic' },
+        { name: 'Bold & Woody', emoji: '🌲', link: '/shop?family=Woody', desc: 'Confidence in a bottle' },
+        { name: 'Sweet & Warm', emoji: '🍦', link: '/shop?family=Sweet', desc: 'Cozy & inviting' },
+        { name: 'Oud & Intense', emoji: '🦅', link: '/shop?family=Oud', desc: 'Rich & luxurious' },
+        { name: 'Office Ready', emoji: '💼', link: '/shop?occasion=Office', desc: 'Professional & subtle' },
+        { name: 'Night Out', emoji: '🥂', link: '/shop?occasion=Party', desc: 'Make a statement' },
     ];
 
     const comparisonItems = [
@@ -54,6 +53,13 @@ const Home = () => {
         { designer: 'Imported pricing', ours: 'Indian optimized', label: 'Pricing Model' },
         { designer: '~20% oil concentration', ours: 'High concentration oils', label: 'Concentration' },
         { designer: 'Expensive branding', ours: 'Smart pricing', label: 'Value' },
+    ];
+
+    const whyChooseFeatures = [
+        { icon: <FiDroplet size={24} />, title: 'High Oil Concentration', desc: 'Lasts 8-10 hours' },
+        { icon: <FiSun size={24} />, title: 'Indian Climate Ready', desc: 'Performs in humidity' },
+        { icon: <FiStar size={24} />, title: 'Luxury Profiles', desc: 'Inspired by icons' },
+        { icon: <FiCheck size={24} />, title: 'Accessible Pricing', desc: 'luxury for everyone' },
     ];
 
     const combos = [
@@ -142,11 +148,11 @@ const Home = () => {
                             <span className="hero-title-accent">Smart Prices.</span>
                         </h1>
                         <p className="hero-subtitle">
-                            Premium fragrance profiles inspired by iconic scents — crafted for everyday wear in India.
+                            Inspired interpretations crafted for Indian climate.
                         </p>
                         <div className="hero-buttons">
-                            <Link to="/shop" className="btn btn-primary btn-lg">
-                                Shop Now <FiArrowRight size={16} />
+                            <Link to="/shop?tag=bestseller" className="btn btn-primary btn-lg">
+                                Shop Bestsellers <FiArrowRight size={16} />
                             </Link>
                             <Link to="/shop?tag=combo" className="btn btn-outline btn-lg">
                                 Explore Combos
@@ -156,19 +162,6 @@ const Home = () => {
                             Starting at <span className="hero-price">₹499</span>
                         </div>
                     </motion.div>
-                </div>
-
-                {/* Trust Strip */}
-                <div className="hero-trust-strip">
-                    <div className="container">
-                        <div className="trust-strip">
-                            <span className="trust-strip-item"><FiTruck size={14} /> COD Available</span>
-                            <span className="trust-strip-divider" />
-                            <span className="trust-strip-item"><FiClock size={14} /> 8–10 Hr Lasting</span>
-                            <span className="trust-strip-divider" />
-                            <span className="trust-strip-item">🇮🇳 Made in India</span>
-                        </div>
-                    </div>
                 </div>
             </section>
 
@@ -203,28 +196,56 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* ─── Shop by Category ───────────────────────────────── */}
+            {/* ─── Shop by Mood ───────────────────────────────── */}
             <section className="section section-gray">
                 <div className="container">
                     <div className="section-header">
-                        <span className="section-label">Collections</span>
-                        <h2 className="section-title">Shop by Category</h2>
+                        <span className="section-label">Find Your Vibe</span>
+                        <h2 className="section-title">Shop by Mood</h2>
                     </div>
                     <div className="categories-grid">
-                        {categories.map((cat, i) => (
+                        {moods.map((mood, i) => (
                             <motion.div
-                                key={cat.name}
+                                key={mood.name}
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: i * 0.06 }}
                             >
-                                <Link to={cat.link} className="category-tile">
-                                    <span className="category-tile-emoji">{cat.emoji}</span>
-                                    <h3 className="category-tile-name">{cat.name}</h3>
-                                    <p className="category-tile-desc">{cat.desc}</p>
+                                <Link to={mood.link} className="category-tile">
+                                    <span className="category-tile-emoji">{mood.emoji}</span>
+                                    <h3 className="category-tile-name">{mood.name}</h3>
+                                    <p className="category-tile-desc">{mood.desc}</p>
                                     <FiArrowRight className="category-tile-arrow" size={16} />
                                 </Link>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── Why Choose GoldenBuck ──────────────────────────── */}
+            <section className="section">
+                <div className="container">
+                    <div className="section-header">
+                        <span className="section-label">The GoldenBuck Standard</span>
+                        <h2 className="section-title">Why Choose GoldenBuck?</h2>
+                    </div>
+                    <div className="why-choose-grid">
+                        {whyChooseFeatures.map((feature, i) => (
+                            <motion.div
+                                key={feature.title}
+                                className="trust-feature"
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.08 }}
+                            >
+                                <div className="trust-feature-icon" style={{ color: 'var(--text-primary)', marginBottom: '16px' }}>
+                                    {feature.icon}
+                                </div>
+                                <h4 className="trust-feature-title" style={{ color: 'var(--text-primary)', fontSize: '1.1rem' }}>{feature.title}</h4>
+                                <p className="trust-feature-desc" style={{ color: 'var(--text-secondary)' }}>{feature.desc}</p>
                             </motion.div>
                         ))}
                     </div>
@@ -236,7 +257,7 @@ const Home = () => {
                 <div className="container">
                     <div className="section-header">
                         <span className="section-label">Smart Comparison</span>
-                        <h2 className="section-title">Why Pay ₹8,000?</h2>
+                        <h2 className="section-title">Smell Premium. Spend Smart.</h2>
                         <p className="section-subtitle">
                             Same quality fragrance profiles. Fraction of the price. Made for India.
                         </p>

@@ -494,3 +494,107 @@
         -webkit-overflow-scrolling: touch;
     }
 }
+
+/* ─── Performance Meter ───────────────────────────────────── */
+.product-performance-meter {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--divider);
+}
+
+.product-performance-meter .meter-title {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: var(--space-md);
+    color: var(--text-primary);
+}
+
+.meter-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.meter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.meter-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.meter-value {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.meter-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.meter-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: var(--radius-full);
+}
+
+/* ─── FAQ Section ─────────────────────────────────────────── */
+.product-faq-section {
+    padding: var(--space-xl);
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+}
+
+.faq-item {
+    border-bottom: 1px solid var(--divider);
+    padding-bottom: var(--space-md);
+}
+
+.faq-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.faq-item summary {
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    position: relative;
+    padding-right: 20px;
+    color: var(--text-primary);
+}
+
+.faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq-item summary::after {
+    content: '+';
+    position: absolute;
+    right: 0;
+    font-weight: 300;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.faq-item[open] summary::after {
+    content: '-';
+}
+
+.faq-item p {
+    margin-top: var(--space-sm);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}

@@ -34,6 +34,17 @@ export const getProducts = async (req, res, next) => {
             query.fragranceFamily = req.query.fragranceFamily;
         }
 
+        // Occasion filter (supports comma-separated)
+        if (req.query.occasion) {
+            const occasions = req.query.occasion.split(',');
+            query.occasion = { $in: occasions };
+        }
+
+        // Tags filter
+        if (req.query.tag) {
+            query.tags = { $in: [req.query.tag] };
+        }
+
         // Price range filter
         if (req.query.minPrice || req.query.maxPrice) {
             query.price = {};

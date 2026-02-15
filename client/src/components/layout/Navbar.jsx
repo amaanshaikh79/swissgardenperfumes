@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiUser, FiShoppingBag, FiMenu, FiX, FiChevronDown, FiLogOut, FiGrid, FiPackage, FiHeart } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import TopBar from './TopBar';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -54,12 +55,13 @@ const Navbar = () => {
         navigate('/');
     };
 
+    // Center Menu: Shop | Bestsellers | For Him | For Her | Combo Sets | About
     const navLinks = [
         { to: '/shop', label: 'Shop', hasDropdown: true },
         { to: '/shop?tag=bestseller', label: 'Bestsellers' },
         { to: '/shop?gender=Men', label: 'For Him' },
         { to: '/shop?gender=Women', label: 'For Her' },
-        { to: '/shop?tag=combo', label: 'Combo Deals' },
+        { to: '/shop?tag=combo', label: 'Combo Sets' },
         { to: '/about', label: 'About' },
     ];
 
@@ -71,7 +73,7 @@ const Navbar = () => {
         ],
         'By Type': [
             { label: 'Eau De Parfum', to: '/shop?category=Eau de Parfum' },
-            { label: 'Attar Roll-On', to: '/shop?category=Parfum' },
+            { label: 'Attar Roll-On', to: '/shop?category=Attar' },
         ],
         'By Occasion': [
             { label: 'Office', to: '/shop?occasion=Office' },
@@ -88,12 +90,7 @@ const Navbar = () => {
 
     return (
         <>
-            {/* Announcement Bar */}
-            <div className="announcement-bar">
-                <div className="container">
-                    <p>🎉 <strong>FREE SHIPPING</strong> on orders above ₹999 &nbsp;|&nbsp; COD Available across India</p>
-                </div>
-            </div>
+            <TopBar />
 
             <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}>
                 <div className="navbar-container">
@@ -102,7 +99,7 @@ const Navbar = () => {
                         {mobileOpen ? <FiX size={22} /> : <FiMenu size={22} />}
                     </button>
 
-                    {/* Logo */}
+                    {/* Logo (Left) */}
                     <Link to="/" className="navbar-logo">
                         <span className="logo-text">GOLDENBUCK</span>
                         <span className="logo-sub">PERFUMES</span>

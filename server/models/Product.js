@@ -77,6 +77,7 @@ const productSchema = new mongoose.Schema(
                 'Eau de Toilette',
                 'Eau de Cologne',
                 'Parfum',
+                'Attar',
                 'Body Mist',
                 'Gift Set',
             ],
