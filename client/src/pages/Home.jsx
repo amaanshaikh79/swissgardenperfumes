@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import {
     FiArrowRight, FiStar, FiCheck, FiShield, FiClock,
-    FiTruck, FiDroplet, FiHeart, FiSend, FiPhoneCall
+    FiTruck, FiDroplet, FiHeart, FiSend, FiPhoneCall, FiSun
 } from 'react-icons/fi';
 import ProductCard from '../components/product/ProductCard';
 import { productsAPI } from '../services/api';
