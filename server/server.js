@@ -8,8 +8,8 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 if (!process.env.JWT_SECRET) {
-    console.error('FATAL ERROR: JWT_SECRET is not defined.');
-    process.exit(1);
+    console.warn('WARNING: JWT_SECRET is not defined using .env. Using insecure fallback secret for development/deployment testing.');
+    process.env.JWT_SECRET = 'fallback_secret_for_dev_deployment_only_123';
 }
 
 import express from 'express';
