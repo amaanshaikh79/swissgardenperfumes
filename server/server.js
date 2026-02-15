@@ -1,7 +1,18 @@
-import express from 'express';
+import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
+
+// Load env vars
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+if (!process.env.JWT_SECRET) {
+    console.error('FATAL ERROR: JWT_SECRET is not defined.');
+    process.exit(1);
+}
+
+import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -17,9 +28,6 @@ import orderRoutes from './routes/orderRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
-
-// Load env vars
-dotenv.config();
 
 // Connect to database
 connectDB();
@@ -86,8 +94,6 @@ app.get('/api/health', (req, res) => {
 });
 
 // ─── Production Static Serving ──────────────────────────────────
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../client/dist')));
