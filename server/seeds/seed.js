@@ -9,7 +9,7 @@ dotenv.config();
 const products = [
     {
         name: 'Dark Oud Elixir',
-        brand: 'ScentGold',
+        brand: 'GoldenBuck',
         description:
             'A commanding oud fragrance that opens with a burst of bergamot and pink pepper, flowing into a heart of rich oud wood and Damascus rose. The base rests on aged sandalwood, amber, and warm tonka bean. An independent fragrance inspired by popular luxury oud profiles — crafted for everyday wear in India.',
         shortDescription: 'Rich oud with rose, sandalwood & amber – long lasting oud fragrance',
@@ -38,7 +38,7 @@ const products = [
     },
     {
         name: 'Rose Velvet',
-        brand: 'ScentGold',
+        brand: 'GoldenBuck',
         description:
             'A sophisticated floral symphony capturing the essence of an elegant garden at twilight. Velvety Turkish rose petals intertwine with powdery iris, while violet leaf adds depth. The dry-down reveals rich suede, musk, and patchouli — romantic and modern. An independent fragrance profile inspired by popular luxury floral scents.',
         shortDescription: 'Elegant rose & iris blend with suede undertones',
@@ -66,7 +66,7 @@ const products = [
     },
     {
         name: 'Midnight Amber',
-        brand: 'ScentGold',
+        brand: 'GoldenBuck',
         description:
             'Step into the mystique of the night with this captivating amber fragrance. Rich labdanum and amber meld with exotic spices — cardamom, nutmeg, and star anise — creating an intoxicating warmth. Smoky benzoin, vanilla, and a whisper of leather evoke moonlit evenings. Perfect for Indian winters.',
         shortDescription: 'Deep amber with exotic spices & smoky warmth – perfect for winters',
@@ -95,7 +95,7 @@ const products = [
     },
     {
         name: 'Aqua Marine',
-        brand: 'ScentGold',
+        brand: 'GoldenBuck',
         description:
             'A refreshing aquatic scent perfect for Indian summers and everyday office wear. Sparkling lemon and marine accord dance with aromatic lavender and geranium. A base of cedarwood and ambergris provides a clean, sophisticated finish — fresh, confident, and long lasting even in humid weather.',
         shortDescription: 'Fresh aquatic fragrance – perfect for office & summer wear',
@@ -123,7 +123,7 @@ const products = [
     },
     {
         name: 'Noir Intense',
-        brand: 'ScentGold',
+        brand: 'GoldenBuck',
         description:
             'A dark and seductive fragrance for the modern man. Bergamot and black pepper create a powerful opening, giving way to oud, vetiver, and dark chocolate. Indonesian patchouli and cedar create warmth that is both dangerous and irresistible. Compliment magnet on dates.',
         shortDescription: 'Dark & seductive – oud, chocolate & vetiver blend',
@@ -152,7 +152,7 @@ const products = [
     },
     {
         name: 'Bloom Garden',
-        brand: 'ScentGold',
+        brand: 'GoldenBuck',
         description:
             'A regal floral masterpiece. Dewy lily of the valley and hyacinth open the composition, leading to a voluptuous heart of tuberose and gardenia. The velvety base of orris, white musk, and cashmere wood creates refined elegance. Perfect for daily wear in Indian spring weather.',
         shortDescription: 'Regal floral – tuberose, gardenia & cashmere wood',
@@ -180,7 +180,7 @@ const products = [
     },
     {
         name: 'Sacred Santal',
-        brand: 'ScentGold',
+        brand: 'GoldenBuck',
         description:
             'A meditative journey inspired by sacred Indian sandalwood. Creamy sandalwood enriched with warm cardamom and smoky incense. Pure Mysore-style sandalwood, cedarwood, and a touch of vanilla create spiritual serenity. Made for the Indian weather — smooth and skin-hugging.',
         shortDescription: 'Sacred sandalwood & incense – the Indian classic',
@@ -209,7 +209,7 @@ const products = [
     },
     {
         name: 'Party Pop',
-        brand: 'ScentGold',
+        brand: 'GoldenBuck',
         description:
             'Celebrate life with this effervescent and joyful fragrance. Fizzy champagne accord and blackcurrant burst forth, while peach blossom and pink peppercorn add playful sophistication. Musks, praline, and blonde wood create sheer indulgence — the perfect party companion.',
         shortDescription: 'Fizzy, fruity & fun – the ultimate party fragrance',
@@ -237,7 +237,7 @@ const products = [
     },
     {
         name: 'Tobacco Royale',
-        brand: 'ScentGold',
+        brand: 'GoldenBuck',
         description:
             'An indulgent gourmand fragrance that wraps you in pure warmth. Rich tobacco leaf and Madagascar vanilla create an addictive combination, enhanced by honey, cinnamon bark, and dried fruit. Amber, benzoin, and rare woods provide a warm cocoon that lasts well into the night.',
         shortDescription: 'Indulgent tobacco & vanilla – warm & addictive',
@@ -266,7 +266,7 @@ const products = [
     },
     {
         name: 'Citrus Rush',
-        brand: 'ScentGold',
+        brand: 'GoldenBuck',
         description:
             'Capture fresh energy in a bottle. This vibrant citrus composition opens with juicy blood orange, lemon, and kumquat, leading to an aromatic heart of neroli, petitgrain, and white tea. Vetiver, white musk, and ambrette seed ensure this stays fresh and sophisticated all day.',
         shortDescription: 'Vibrant citrus with white tea – energetic & fresh daily wear',
@@ -293,15 +293,15 @@ const products = [
         season: ['Spring', 'Summer'],
     },
     {
-        name: 'The ScentGold Discovery Set',
-        brand: 'ScentGold',
+        name: 'The GoldenBuck Discovery Set',
+        brand: 'GoldenBuck',
         description:
-            'Experience the best of ScentGold with this curated discovery set. Contains 5 miniatures of our top-selling fragrances: Dark Oud Elixir, Rose Velvet, Aqua Marine, Noir Intense, and Citrus Rush — each 10ml. Presented in a premium gift box. The perfect way to find your signature scent.',
+            'Experience the best of GoldenBuck with this curated discovery set. Contains 5 miniatures of our top-selling fragrances: Dark Oud Elixir, Rose Velvet, Aqua Marine, Noir Intense, and Citrus Rush — each 10ml. Presented in a premium gift box. The perfect way to find your signature scent.',
         shortDescription: 'Curated 5-piece discovery set – the perfect gift',
         price: 999,
         compareAtPrice: 1499,
         images: [
-            { url: 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=800', alt: 'The ScentGold Discovery Set' },
+            { url: 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=800', alt: 'The GoldenBuck Discovery Set' },
         ],
         category: 'Gift Set',
         gender: 'Unisex',
@@ -323,7 +323,7 @@ const products = [
     },
     {
         name: 'White Magnolia',
-        brand: 'ScentGold',
+        brand: 'GoldenBuck',
         description:
             'A delicate and ethereal white floral fragrance capturing the beauty of magnolia in full bloom. Fresh bergamot and lychee create a luminous opening, while the magnolia heart is enriched with white lily and freesia. Soft cedarwood, sheer musk, and blonde amber create pure enchantment.',
         shortDescription: 'Ethereal white magnolia with lychee & sheer musk',
@@ -353,7 +353,7 @@ const products = [
 
 const adminUser = {
     firstName: 'Admin',
-    lastName: 'ScentGold',
+    lastName: 'GoldenBuck',
     email: 'adnanshaikh07@gmail.com',
     password: 'Admin@123',
     role: 'admin',
@@ -369,7 +369,7 @@ const demoUser = {
 
 const seedDatabase = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/scentgold');
+        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/goldenbuck-perfumes');
         console.log('✨ Connected to MongoDB');
 
         // Clear existing data

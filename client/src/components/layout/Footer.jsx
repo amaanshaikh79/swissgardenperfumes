@@ -11,8 +11,8 @@ const Footer = () => {
                         {/* Brand */}
                         <div className="footer-brand">
                             <Link to="/" className="footer-logo">
-                                <span className="logo-text">SCENTGOLD</span>
-                                <span className="logo-sub">Premium Fragrances</span>
+                                <span className="logo-text">GOLDENBUCK</span>
+                                <span className="logo-sub">PERFUMES</span>
                             </Link>
                             <p className="footer-brand-desc">
                                 Premium fragrance profiles inspired by iconic luxury scents — crafted for everyday wear in India. Smart buyer's luxury alternative.
@@ -59,7 +59,7 @@ const Footer = () => {
                             </div>
                             <div className="footer-contact-item">
                                 <FiMail size={14} />
-                                <span>hello@scentgold.in</span>
+                                <span>hello@goldenbuckperfumes.com</span>
                             </div>
                             <div className="footer-contact-item">
                                 <FiMessageCircle size={14} />
@@ -82,7 +82,7 @@ const Footer = () => {
             <div className="footer-bottom">
                 <div className="container">
                     <div className="footer-bottom-content">
-                        <p>© {new Date().getFullYear()} ScentGold. All rights reserved.</p>
+                        <p>© {new Date().getFullYear()} GoldenBuck Perfumes. All rights reserved.</p>
                         <div className="footer-payments">
                             <span>UPI</span>
                             <span>•</span>

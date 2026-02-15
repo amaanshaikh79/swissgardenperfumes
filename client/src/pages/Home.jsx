@@ -122,7 +122,7 @@ const Home = () => {
     return (
         <>
             <Helmet>
-                <title>ScentGold — Luxury Inspired Scents at Smart Prices | India</title>
+                <title>GoldenBuck Perfumes — Luxury Inspired Scents at Smart Prices | India</title>
                 <meta name="description" content="Premium fragrance profiles inspired by iconic scents — crafted for everyday wear in India. Shop bestsellers from ₹499. COD Available. 8–10 hour lasting." />
             </Helmet>
 
@@ -249,7 +249,7 @@ const Home = () => {
                                 <span className="comparison-col-title">Designer Brands</span>
                             </div>
                             <div className="comparison-col comparison-col--ours">
-                                <span className="comparison-col-title">ScentGold ✨</span>
+                                <span className="comparison-col-title">GoldenBuck ✨</span>
                             </div>
                         </div>
                         {comparisonItems.map((item, i) => (
