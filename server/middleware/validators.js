@@ -65,7 +65,7 @@ export const orderRules = [
     body('shippingAddress.state').notEmpty().withMessage('State is required'),
     body('shippingAddress.zipCode').notEmpty().withMessage('Zip code is required'),
     body('shippingAddress.country').notEmpty().withMessage('Country is required'),
-    body('paymentMethod').isIn(['stripe', 'razorpay', 'cod']).withMessage('Invalid payment method'),
+    body('paymentMethod').isIn(['razorpay', 'cod']).withMessage('Invalid payment method'),
 ];
 
 // ID param validation

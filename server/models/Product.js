@@ -39,6 +39,7 @@ const productSchema = new mongoose.Schema(
             type: String,
             unique: true,
             lowercase: true,
+            sparse: true,
         },
         brand: {
             type: String,
@@ -186,7 +187,6 @@ productSchema.methods.calculateAverageRating = function () {
 
 // Text index for search
 productSchema.index({ name: 'text', description: 'text', brand: 'text', tags: 'text' });
-productSchema.index({ slug: 1 });
 productSchema.index({ category: 1, gender: 1, price: 1 });
 
 const Product = mongoose.model('Product', productSchema);
