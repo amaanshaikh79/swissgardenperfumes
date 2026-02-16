@@ -169,7 +169,7 @@ const CartDrawer = () => {
                                         style={{ marginBottom: '10px', backgroundColor: '#25D366', color: 'white', border: 'none' }}
                                         onClick={() => {
                                             const message = `Hi GoldenBuck! I want to order:\n${cartItems.map(item => `- ${item.name} (${item.size}) x ${item.quantity}`).join('\n')}\n\nTotal: ₹${orderTotal}\nShipping: ${shippingAmount === 0 ? 'Free' : '₹' + shippingAmount}\n\nPlease confirm my order.`;
-                                            window.open(`https://wa.me/919876543210?text=${encodeURIComponent(message)}`, '_blank');
+                                            window.open(`https://wa.me/916354521414?text=${encodeURIComponent(message)}`, '_blank');
                                         }}
                                     >
                                         Order via WhatsApp (COD)
