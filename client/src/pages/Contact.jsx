@@ -92,7 +92,7 @@ const Contact = () => {
                                 <div className="contact-info-icon"><FiMail size={20} /></div>
                                 <div>
                                     <h4>Email Us</h4>
-                                    <p>hello@swissgardenperfumes.com</p>
+                                    <p>Contact@swissgardenperfumes.com</p>
                                 </div>
                             </div>
                             <div className="contact-hours">
