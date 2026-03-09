@@ -1,7 +1,7 @@
 {
-    "name": "goldenbuck-perfumes",
+    "name": "swissgarden-perfumes",
     "version": "1.0.0",
-    "description": "GoldenBuck Perfumes - Luxury Ecommerce Platform",
+    "description": "swissgarden Perfumes - Luxury Ecommerce Platform",
     "main": "server/server.js",
     "scripts": {
         "install": "npm install --prefix server && npm install --prefix client",

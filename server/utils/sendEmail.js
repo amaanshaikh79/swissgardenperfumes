@@ -55,7 +55,7 @@ export const orderConfirmationEmail = (order, user) => {
     return `
     <div style="max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #fff; font-family: 'Georgia', serif;">
       <div style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #1a1a2e 0%, #0a0a0a 100%);">
-        <h1 style="color: #D4AF37; font-size: 28px; margin: 0; letter-spacing: 4px;">GOLDENBUCK</h1>
+        <h1 style="color: #D4AF37; font-size: 28px; margin: 0; letter-spacing: 4px;">swissgarden</h1>
         <p style="color: #999; font-size: 12px; letter-spacing: 6px; margin-top: 8px;">PERFUMES</p>
       </div>
       
@@ -95,7 +95,7 @@ export const orderConfirmationEmail = (order, user) => {
       </div>
       
       <div style="text-align: center; padding: 30px; background: #111; border-top: 1px solid #333;">
-        <p style="color: #666; font-size: 12px;">© 2025 GoldenBuck Perfumes. All rights reserved.</p>
+        <p style="color: #666; font-size: 12px;">© 2025 swissgarden Perfumes. All rights reserved.</p>
         <p style="color: #666; font-size: 11px; margin-top: 8px;">Crafted with passion for the discerning connoisseur.</p>
       </div>
     </div>

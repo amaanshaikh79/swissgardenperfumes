@@ -14,7 +14,7 @@ const Wishlist = () => {
 
     return (
         <>
-            <Helmet><title>My Wishlist | GoldenBuck Perfumes</title></Helmet>
+            <Helmet><title>My Wishlist | swissgarden Perfumes</title></Helmet>
             <div className="wishlist-page">
                 <div className="container">
                     <h1 className="page-title">My Wishlist</h1>

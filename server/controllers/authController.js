@@ -153,10 +153,10 @@ export const sendOTP = async (req, res, next) => {
         try {
             await sendEmail({
                 email: user.email,
-                subject: 'Your GoldenBuck Perfumes Login OTP',
+                subject: 'Your swissgarden Perfumes Login OTP',
                 html: `
                     <div style="font-family: 'Helvetica Neue', Arial, sans-serif; text-align: center; padding: 40px 20px; background: #0a0a0a; color: #fff;">
-                        <h1 style="font-family: serif; color: #D4AF37; margin-bottom: 10px;">GoldenBuck Perfumes</h1>
+                        <h1 style="font-family: serif; color: #D4AF37; margin-bottom: 10px;">swissgarden Perfumes</h1>
                         <p style="color: #999; font-size: 14px; margin-bottom: 30px;">Your One-Time Password</p>
                         <div style="background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 30px; max-width: 400px; margin: 0 auto;">
                             <p style="font-size: 14px; color: #999; margin-bottom: 15px;">Your OTP code is:</p>

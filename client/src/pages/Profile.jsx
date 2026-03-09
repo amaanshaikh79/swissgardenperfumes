@@ -28,7 +28,7 @@ const Profile = () => {
 
     return (
         <>
-            <Helmet><title>My Profile | GoldenBuck Perfumes</title></Helmet>
+            <Helmet><title>My Profile | swissgarden Perfumes</title></Helmet>
             <div className="profile-page">
                 <div className="container-sm">
                     <h1 className="page-title">My Profile</h1>

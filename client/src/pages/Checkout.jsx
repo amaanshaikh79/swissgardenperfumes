@@ -67,7 +67,7 @@ const Checkout = () => {
                 key: '', // Will be set from config
                 amount: order.amount,
                 currency: order.currency || 'INR',
-                name: 'GoldenBuck Perfumes',
+                name: 'swissgarden Perfumes',
                 description: `Order Payment - ${cartItems.length} item(s)`,
                 order_id: order.id,
                 prefill: {
@@ -150,7 +150,7 @@ const Checkout = () => {
                         key: keyId,
                         amount: razorpayOrder.amount,
                         currency: razorpayOrder.currency || 'INR',
-                        name: 'GoldenBuck Perfumes',
+                        name: 'swissgarden Perfumes',
                         description: `Order - ${cartItems.length} item(s)`,
                         order_id: razorpayOrder.id,
                         prefill: {
@@ -227,7 +227,7 @@ const Checkout = () => {
 
     return (
         <>
-            <Helmet><title>Checkout | GoldenBuck Perfumes</title></Helmet>
+            <Helmet><title>Checkout | swissgarden Perfumes</title></Helmet>
             <div className="checkout-page">
                 <div className="container-sm">
                     <h1 className="checkout-title">Checkout</h1>

@@ -128,7 +128,7 @@ const Home = () => {
     return (
         <>
             <Helmet>
-                <title>GoldenBuck Perfumes — Luxury Inspired Scents at Smart Prices | India</title>
+                <title>swissgarden Perfumes — Luxury Inspired Scents at Smart Prices | India</title>
                 <meta name="description" content="Premium fragrance profiles inspired by iconic scents — crafted for everyday wear in India. Shop bestsellers from ₹499. COD Available. 8–10 hour lasting." />
             </Helmet>
 
@@ -224,12 +224,12 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* ─── Why Choose GoldenBuck ──────────────────────────── */}
+            {/* ─── Why Choose swissgarden ──────────────────────────── */}
             <section className="section">
                 <div className="container">
                     <div className="section-header">
-                        <span className="section-label">The GoldenBuck Standard</span>
-                        <h2 className="section-title">Why Choose GoldenBuck?</h2>
+                        <span className="section-label">The swissgarden Standard</span>
+                        <h2 className="section-title">Why Choose swissgarden?</h2>
                     </div>
                     <div className="why-choose-grid">
                         {whyChooseFeatures.map((feature, i) => (
@@ -270,7 +270,7 @@ const Home = () => {
                                 <span className="comparison-col-title">Designer Brands</span>
                             </div>
                             <div className="comparison-col comparison-col--ours">
-                                <span className="comparison-col-title">GoldenBuck ✨</span>
+                                <span className="comparison-col-title">swissgarden ✨</span>
                             </div>
                         </div>
                         {comparisonItems.map((item, i) => (

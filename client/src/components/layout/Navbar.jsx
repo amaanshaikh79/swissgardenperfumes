@@ -101,7 +101,7 @@ const Navbar = () => {
 
                     {/* Logo (Left) */}
                     <Link to="/" className="navbar-logo">
-                        <span className="logo-text">GOLDENBUCK</span>
+                        <span className="logo-text">swissgarden</span>
                         <span className="logo-sub">PERFUMES</span>
                     </Link>
 
@@ -261,7 +261,7 @@ const Navbar = () => {
                             transition={{ type: 'tween', duration: 0.3 }}
                         >
                             <div className="mobile-menu-header">
-                                <span className="logo-text">GOLDENBUCK</span>
+                                <span className="logo-text">swissgarden</span>
                                 <button onClick={() => setMobileOpen(false)}>
                                     <FiX size={22} />
                                 </button>

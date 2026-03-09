@@ -100,7 +100,7 @@ app.use('/api/admin', adminRoutes);
 app.get('/api/health', (req, res) => {
     res.status(200).json({
         success: true,
-        message: 'GoldenBuck Perfumes API is running',
+        message: 'swissgarden Perfumes API is running',
         environment: process.env.NODE_ENV,
         timestamp: new Date().toISOString(),
     });
@@ -125,7 +125,7 @@ app.listen(PORT, HOST, () => {
     console.log(`
   ╔═══════════════════════════════════════════╗
   ║                                           ║
-  ║   🏆 GoldenBuck Perfumes API Server        ║
+  ║   🏆 swissgarden Perfumes API Server        ║
   ║                                           ║
   ║   Port:        ${PORT}                       ║
   ║   Host:        ${HOST}                 ║

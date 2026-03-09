@@ -11,7 +11,7 @@ const Footer = () => {
                         {/* Brand */}
                         <div className="footer-brand">
                             <Link to="/" className="footer-logo">
-                                <span className="logo-text">GOLDENBUCK</span>
+                                <span className="logo-text">swissgarden</span>
                                 <span className="logo-sub">PERFUMES</span>
                             </Link>
                             <p className="footer-brand-desc">
@@ -59,7 +59,7 @@ const Footer = () => {
                             </div>
                             <div className="footer-contact-item">
                                 <FiMail size={14} />
-                                <span>hello@goldenbuckperfumes.com</span>
+                                <span>hello@swissgardenperfumes.com</span>
                             </div>
                             <div className="footer-contact-item">
                                 <FiMessageCircle size={14} />
@@ -82,7 +82,7 @@ const Footer = () => {
             <div className="footer-bottom">
                 <div className="container">
                     <div className="footer-bottom-content">
-                        <p>© {new Date().getFullYear()} GoldenBuck Perfumes. All rights reserved.</p>
+                        <p>© {new Date().getFullYear()} swissgarden Perfumes. All rights reserved.</p>
                         <div className="footer-payments">
                             <span>UPI</span>
                             <span>•</span>
