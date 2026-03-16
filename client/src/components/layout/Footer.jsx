@@ -18,9 +18,14 @@ const Footer = () => {
                                 Premium fragrance profiles inspired by iconic luxury scents — crafted for everyday wear in India. Smart buyer's luxury alternative.
                             </p>
                             <div className="footer-socials">
-                                <a href="#" className="footer-social-link" aria-label="Instagram"><FiInstagram size={18} /></a>
-                                <a href="#" className="footer-social-link" aria-label="WhatsApp"><FiMessageCircle size={18} /></a>
-                                <a href="#" className="footer-social-link" aria-label="Email"><FiMail size={18} /></a>
+                                <a href="www.instagram.com/swissgardenperfumes" className="footer-social-link" aria-label="Instagram"><FiInstagram size={18} /></a>
+                                <a href="www.whatsapp.com/swissgardenperfumes" className="footer-social-link" aria-label="WhatsApp"><FiMessageCircle size={18} /></a>
+                                <a href="www.gmail.com/swissgardenperfumes" className="footer-social-link" aria-label="Email"><FiMail size={18} /></a>
+                                <a href="www.facebook.com/swissgardenperfumes" className="footer-social-link" aria-label="Facebook"><FiFacebook size={18} /></a>
+                                <a href="www.twitter.com/swissgardenperfumes" className="footer-social-link" aria-label="Twitter"><FiTwitter size={18} /></a>
+                                <a href="www.linkedin.com/swissgardenperfumes" className="footer-social-link" aria-label="LinkedIn"><FiLinkedin size={18} /></a>
+                                <a href="www.youtube.com/swissgardenperfumes" className="footer-social-link" aria-label="YouTube"><FiYoutube size={18} /></a>
+                                <a href="www.pinterest.com/swissgardenperfumes" className="footer-social-link" aria-label="Pinterest"><FiPinterest size={18} /></a>
                             </div>
                         </div>
 
@@ -51,7 +56,7 @@ const Footer = () => {
                             <h4 className="footer-heading">Get in Touch</h4>
                             <div className="footer-contact-item">
                                 <FiMapPin size={14} />
-                                <span>Mumbai, Maharashtra<br />India</span>
+                                <span>Delhi<br />India</span>
                             </div>
                             <div className="footer-contact-item">
                                 <FiPhone size={14} />

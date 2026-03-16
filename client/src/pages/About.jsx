@@ -27,10 +27,12 @@ const About = () => {
 
                     <div className="about-content">
                         <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                            Founded in 1987 in the heart of New York City, swissgarden Perfumes was born from a singular vision: to create fragrances that transcend the ordinary and touch the soul. Our founder, Alexander swissgarden, a third-generation perfumer, believed that scent is the most intimate form of self-expression.
+                            Founded in 2026 in the heart of Delhi, Swissgarden Perfumes was created with a passion for crafting unique and memorable fragrances. We believe that a fragrance is more than just a scent — it is a reflection of personality, mood, and identity. Every perfume is designed to make people feel confident, special, and unforgettable. ✨🌿.
                         </motion.p>
                         <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}>
-                            Today, our master perfumers travel the world to source the rarest ingredients — from the ancient agarwood forests of Southeast Asia to the lavender fields of Provence, the rose valleys of Bulgaria to the vanilla plantations of Madagascar. Every ingredient is carefully selected and tested before it earns a place in our compositions.
+                            Here is a **more Indian-style version (simple and natural)**:
+
+                            Today, our perfumers carefully select the finest ingredients from different parts of the world and India — from rich agarwood in North Asia to fresh lavender from France, beautiful roses from Bulgaria, and sweet vanilla from Madagascar. Each ingredient is chosen with care to ensure the best quality, so every fragrance feels rich, long-lasting, and truly special. 🌸✨.
                         </motion.p>
                         <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}>
                             Our philosophy is simple: luxury should be an experience, not just a product. Each swissgarden fragrance is a masterwork — blended with precision, patience, and an unwavering commitment to excellence. We don't follow trends; we create timeless signatures that become an extension of who you are.

@@ -78,21 +78,21 @@ const Contact = () => {
                                 <div className="contact-info-icon"><FiMapPin size={20} /></div>
                                 <div>
                                     <h4>Visit Us</h4>
-                                    <p>5th Avenue, Suite 1200<br />New York, NY 10022</p>
+                                    <p>Aerocity, Worldmark 1, Suite 502<br />New Delhi, Delhi 110037</p>
                                 </div>
                             </div>
                             <div className="contact-info-item">
                                 <div className="contact-info-icon"><FiPhone size={20} /></div>
                                 <div>
                                     <h4>Call Us</h4>
-                                    <p>+1 (212) 555-0187</p>
+                                    <p>+91 98765 43210</p>
                                 </div>
                             </div>
                             <div className="contact-info-item">
                                 <div className="contact-info-icon"><FiMail size={20} /></div>
                                 <div>
                                     <h4>Email Us</h4>
-                                    <p>Contact@swissgardenperfumes.com</p>
+                                    <p>contact@swissgardenperfumes.com</p>
                                 </div>
                             </div>
                             <div className="contact-hours">
