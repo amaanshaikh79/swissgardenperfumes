@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FiInstagram, FiMail, FiMapPin, FiPhone, FiMessageCircle } from 'react-icons/fi';
+import { FaFacebookF, FaTwitter, FaLinkedinIn, FaYoutube, FaPinterestP } from 'react-icons/fa';
 import './Footer.css';
 
 const Footer = () => {
@@ -21,11 +22,11 @@ const Footer = () => {
                                 <a href="www.instagram.com/swissgardenperfumes" className="footer-social-link" aria-label="Instagram"><FiInstagram size={18} /></a>
                                 <a href="www.whatsapp.com/swissgardenperfumes" className="footer-social-link" aria-label="WhatsApp"><FiMessageCircle size={18} /></a>
                                 <a href="www.gmail.com/swissgardenperfumes" className="footer-social-link" aria-label="Email"><FiMail size={18} /></a>
-                                <a href="www.facebook.com/swissgardenperfumes" className="footer-social-link" aria-label="Facebook"><FiFacebook size={18} /></a>
-                                <a href="www.twitter.com/swissgardenperfumes" className="footer-social-link" aria-label="Twitter"><FiTwitter size={18} /></a>
-                                <a href="www.linkedin.com/swissgardenperfumes" className="footer-social-link" aria-label="LinkedIn"><FiLinkedin size={18} /></a>
-                                <a href="www.youtube.com/swissgardenperfumes" className="footer-social-link" aria-label="YouTube"><FiYoutube size={18} /></a>
-                                <a href="www.pinterest.com/swissgardenperfumes" className="footer-social-link" aria-label="Pinterest"><FiPinterest size={18} /></a>
+                                <a href="https://www.facebook.com/swissgardenperfumes" className="footer-social-link" aria-label="Facebook"><FaFacebookF size={18} /></a>
+                                <a href="https://www.twitter.com/swissgardenperfumes" className="footer-social-link" aria-label="Twitter"><FaTwitter size={18} /></a>
+                                <a href="https://www.linkedin.com/swissgardenperfumes" className="footer-social-link" aria-label="LinkedIn"><FaLinkedinIn size={18} /></a>
+                                <a href="https://www.youtube.com/swissgardenperfumes" className="footer-social-link" aria-label="YouTube"><FaYoutube size={18} /></a>
+                                <a href="https://www.pinterest.com/swissgardenperfumes" className="footer-social-link" aria-label="Pinterest"><FaPinterestP size={18} /></a>
                             </div>
                         </div>
 
