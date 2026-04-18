@@ -2,6 +2,20 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import rateLimit from 'express-rate-limit';
+import mongoSanitize from 'express-mongo-sanitize';
+import connectDB from './config/db.js';
+import errorHandler from './middleware/errorHandler.js';
+import authRoutes from './routes/authRoutes.js';
+import productRoutes from './routes/productRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 // ⚠️  CRITICAL: Load .env FIRST before any other code runs
 const __filename = fileURLToPath(import.meta.url);
@@ -38,22 +52,6 @@ if (!process.env.JWT_EXPIRE) {
 if (!process.env.JWT_COOKIE_EXPIRE) {
     process.env.JWT_COOKIE_EXPIRE = '30';
 }
-
-// NOW load all other imports (they can safely read env vars)
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import cookieParser from 'cookie-parser';
-import rateLimit from 'express-rate-limit';
-import mongoSanitize from 'express-mongo-sanitize';
-import connectDB from './config/db.js';
-import errorHandler from './middleware/errorHandler.js';
-import authRoutes from './routes/authRoutes.js';
-import productRoutes from './routes/productRoutes.js';
-import orderRoutes from './routes/orderRoutes.js';
-import contactRoutes from './routes/contactRoutes.js';
-import paymentRoutes from './routes/paymentRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
 
 // Connect to database
 connectDB();

@@ -2,32 +2,43 @@ import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import Order from '../models/Order.js';
 
-// ── Read keys from env ────────────────────────────────────────────
-const KEY_ID = process.env.RAZORPAY_KEY_ID?.trim();
-const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET?.trim();
-const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET?.trim();
+// Helper to get keys lazily (only when actually needed)
+const getKeys = () => ({
+    KEY_ID: process.env.RAZORPAY_KEY_ID?.trim(),
+    KEY_SECRET: process.env.RAZORPAY_KEY_SECRET?.trim(),
+    WEBHOOK_SECRET: process.env.RAZORPAY_WEBHOOK_SECRET?.trim(),
+});
 
 const isKeyConfigured = (key) => key && !key.startsWith('your_') && !key.startsWith('rzp_live_your') && key !== 'rzp_test_demo' && key.length > 0;
 
-if (!isKeyConfigured(KEY_ID)) {
-    console.warn('⚠️  RAZORPAY_KEY_ID not configured properly. Payments will not work.');
-}
-if (!isKeyConfigured(KEY_SECRET)) {
-    console.warn('⚠️  RAZORPAY_KEY_SECRET not configured properly. Payments will not work.');
-}
+// Log keys once on first endpoint call
+let keysLogged = false;
+const logKeysOnce = () => {
+    if (!keysLogged) {
+        const { KEY_ID, KEY_SECRET } = getKeys();
+        console.log(`\n🔐 Razorpay Configuration Check:`);
+        console.log(`   KEY_ID value: "${KEY_ID ? KEY_ID.substring(0, 20) + '...' : 'undefined'}"`);
+        console.log(`   KEY_SECRET value: "${KEY_SECRET ? KEY_SECRET.substring(0, 10) + '...' : 'undefined'}"`);
+        console.log(`   KEY_ID valid: ${isKeyConfigured(KEY_ID)}`);
+        console.log(`   KEY_SECRET valid: ${isKeyConfigured(KEY_SECRET)}\n`);
+        keysLogged = true;
+    }
+};
 
 // Lazy-init: create instance only when a payment endpoint is hit,
 // so the server does not crash at startup if keys are missing.
 let _razorpayInstance = null;
 const getRazorpay = () => {
+    const { KEY_ID, KEY_SECRET } = getKeys();
     if (!_razorpayInstance) {
+        logKeysOnce();
         if (!isKeyConfigured(KEY_ID) || !isKeyConfigured(KEY_SECRET)) {
             const msg = 'Razorpay API keys not configured. Ensure RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET are set in server/.env';
             console.error(`❌ ${msg}`);
             throw new Error(msg);
         }
         _razorpayInstance = new Razorpay({ key_id: KEY_ID, key_secret: KEY_SECRET });
-        console.log('✓ Razorpay instance initialized successfully');
+        console.log('✅ Razorpay instance initialized successfully with test keys\n');
     }
     return _razorpayInstance;
 };
@@ -38,20 +49,14 @@ const getRazorpay = () => {
 // @access  Public
 // ─────────────────────────────────────────────────────────────────
 export const getPaymentConfig = (req, res) => {
+    logKeysOnce();
+    const { KEY_ID } = getKeys();
     if (!isKeyConfigured(KEY_ID)) {
         console.error('❌ Payment config error: RAZORPAY_KEY_ID is missing or invalid');
-        console.error('   KEY_ID value:', KEY_ID ? `"${KEY_ID}"` : 'undefined');
         console.error('   Fix: Set RAZORPAY_KEY_ID in server/.env and restart the server');
         return res.status(503).json({
             success: false,
             message: 'Payment gateway is not configured. Razorpay API key is missing. Please check server logs.',
-        });
-    }
-    if (!isKeyConfigured(KEY_SECRET)) {
-        console.error('❌ Payment config error: RAZORPAY_KEY_SECRET is missing or invalid');
-        return res.status(503).json({
-            success: false,
-            message: 'Payment gateway is not configured. API secret is missing. Please check server logs.',
         });
     }
     res.status(200).json({
@@ -120,6 +125,7 @@ export const createRazorpayOrder = async (req, res, next) => {
 export const verifyPayment = async (req, res, next) => {
     try {
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+        const { KEY_SECRET } = getKeys();
 
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
             return res.status(400).json({
@@ -128,7 +134,7 @@ export const verifyPayment = async (req, res, next) => {
             });
         }
 
-        if (!KEY_SECRET) {
+        if (!isKeyConfigured(KEY_SECRET)) {
             return res.status(503).json({
                 success: false,
                 message: 'Payment gateway is not configured',
@@ -174,12 +180,13 @@ export const verifyPayment = async (req, res, next) => {
 export const webhookHandler = async (req, res, next) => {
     try {
         const signature = req.headers['x-razorpay-signature'];
+        const { WEBHOOK_SECRET } = getKeys();
 
         if (!signature) {
             return res.status(400).json({ success: false, message: 'Missing webhook signature' });
         }
 
-        if (!WEBHOOK_SECRET) {
+        if (!isKeyConfigured(WEBHOOK_SECRET)) {
             console.warn('RAZORPAY_WEBHOOK_SECRET not set — skipping signature verification');
         } else {
             // Verify webhook signature using raw body
