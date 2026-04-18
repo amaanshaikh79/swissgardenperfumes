@@ -108,15 +108,20 @@ const Register = () => {
         setLoading(true);
         try {
             await register({
-                firstName: form.firstName,
-                lastName: form.lastName,
-                email: form.email,
+                firstName: form.firstName.trim(),
+                lastName: form.lastName.trim(),
+                email: form.email.trim(),
                 password: form.password,
             });
             toast.success('Account created successfully!');
             navigate('/');
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Registration failed');
+            const response = error.response?.data;
+            const errorMessage =
+                response?.errorMessage || response?.message ||
+                (Array.isArray(response?.errors) ? response.errors[0]?.message : null) ||
+                'Registration failed';
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }
