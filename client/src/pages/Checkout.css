@@ -320,10 +320,50 @@
 .checkout-btn-loading {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-xs);
+    gap: var(--space-sm);
+}
+
+/* Animated loading spinner inside button */
+.checkout-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Payment error banner */
+.checkout-error-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    background: rgba(231, 76, 60, 0.08);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    border-radius: var(--radius-md);
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-bottom: var(--space-lg);
+    line-height: 1.4;
+}
+
+/* Back link below place order button */
+.checkout-back-link {
+    margin-top: var(--space-sm);
+    margin-bottom: var(--space-md);
 }
 
 .checkout-secure-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
     text-align: center;
     font-size: 0.72rem;
     color: var(--text-muted);
@@ -446,6 +486,32 @@
     padding-top: var(--space-md);
     border-top: 1px solid var(--divider);
 }
+
+/* Combo discount row */
+.checkout-discount-row {
+    color: #2ecc71 !important;
+    font-weight: 600;
+}
+
+/* Free shipping inline badge */
+.checkout-free-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #2ecc71;
+    letter-spacing: 0.5px;
+}
+
+/* Free shipping celebration note */
+.checkout-free-shipping-note {
+    font-size: 0.78rem;
+    color: #2ecc71;
+    text-align: center;
+    margin-top: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(46, 204, 113, 0.08);
+    border-radius: var(--radius-sm);
+}
+
 
 /* ─── Responsive ──────────────────────────────────────────── */
 @media (max-width: 900px) {

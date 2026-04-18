@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
@@ -18,6 +19,21 @@ import Wishlist from './pages/Wishlist';
 import Contact from './pages/Contact';
 import About from './pages/About';
 import AdminDashboard from './pages/Admin';
+import OrderSuccess from './pages/OrderSuccess';
+import ShippingPolicy from './pages/ShippingPolicy';
+import ReturnPolicy from './pages/ReturnPolicy';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsConditions from './pages/TermsConditions';
+import NotFound from './pages/NotFound';
+
+// Scroll to top on every route change
+const ScrollToTop = () => {
+    const { pathname } = useLocation();
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    }, [pathname]);
+    return null;
+};
 
 // Protected Route component
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -49,6 +65,7 @@ function App() {
 
     return (
         <>
+            <ScrollToTop />
             <ExitIntentPopup />
             {!isAuthPage && <Navbar />}
             <CartDrawer />
@@ -61,6 +78,10 @@ function App() {
                     <Route path="/register" element={<Register />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/contact" element={<Contact />} />
+                    <Route path="/shipping-policy" element={<ShippingPolicy />} />
+                    <Route path="/return-policy" element={<ReturnPolicy />} />
+                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                    <Route path="/terms" element={<TermsConditions />} />
 
                     {/* Protected Routes */}
                     <Route path="/checkout" element={
@@ -75,6 +96,9 @@ function App() {
                     <Route path="/wishlist" element={
                         <ProtectedRoute><Wishlist /></ProtectedRoute>
                     } />
+                    <Route path="/order-success/:orderId" element={
+                        <ProtectedRoute><OrderSuccess /></ProtectedRoute>
+                    } />
 
                     {/* Admin Routes */}
                     <Route path="/admin" element={
@@ -82,13 +106,7 @@ function App() {
                     } />
 
                     {/* 404 */}
-                    <Route path="*" element={
-                        <div className="page-loader" style={{ minHeight: '80vh', paddingTop: '120px' }}>
-                            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '4rem', color: 'var(--accent)' }}>404</h1>
-                            <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Page not found</p>
-                            <a href="/" className="btn btn-outline">Return Home</a>
-                        </div>
-                    } />
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
             </main>
             {!isAuthPage && <Footer />}

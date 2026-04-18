@@ -46,9 +46,9 @@ const Footer = () => {
                             <h4 className="footer-heading">Company</h4>
                             <Link to="/about" className="footer-link">About Us</Link>
                             <Link to="/contact" className="footer-link">Contact Us</Link>
-                            <Link to="/shipping" className="footer-link">Shipping Policy</Link>
-                            <Link to="/returns" className="footer-link">Return Policy</Link>
-                            <Link to="/privacy" className="footer-link">Privacy Policy</Link>
+                            <Link to="/shipping-policy" className="footer-link">Shipping Policy</Link>
+                            <Link to="/return-policy" className="footer-link">Return Policy</Link>
+                            <Link to="/privacy-policy" className="footer-link">Privacy Policy</Link>
                             <Link to="/terms" className="footer-link">Terms & Conditions</Link>
                         </div>
 

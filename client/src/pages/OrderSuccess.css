@@ -1,0 +1,295 @@
+/* ─── Order Success Page ──────────────────────────────────── */
+.success-page {
+    min-height: 100vh;
+    padding: 120px var(--space-lg) var(--space-4xl);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ── Animated Icon ──────────────────────────────────────────── */
+.success-icon-wrap {
+    margin-bottom: var(--space-2xl);
+}
+
+.success-icon-ring {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05));
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
+}
+
+.success-icon {
+    font-size: 2.8rem;
+    color: var(--accent);
+    stroke-width: 1.5;
+}
+
+/* ── Content ─────────────────────────────────────────────────── */
+.success-content {
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.success-title {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: var(--space-sm);
+    background: linear-gradient(135deg, var(--accent), #f0d060);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.success-subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--space-2xl);
+    max-width: 480px;
+}
+
+/* ── Info Grid ───────────────────────────────────────────────── */
+.success-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-md);
+    width: 100%;
+    margin-bottom: var(--space-2xl);
+}
+
+.success-info-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    text-align: left;
+}
+
+.success-info-icon {
+    font-size: 1.2rem;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.success-info-label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.success-info-value {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.success-order-num {
+    color: var(--accent);
+    font-family: var(--font-heading);
+    font-size: 1rem;
+}
+
+.success-payment-id {
+    font-size: 0.75rem;
+    word-break: break-all;
+    font-family: monospace;
+    color: var(--text-secondary);
+}
+
+/* ── Items List ──────────────────────────────────────────────── */
+.success-items {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: var(--space-xl);
+    text-align: left;
+}
+
+.success-items-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: var(--space-lg) var(--space-xl);
+    border-bottom: 1px solid var(--divider);
+    color: var(--text-primary);
+}
+
+.success-items-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.success-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-xl);
+    border-bottom: 1px solid var(--divider);
+}
+
+.success-item:last-child {
+    border-bottom: none;
+}
+
+.success-item-img {
+    width: 52px;
+    height: 52px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+}
+
+.success-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.success-item-name {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.success-item-meta {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.success-item-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.success-item-qty {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.success-item-price {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+/* ── Price Summary ───────────────────────────────────────────── */
+.success-price-summary {
+    padding: var(--space-lg) var(--space-xl);
+    background: var(--bg-tertiary);
+}
+
+.success-price-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xs);
+}
+
+.success-price-total {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--divider);
+}
+
+/* ── COD Notice ──────────────────────────────────────────────── */
+.success-cod-notice {
+    width: 100%;
+    padding: var(--space-md) var(--space-lg);
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: var(--radius-md);
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-lg);
+    text-align: center;
+}
+
+/* ── Email Note ──────────────────────────────────────────────── */
+.success-email-note {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-2xl);
+}
+
+/* ── Action Buttons ──────────────────────────────────────────── */
+.success-actions {
+    display: flex;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.success-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    min-width: 180px;
+    justify-content: center;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 600px) {
+    .success-page {
+        padding-top: 90px;
+    }
+
+    .success-title {
+        font-size: 1.7rem;
+    }
+
+    .success-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .success-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .success-btn {
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .success-item {
+        padding: var(--space-md);
+    }
+}
