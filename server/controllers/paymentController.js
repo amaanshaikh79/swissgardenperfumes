@@ -7,13 +7,13 @@ const KEY_ID = process.env.RAZORPAY_KEY_ID?.trim();
 const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET?.trim();
 const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET?.trim();
 
-const isKeyConfigured = (key) => key && !key.startsWith('your_') && !key.startsWith('rzp_live_your') && key !== 'rzp_test_demo';
+const isKeyConfigured = (key) => key && !key.startsWith('your_') && !key.startsWith('rzp_live_your') && key !== 'rzp_test_demo' && key.length > 0;
 
 if (!isKeyConfigured(KEY_ID)) {
-    console.warn('⚠️  RAZORPAY_KEY_ID not found or invalid. Payments will not work. Set RAZORPAY_KEY_ID in server/.env');
+    console.warn('⚠️  RAZORPAY_KEY_ID not configured properly. Payments will not work.');
 }
 if (!isKeyConfigured(KEY_SECRET)) {
-    console.warn('⚠️  RAZORPAY_KEY_SECRET not found or invalid. Payments will not work. Set RAZORPAY_KEY_SECRET in server/.env');
+    console.warn('⚠️  RAZORPAY_KEY_SECRET not configured properly. Payments will not work.');
 }
 
 // Lazy-init: create instance only when a payment endpoint is hit,

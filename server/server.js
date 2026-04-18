@@ -1,27 +1,45 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
-// Load env vars
+// ⚠️  CRITICAL: Load .env FIRST before any other code runs
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+const envPath = path.resolve(__dirname, '.env');
 
+console.log(`\n📁 Environment Setup:`);
+console.log(`   .env path: ${envPath}`);
+console.log(`   .env exists: ${fs.existsSync(envPath)}`);
+
+const result = dotenv.config({ path: envPath });
+if (result.error) {
+    console.error(`❌ Failed to load .env file:`, result.error);
+    process.exit(1);
+} else {
+    console.log(`✅ .env file loaded successfully (${Object.keys(result.parsed || {}).length} variables)\n`);
+}
+
+console.log(`🔑 Verification:`);
+console.log(`   NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`   RAZORPAY_KEY_ID: ${process.env.RAZORPAY_KEY_ID ? '✓ Loaded' : '✗ Missing'}`);
+console.log(`   RAZORPAY_KEY_SECRET: ${process.env.RAZORPAY_KEY_SECRET ? '✓ Loaded' : '✗ Missing'}`);
+console.log(`   MONGO_URI: ${process.env.MONGO_URI ? '✓ Loaded' : '✗ Missing'}`);
+console.log(`   JWT_SECRET: ${process.env.JWT_SECRET ? '✓ Loaded' : '✗ Missing'}\n`);
+
+// Set fallback values for development
 if (!process.env.JWT_SECRET) {
-    console.warn('WARNING: JWT_SECRET is not defined using .env. Using insecure fallback secret for development/deployment testing.');
+    console.warn('⚠️  JWT_SECRET not set. Using development fallback.');
     process.env.JWT_SECRET = 'fallback_secret_for_dev_deployment_only_123';
 }
-
 if (!process.env.JWT_EXPIRE) {
-    console.warn('WARNING: JWT_EXPIRE is not defined. Using default 30d.');
     process.env.JWT_EXPIRE = '30d';
 }
-
 if (!process.env.JWT_COOKIE_EXPIRE) {
-    console.warn('WARNING: JWT_COOKIE_EXPIRE is not defined. Using default 30.');
     process.env.JWT_COOKIE_EXPIRE = '30';
 }
 
+// NOW load all other imports (they can safely read env vars)
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -30,8 +48,6 @@ import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import connectDB from './config/db.js';
 import errorHandler from './middleware/errorHandler.js';
-
-// Route imports
 import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
