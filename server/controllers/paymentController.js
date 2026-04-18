@@ -3,15 +3,17 @@ import crypto from 'crypto';
 import Order from '../models/Order.js';
 
 // ── Read keys from env ────────────────────────────────────────────
-const KEY_ID = process.env.RAZORPAY_KEY_ID;
-const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
-const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET;
+const KEY_ID = process.env.RAZORPAY_KEY_ID?.trim();
+const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET?.trim();
+const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET?.trim();
 
-if (!KEY_ID || KEY_ID.startsWith('rzp_live_your') || KEY_ID === 'rzp_test_demo') {
-    console.warn('⚠️  WARNING: RAZORPAY_KEY_ID is not configured. Payments will not work.');
+const isKeyConfigured = (key) => key && !key.startsWith('your_') && !key.startsWith('rzp_live_your') && key !== 'rzp_test_demo';
+
+if (!isKeyConfigured(KEY_ID)) {
+    console.warn('⚠️  RAZORPAY_KEY_ID not found or invalid. Payments will not work. Set RAZORPAY_KEY_ID in server/.env');
 }
-if (!KEY_SECRET || KEY_SECRET === 'demo_secret' || KEY_SECRET.startsWith('your_razorpay')) {
-    console.warn('⚠️  WARNING: RAZORPAY_KEY_SECRET is not configured. Payments will not work.');
+if (!isKeyConfigured(KEY_SECRET)) {
+    console.warn('⚠️  RAZORPAY_KEY_SECRET not found or invalid. Payments will not work. Set RAZORPAY_KEY_SECRET in server/.env');
 }
 
 // Lazy-init: create instance only when a payment endpoint is hit,
@@ -19,10 +21,13 @@ if (!KEY_SECRET || KEY_SECRET === 'demo_secret' || KEY_SECRET.startsWith('your_r
 let _razorpayInstance = null;
 const getRazorpay = () => {
     if (!_razorpayInstance) {
-        if (!KEY_ID || !KEY_SECRET) {
-            throw new Error('Razorpay API keys are not configured. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in server/.env');
+        if (!isKeyConfigured(KEY_ID) || !isKeyConfigured(KEY_SECRET)) {
+            const msg = 'Razorpay API keys not configured. Ensure RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET are set in server/.env';
+            console.error(`❌ ${msg}`);
+            throw new Error(msg);
         }
         _razorpayInstance = new Razorpay({ key_id: KEY_ID, key_secret: KEY_SECRET });
+        console.log('✓ Razorpay instance initialized successfully');
     }
     return _razorpayInstance;
 };
@@ -33,10 +38,20 @@ const getRazorpay = () => {
 // @access  Public
 // ─────────────────────────────────────────────────────────────────
 export const getPaymentConfig = (req, res) => {
-    if (!KEY_ID || KEY_ID.startsWith('rzp_live_your') || KEY_ID === 'rzp_test_demo') {
+    if (!isKeyConfigured(KEY_ID)) {
+        console.error('❌ Payment config error: RAZORPAY_KEY_ID is missing or invalid');
+        console.error('   KEY_ID value:', KEY_ID ? `"${KEY_ID}"` : 'undefined');
+        console.error('   Fix: Set RAZORPAY_KEY_ID in server/.env and restart the server');
         return res.status(503).json({
             success: false,
-            message: 'Payment gateway is not configured. Please contact support.',
+            message: 'Payment gateway is not configured. Razorpay API key is missing. Please check server logs.',
+        });
+    }
+    if (!isKeyConfigured(KEY_SECRET)) {
+        console.error('❌ Payment config error: RAZORPAY_KEY_SECRET is missing or invalid');
+        return res.status(503).json({
+            success: false,
+            message: 'Payment gateway is not configured. API secret is missing. Please check server logs.',
         });
     }
     res.status(200).json({
