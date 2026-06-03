@@ -22,7 +22,7 @@ import deliveryPartnerRoutes from './routes/deliveryPartnerRoutes.js';
 import returnRoutes from './routes/returnRoutes.js';
 import passport from './config/passport.js';
 
-// ⚠️  CRITICAL: Load .env FIRST before any other code runs
+// ⚠️  Load .env in development. On Render/production, env vars are injected by the platform.
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const envPath = path.resolve(__dirname, '.env');
@@ -31,12 +31,15 @@ console.log(`\n📁 Environment Setup:`);
 console.log(`   .env path: ${envPath}`);
 console.log(`   .env exists: ${fs.existsSync(envPath)}`);
 
-const result = dotenv.config({ path: envPath });
-if (result.error) {
-    console.error(`❌ Failed to load .env file:`, result.error);
-    process.exit(1);
+if (fs.existsSync(envPath)) {
+    const result = dotenv.config({ path: envPath });
+    if (result.error) {
+        console.warn(`⚠️  Failed to parse .env file:`, result.error.message);
+    } else {
+        console.log(`✅ .env file loaded successfully (${Object.keys(result.parsed || {}).length} variables)\n`);
+    }
 } else {
-    console.log(`✅ .env file loaded successfully (${Object.keys(result.parsed || {}).length} variables)\n`);
+    console.log(`ℹ️  No .env file found — using platform environment variables (Render/production mode)\n`);
 }
 
 console.log(`🔑 Verification:`);
@@ -45,6 +48,7 @@ console.log(`   RAZORPAY_KEY_ID: ${process.env.RAZORPAY_KEY_ID ? '✓ Loaded' : 
 console.log(`   RAZORPAY_KEY_SECRET: ${process.env.RAZORPAY_KEY_SECRET ? '✓ Loaded' : '✗ Missing'}`);
 console.log(`   MONGO_URI: ${process.env.MONGO_URI ? '✓ Loaded' : '✗ Missing'}`);
 console.log(`   JWT_SECRET: ${process.env.JWT_SECRET ? '✓ Loaded' : '✗ Missing'}\n`);
+
 
 // Set fallback values for development
 if (!process.env.JWT_SECRET) {
