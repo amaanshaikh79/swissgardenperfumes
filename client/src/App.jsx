@@ -28,6 +28,7 @@ import ShippingPolicy from './pages/ShippingPolicy';
 import ReturnPolicy from './pages/ReturnPolicy';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsConditions from './pages/TermsConditions';
+import OAuthCallback from './pages/OAuthCallback';
 import NotFound from './pages/NotFound';
 
 // Scroll to top on every route change
@@ -65,7 +66,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 
 function App() {
     const location = useLocation();
-    const isAuthPage = ['/login', '/register'].includes(location.pathname);
+    const isAuthPage = ['/login', '/register', '/auth/callback'].includes(location.pathname);
     const [showSplash, setShowSplash] = useState(() => !sessionStorage.getItem('sg_splash_shown'));
 
     const handleSplashComplete = useCallback(() => {
@@ -96,6 +97,7 @@ function App() {
                     <Route path="/return-policy" element={<ReturnPolicy />} />
                     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                     <Route path="/terms" element={<TermsConditions />} />
+                    <Route path="/auth/callback" element={<OAuthCallback />} />
 
                     {/* Protected Routes */}
                     <Route path="/checkout" element={

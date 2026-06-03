@@ -146,49 +146,86 @@
 }
 
 .auth-social-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
 }
 
 .auth-social-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-sm);
-    padding: var(--space-md);
-    border: 1px solid var(--border-color);
+    gap: 12px;
+    width: 100%;
+    padding: 13px var(--space-lg);
     border-radius: var(--radius-md);
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: 0.92rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.22s ease;
+    border: 1.5px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.2px;
+}
+
+.auth-social-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.2s;
 }
 
 .auth-social-btn:hover {
-    border-color: var(--accent);
-    background: var(--bg-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px -4px rgba(0,0,0,0.3);
 }
 
+/* Google */
 .auth-social-google {
-    color: #DB4437;
+    border-color: rgba(66, 133, 244, 0.3);
 }
-
+.auth-social-google::before {
+    background: linear-gradient(135deg, rgba(66,133,244,0.08), rgba(52,168,83,0.06));
+}
 .auth-social-google:hover {
-    background: #fef7f7;
-    border-color: #DB4437;
+    border-color: rgba(66, 133, 244, 0.6);
+    color: var(--text-primary);
+}
+.auth-social-google:hover::before {
+    opacity: 1;
 }
 
+/* Facebook */
 .auth-social-facebook {
+    border-color: rgba(66, 103, 178, 0.3);
     color: #4267B2;
 }
-
-.auth-social-facebook:hover {
-    background: #f0f5ff;
-    border-color: #4267B2;
+.auth-social-facebook::before {
+    background: linear-gradient(135deg, rgba(66,103,178,0.1), rgba(66,103,178,0.04));
 }
+.auth-social-facebook:hover {
+    border-color: rgba(66, 103, 178, 0.6);
+    color: #4267B2;
+}
+.auth-social-facebook:hover::before {
+    opacity: 1;
+}
+
+.auth-social-btn span {
+    position: relative;
+    z-index: 1;
+}
+
+.auth-social-btn svg {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+}
+
 
 /* ═══════════════════════════════════════════════════════════
    Responsive
