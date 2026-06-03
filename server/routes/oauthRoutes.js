@@ -4,11 +4,11 @@ import passport from '../config/passport.js';
 const router = express.Router();
 
 // Google OAuth
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
 
 router.get(
     '/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login?error=google_failed' }),
+    passport.authenticate('google', { failureRedirect: '/login?error=google_failed', session: false }),
     (req, res) => {
         // Generate JWT token
         const token = req.user.getSignedJwtToken();
@@ -19,11 +19,11 @@ router.get(
 );
 
 // Facebook OAuth
-router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+router.get('/facebook', passport.authenticate('facebook', { scope: ['email'], session: false }));
 
 router.get(
     '/facebook/callback',
-    passport.authenticate('facebook', { failureRedirect: '/login?error=facebook_failed' }),
+    passport.authenticate('facebook', { failureRedirect: '/login?error=facebook_failed', session: false }),
     (req, res) => {
         // Generate JWT token
         const token = req.user.getSignedJwtToken();

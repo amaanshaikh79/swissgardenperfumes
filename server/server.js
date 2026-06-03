@@ -137,9 +137,8 @@ app.use('/api/auth', oauthRoutes);
 app.use('/api/delivery-partners', deliveryPartnerRoutes);
 app.use('/api/returns', returnRoutes);
 
-// ─── Passport Initialization ─────────────────────────────────────
+// ─── Passport Initialization (JWT mode — no sessions needed) ──────
 app.use(passport.initialize());
-app.use(passport.session());
 
 // ─── Health Check ───────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
