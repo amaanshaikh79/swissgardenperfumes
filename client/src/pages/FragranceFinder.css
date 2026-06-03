@@ -1,0 +1,275 @@
+/* ═══════════════════════════════════════════════════════════
+   Fragrance Finder — Quiz & Results
+   ═══════════════════════════════════════════════════════════ */
+
+.finder-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px var(--space-xl) var(--space-4xl);
+    background: var(--bg-secondary);
+}
+
+/* ─── Quiz Layout ─────────────────────────────────────────── */
+.finder-quiz {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.finder-progress {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-3xl);
+}
+
+.finder-progress-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--border-color);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.finder-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: var(--radius-full);
+}
+
+.finder-progress-text {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+/* ─── Question ────────────────────────────────────────────── */
+.finder-question {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+}
+
+.finder-question-text {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+    font-weight: 400;
+    color: var(--text-primary);
+    line-height: 1.3;
+    margin-bottom: var(--space-2xl);
+}
+
+.finder-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+}
+
+.finder-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-lg) var(--space-xl);
+    background: var(--white);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    text-align: left;
+    transition: all var(--transition-fast);
+    position: relative;
+}
+
+.finder-option:hover {
+    border-color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.finder-option.selected {
+    border-color: var(--accent);
+    background: var(--accent-subtle);
+}
+
+.finder-option-emoji {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.finder-option-label {
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.finder-option-check {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    color: var(--accent);
+}
+
+/* ─── Navigation ──────────────────────────────────────────── */
+.finder-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* ─── Results ─────────────────────────────────────────────── */
+.finder-results {
+    width: 100%;
+    max-width: 650px;
+    text-align: center;
+}
+
+.finder-results-content {
+    background: var(--white);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-4xl) var(--space-3xl);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
+}
+
+.finder-results-name {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 300;
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+    margin-top: var(--space-md);
+}
+
+.finder-results-desc {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--space-2xl);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.finder-results-families {
+    margin-bottom: var(--space-2xl);
+}
+
+.finder-results-families h4,
+.finder-results-recs h4 {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: var(--space-md);
+}
+
+.finder-family-tags {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.finder-family-tag {
+    padding: 8px 20px;
+    background: var(--accent-subtle);
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-600);
+}
+
+.finder-results-recs {
+    margin-bottom: var(--space-2xl);
+}
+
+.finder-rec-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.finder-rec-list li {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.finder-results-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-2xl);
+}
+
+.finder-sample-cta {
+    padding: var(--space-xl);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.finder-sample-cta p {
+    font-size: 0.88rem;
+    color: var(--text-tertiary);
+    margin-bottom: var(--space-md);
+}
+
+.finder-retake {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .finder-page {
+        padding: 100px var(--space-md) var(--space-2xl);
+    }
+
+    .finder-options {
+        grid-template-columns: 1fr;
+    }
+
+    .finder-results-content {
+        padding: var(--space-2xl) var(--space-xl);
+    }
+
+    .finder-results-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .finder-results-actions .btn {
+        width: 100%;
+        max-width: 280px;
+    }
+}
+
+@media (max-width: 480px) {
+    .finder-question-text {
+        font-size: 1.3rem;
+    }
+
+    .finder-option {
+        padding: var(--space-md) var(--space-lg);
+    }
+
+    .finder-option-emoji {
+        font-size: 1.2rem;
+    }
+
+    .finder-option-label {
+        font-size: 0.85rem;
+    }
+}

@@ -2,20 +2,29 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiCheck, FiCreditCard, FiMapPin, FiSmartphone, FiTruck, FiLock, FiAlertCircle } from 'react-icons/fi';
+import { FiCheck, FiCreditCard, FiMapPin, FiSmartphone, FiTruck, FiLock, FiAlertCircle, FiTag, FiX } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { ordersAPI, paymentAPI } from '../services/api';
+import { ordersAPI, paymentAPI, couponAPI } from '../services/api';
 import { getCountries, getStates, getCities } from '../data/locationData';
 import toast from 'react-hot-toast';
 import './Checkout.css';
+
+const formatINR = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(amount);
+};
 
 const PAYMENT_METHODS = [
     {
         id: 'cod',
         label: 'Cash on Delivery',
         icon: <FiTruck size={22} />,
-        desc: 'Pay when your order arrives at your doorstep',
+        desc: 'Pay when delivered (+₹50 COD charge)',
     },
     {
         id: 'razorpay',
@@ -38,7 +47,7 @@ const PAYMENT_METHODS = [
 ];
 
 const Checkout = () => {
-    const { cartItems, cartTotal, taxAmount, shippingAmount, comboDiscount, orderTotal, clearCart } = useCart();
+    const { cartItems, cartTotal, taxAmount, shippingAmount, comboDiscount, codCharge, orderTotal, orderTotalWithCOD, clearCart } = useCart();
     const { user } = useAuth();
     const navigate = useNavigate();
 
@@ -49,6 +58,38 @@ const Checkout = () => {
     const [shipping, setShipping] = useState({
         street: '', landmark: '', country: '', state: '', city: '', zipCode: '',
     });
+
+    // Coupon state
+    const [couponInput, setCouponInput] = useState('');
+    const [couponLoading, setCouponLoading] = useState(false);
+    const [appliedCoupon, setAppliedCoupon] = useState(null); // { code, discount, description }
+    const couponDiscount = appliedCoupon?.discount || 0;
+
+    const handleApplyCoupon = async () => {
+        if (!couponInput.trim()) return;
+        setCouponLoading(true);
+        try {
+            const { data } = await couponAPI.apply({ code: couponInput.trim(), orderAmount: cartTotal });
+            setAppliedCoupon({ code: data.coupon.code, discount: data.discount, description: data.coupon.description });
+            toast.success(data.message);
+        } catch (err) {
+            const msg = err.response?.data?.message || 'Invalid coupon code';
+            toast.error(msg);
+            setAppliedCoupon(null);
+        } finally {
+            setCouponLoading(false);
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        setAppliedCoupon(null);
+        setCouponInput('');
+        toast.success('Coupon removed');
+    };
+
+    // Final totals with coupon
+    const finalOrderTotal = Math.max(0, orderTotal - couponDiscount);
+    const finalOrderTotalWithCOD = Math.max(0, orderTotalWithCOD - couponDiscount);
 
     // Cascading location data
     const countries = useMemo(() => getCountries(), []);
@@ -156,6 +197,7 @@ const Checkout = () => {
                 country: shipping.country,
             },
             paymentMethod: paymentMethod === 'cod' ? 'cod' : 'razorpay',
+            couponCode: appliedCoupon?.code || null,
         };
 
         try {
@@ -181,7 +223,7 @@ const Checkout = () => {
 
             // Step 2: Create Razorpay order on backend (returns amount in paise)
             const paymentRes = await paymentAPI.createOrder({
-                amount: orderTotal,
+                amount: finalOrderTotal,
                 currency: 'INR',
                 receipt: `rcpt_${Date.now()}`,
             });
@@ -473,7 +515,7 @@ const Checkout = () => {
                                                         <p>{item.size} × {item.quantity}</p>
                                                     </div>
                                                     <span className="checkout-review-price">
-                                                        ₹{(item.price * item.quantity).toFixed(2)}
+                                                        {formatINR(item.price * item.quantity)}
                                                     </span>
                                                 </div>
                                             ))}
@@ -533,9 +575,9 @@ const Checkout = () => {
                                                     {paymentMethod === 'cod' ? 'Placing Order…' : 'Processing Payment…'}
                                                 </span>
                                             ) : paymentMethod === 'cod' ? (
-                                                `Place Order — ₹${orderTotal.toFixed(2)} (Pay on Delivery)`
+                                                `Place Order — ${formatINR(finalOrderTotalWithCOD)} (Pay on Delivery)`
                                             ) : (
-                                                `Pay ₹${orderTotal.toFixed(2)} via ${selectedMethod?.label}`
+                                                `Pay ${formatINR(finalOrderTotal)} via ${selectedMethod?.label}`
                                             )}
                                         </button>
 
@@ -559,29 +601,77 @@ const Checkout = () => {
                             {cartItems.map((item) => (
                                 <div key={item._id} className="checkout-summary-item">
                                     <span>{item.name} × {item.quantity}</span>
-                                    <span>₹{(item.price * item.quantity).toFixed(2)}</span>
+                                    <span>{formatINR(item.price * item.quantity)}</span>
                                 </div>
                             ))}
                             <div className="checkout-summary-divider" />
                             <div className="checkout-summary-row">
-                                <span>Subtotal</span><span>₹{cartTotal.toFixed(2)}</span>
+                                <span>Subtotal</span><span>{formatINR(cartTotal)}</span>
                             </div>
                             <div className="checkout-summary-row">
                                 <span>Shipping</span>
-                                <span>{shippingAmount === 0 ? <span className="checkout-free-badge">FREE</span> : `₹${shippingAmount.toFixed(2)}`}</span>
-                            </div>
-                            <div className="checkout-summary-row">
-                                <span>Tax (8%)</span><span>₹{taxAmount.toFixed(2)}</span>
+                                <span>{shippingAmount === 0 ? <span className="checkout-free-badge">FREE</span> : formatINR(shippingAmount)}</span>
                             </div>
                             {comboDiscount > 0 && (
                                 <div className="checkout-summary-row checkout-discount-row">
-                                    <span>Combo Discount</span><span>−₹{comboDiscount.toFixed(2)}</span>
+                                    <span>Combo Discount</span><span>−{formatINR(comboDiscount)}</span>
+                                </div>
+                            )}
+                            {paymentMethod === 'cod' && (
+                                <div className="checkout-summary-row checkout-cod-row">
+                                    <span>COD Charge</span><span>+{formatINR(codCharge)}</span>
+                                </div>
+                            )}
+                            {couponDiscount > 0 && (
+                                <div className="checkout-summary-row checkout-discount-row">
+                                    <span>🎟️ Coupon ({appliedCoupon?.code})</span><span>−{formatINR(couponDiscount)}</span>
                                 </div>
                             )}
                             <div className="checkout-summary-divider" />
                             <div className="checkout-summary-row checkout-summary-total">
-                                <span>Total</span><span>₹{orderTotal.toFixed(2)}</span>
+                                <span>Total</span><span>{formatINR(paymentMethod === 'cod' ? finalOrderTotalWithCOD : finalOrderTotal)}</span>
                             </div>
+                            <p className="checkout-gst-note">Inclusive of all taxes</p>
+
+                            {/* Coupon Input */}
+                            <div className="checkout-coupon-section">
+                                {!appliedCoupon ? (
+                                    <div className="checkout-coupon-input-row">
+                                        <div className="checkout-coupon-input-wrap">
+                                            <FiTag size={14} className="checkout-coupon-icon" />
+                                            <input
+                                                type="text"
+                                                className="checkout-coupon-input"
+                                                placeholder="Enter coupon code"
+                                                value={couponInput}
+                                                onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                                                onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                                            />
+                                        </div>
+                                        <button
+                                            className="btn btn-sm btn-outline checkout-coupon-btn"
+                                            onClick={handleApplyCoupon}
+                                            disabled={couponLoading || !couponInput.trim()}
+                                        >
+                                            {couponLoading ? '...' : 'Apply'}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="checkout-coupon-applied">
+                                        <div className="checkout-coupon-applied-info">
+                                            <FiTag size={14} />
+                                            <div>
+                                                <strong>{appliedCoupon.code}</strong>
+                                                <span>You save {formatINR(couponDiscount)}</span>
+                                            </div>
+                                        </div>
+                                        <button className="checkout-coupon-remove" onClick={handleRemoveCoupon}>
+                                            <FiX size={14} />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
                             {paymentMethod && (
                                 <div className="checkout-summary-method">
                                     <span>Payment</span>

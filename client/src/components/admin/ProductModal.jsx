@@ -166,6 +166,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
                                 <option>Parfum</option>
                                 <option>Body Mist</option>
                                 <option>Gift Set</option>
+                                <option>Attar Roll-On</option>
                             </select>
                         </div>
 

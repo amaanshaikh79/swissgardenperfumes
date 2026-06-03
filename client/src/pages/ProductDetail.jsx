@@ -2,18 +2,22 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
-import { FiHeart, FiShoppingBag, FiStar, FiMinus, FiPlus, FiChevronRight } from 'react-icons/fi';
+import { FiHeart, FiShoppingBag, FiStar, FiMinus, FiPlus, FiChevronRight, FiArrowRight, FiRotateCw } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { productsAPI } from '../services/api';
+import ProductCard from '../components/product/ProductCard';
 import toast from 'react-hot-toast';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
     const { slug } = useParams();
     const [product, setProduct] = useState(null);
+    const [related, setRelated] = useState([]);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
+    const [selectedImage, setSelectedImage] = useState(0);
+    const [imageRotation, setImageRotation] = useState(0);
 
     const getLongevityWidth = (val) => {
         if (!val) return '70%';
@@ -38,7 +42,8 @@ const ProductDetail = () => {
         if (val === 'Moderate') return '60%';
         return '40%';
     };
-    const [activeTab, setActiveTab] = useState('description');
+
+    const [activeTab, setActiveTab] = useState('story');
     const [reviewForm, setReviewForm] = useState({ rating: 5, title: '', comment: '' });
     const [submitting, setSubmitting] = useState(false);
     const { isAuthenticated, isInWishlist, toggleWishlist } = useAuth();
@@ -50,6 +55,16 @@ const ProductDetail = () => {
             try {
                 const { data } = await productsAPI.getBySlug(slug);
                 setProduct(data.product);
+                setSelectedImage(0);
+                setImageRotation(0);
+                // Fetch related products
+                if (data.product.fragranceFamily) {
+                    const relData = await productsAPI.getAll({
+                        fragranceFamily: data.product.fragranceFamily,
+                        limit: 5,
+                    });
+                    setRelated(relData.data.products.filter((p) => p._id !== data.product._id).slice(0, 4));
+                }
             } catch (error) {
                 console.error('Failed to fetch product:', error);
             } finally {
@@ -95,6 +110,10 @@ const ProductDetail = () => {
         }
     };
 
+    const handle360Rotate = () => {
+        setImageRotation((prev) => prev + 90);
+    };
+
     if (loading) {
         return (
             <div className="page-loader" style={{ paddingTop: '100px' }}>
@@ -115,11 +134,17 @@ const ProductDetail = () => {
 
     const inWishlist = isInWishlist(product._id);
 
+    // Perfumer's note — generated from description or custom field
+    const perfumerNote = product.perfumerNote || (product.description ? product.description.slice(0, 300) : '');
+
+    // Dry-down description
+    const dryDown = product.dryDown || 'As the fragrance settles, the base notes emerge slowly \u2014 warm, rich, and deeply personal. The dry-down is where this scent truly becomes yours, evolving on your skin over hours into something intimate and unforgettable.';
+
     return (
         <>
             <Helmet>
-                <title>{product.name} | swissgarden Perfumes</title>
-                <meta name="description" content={product.shortDescription || product.description.slice(0, 160)} />
+                <title>{product.name} | SwissGarden Perfumes</title>
+                <meta name="description" content={product.shortDescription || product.description?.slice(0, 160)} />
             </Helmet>
 
             <div className="product-detail-page">
@@ -137,7 +162,7 @@ const ProductDetail = () => {
                 {/* Main Product */}
                 <div className="container">
                     <div className="product-detail-grid">
-                        {/* Images */}
+                        {/* ─── Large Image Gallery ─────────────── */}
                         <motion.div
                             className="product-detail-images"
                             initial={{ opacity: 0, x: -30 }}
@@ -145,23 +170,33 @@ const ProductDetail = () => {
                             transition={{ duration: 0.5 }}
                         >
                             <div className="product-detail-main-image">
-                                <img
-                                    src={product.images?.[0]?.url || 'https://via.placeholder.com/600x800?text=Perfume'}
+                                <motion.img
+                                    src={product.images?.[selectedImage]?.url || 'https://via.placeholder.com/600x800?text=Perfume'}
                                     alt={product.name}
+                                    style={{ rotate: imageRotation }}
+                                    transition={{ type: 'spring', stiffness: 200, damping: 20 }}
                                 />
+                                <button className="product-360-btn" onClick={handle360Rotate} title="360\u00b0 Rotate">
+                                    <FiRotateCw size={18} />
+                                    <span>360\u00b0</span>
+                                </button>
                             </div>
                             {product.images?.length > 1 && (
                                 <div className="product-detail-thumbnails">
                                     {product.images.map((img, i) => (
-                                        <div key={i} className="product-detail-thumbnail">
+                                        <button
+                                            key={i}
+                                            className={`product-detail-thumbnail ${selectedImage === i ? 'active' : ''}`}
+                                            onClick={() => { setSelectedImage(i); setImageRotation(0); }}
+                                        >
                                             <img src={img.url} alt={img.alt || product.name} />
-                                        </div>
+                                        </button>
                                     ))}
                                 </div>
                             )}
                         </motion.div>
 
-                        {/* Info */}
+                        {/* ─── Product Info ─────────────────────── */}
                         <motion.div
                             className="product-detail-info"
                             initial={{ opacity: 0, x: 30 }}
@@ -170,6 +205,9 @@ const ProductDetail = () => {
                         >
                             <span className="product-detail-brand">{product.brand}</span>
                             <h1 className="product-detail-name">{product.name}</h1>
+                            {product.shortDescription && (
+                                <p className="product-detail-tagline">{product.shortDescription}</p>
+                            )}
                             <p className="product-detail-category">
                                 {product.category} · {product.size} · {product.gender}
                             </p>
@@ -191,53 +229,61 @@ const ProductDetail = () => {
                             )}
 
                             <div className="product-detail-price">
-                                <span className="product-detail-current-price">${product.price.toFixed(2)}</span>
+                                <span className="product-detail-current-price">\u20B9{product.price.toLocaleString('en-IN')}</span>
                                 {product.compareAtPrice && (
-                                    <span className="product-detail-compare-price">${product.compareAtPrice.toFixed(2)}</span>
+                                    <span className="product-detail-compare-price">\u20B9{product.compareAtPrice.toLocaleString('en-IN')}</span>
                                 )}
                                 {product.compareAtPrice && (
                                     <span className="badge badge-gold">
-                                        Save ${(product.compareAtPrice - product.price).toFixed(0)}
+                                        Save \u20B9{Math.round(product.compareAtPrice - product.price)}
                                     </span>
                                 )}
                             </div>
 
-                            <p className="product-detail-short-desc">
-                                {product.shortDescription || product.description.slice(0, 200)}
-                            </p>
-
-                            {/* Fragrance Notes */}
+                            {/* ─── Scent Pyramid ───────────────── */}
                             {product.fragranceNotes && (
                                 <div className="fragrance-pyramid">
-                                    <h4 className="fragrance-pyramid-title">Fragrance Notes</h4>
-                                    <div className="fragrance-layers">
+                                    <h4 className="fragrance-pyramid-title">Scent Pyramid</h4>
+                                    <div className="fragrance-pyramid-visual">
                                         {product.fragranceNotes.top?.length > 0 && (
-                                            <div className="fragrance-layer">
-                                                <span className="fragrance-layer-label">Top</span>
-                                                <div className="fragrance-notes-list">
-                                                    {product.fragranceNotes.top.map((note) => (
-                                                        <span key={note} className="fragrance-note">{note}</span>
-                                                    ))}
+                                            <div className="pyramid-tier pyramid-tier--top">
+                                                <div className="pyramid-tier-bar" />
+                                                <div className="pyramid-tier-content">
+                                                    <span className="pyramid-tier-label">Top Notes</span>
+                                                    <span className="pyramid-tier-desc">First impression \u2014 fades in 15\u201330 min</span>
+                                                    <div className="fragrance-notes-list">
+                                                        {product.fragranceNotes.top.map((note) => (
+                                                            <span key={note} className="fragrance-note">{note}</span>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}
                                         {product.fragranceNotes.middle?.length > 0 && (
-                                            <div className="fragrance-layer">
-                                                <span className="fragrance-layer-label">Heart</span>
-                                                <div className="fragrance-notes-list">
-                                                    {product.fragranceNotes.middle.map((note) => (
-                                                        <span key={note} className="fragrance-note">{note}</span>
-                                                    ))}
+                                            <div className="pyramid-tier pyramid-tier--heart">
+                                                <div className="pyramid-tier-bar" />
+                                                <div className="pyramid-tier-content">
+                                                    <span className="pyramid-tier-label">Heart Notes</span>
+                                                    <span className="pyramid-tier-desc">The soul \u2014 emerges after 30 min</span>
+                                                    <div className="fragrance-notes-list">
+                                                        {product.fragranceNotes.middle.map((note) => (
+                                                            <span key={note} className="fragrance-note">{note}</span>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}
                                         {product.fragranceNotes.base?.length > 0 && (
-                                            <div className="fragrance-layer">
-                                                <span className="fragrance-layer-label">Base</span>
-                                                <div className="fragrance-notes-list">
-                                                    {product.fragranceNotes.base.map((note) => (
-                                                        <span key={note} className="fragrance-note">{note}</span>
-                                                    ))}
+                                            <div className="pyramid-tier pyramid-tier--base">
+                                                <div className="pyramid-tier-bar" />
+                                                <div className="pyramid-tier-content">
+                                                    <span className="pyramid-tier-label">Base Notes</span>
+                                                    <span className="pyramid-tier-desc">The foundation \u2014 lasts for hours</span>
+                                                    <div className="fragrance-notes-list">
+                                                        {product.fragranceNotes.base.map((note) => (
+                                                            <span key={note} className="fragrance-note">{note}</span>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}
@@ -245,7 +291,7 @@ const ProductDetail = () => {
                                 </div>
                             )}
 
-                            {/* Actions */}
+                            {/* ─── Actions ─────────────────────── */}
                             <div className="product-detail-actions">
                                 <div className="product-detail-qty">
                                     <button onClick={() => setQuantity(Math.max(1, quantity - 1))} disabled={quantity <= 1}>
@@ -257,7 +303,7 @@ const ProductDetail = () => {
                                     </button>
                                 </div>
                                 <button className="btn btn-primary btn-lg product-detail-add-btn" onClick={handleAddToCart}>
-                                    <FiShoppingBag size={18} /> Add to Bag — ${(product.price * quantity).toFixed(2)}
+                                    <FiShoppingBag size={18} /> Add to Bag — \u20B9{(product.price * quantity).toLocaleString('en-IN')}
                                 </button>
                                 <button
                                     className={`btn btn-icon btn-outline product-detail-wish-btn ${inWishlist ? 'in-wishlist' : ''}`}
@@ -267,9 +313,9 @@ const ProductDetail = () => {
                                 </button>
                             </div>
 
-                            {/* Performance Meter */}
+                            {/* ─── Performance Meter ────────────── */}
                             <div className="product-performance-meter">
-                                <h4 className="meter-title">Performance & Sillage</h4>
+                                <h4 className="meter-title">How It Wears</h4>
                                 <div className="meter-grid">
                                     <div className="meter-item">
                                         <div className="meter-label">
@@ -277,10 +323,7 @@ const ProductDetail = () => {
                                             <span className="meter-value">{product.longevity || '8-10 Hours'}</span>
                                         </div>
                                         <div className="meter-bar-bg">
-                                            <div
-                                                className="meter-bar-fill"
-                                                style={{ width: getLongevityWidth(product.longevity) }}
-                                            />
+                                            <div className="meter-bar-fill" style={{ width: getLongevityWidth(product.longevity) }} />
                                         </div>
                                     </div>
                                     <div className="meter-item">
@@ -289,10 +332,7 @@ const ProductDetail = () => {
                                             <span className="meter-value">{product.sillage || 'Moderate'}</span>
                                         </div>
                                         <div className="meter-bar-bg">
-                                            <div
-                                                className="meter-bar-fill"
-                                                style={{ width: getSillageWidth(product.sillage) }}
-                                            />
+                                            <div className="meter-bar-fill" style={{ width: getSillageWidth(product.sillage) }} />
                                         </div>
                                     </div>
                                     <div className="meter-item">
@@ -301,24 +341,19 @@ const ProductDetail = () => {
                                             <span className="meter-value">{product.concentration || 'Strong'}</span>
                                         </div>
                                         <div className="meter-bar-bg">
-                                            <div
-                                                className="meter-bar-fill"
-                                                style={{ width: getIntensityWidth(product.concentration) }}
-                                            />
+                                            <div className="meter-bar-fill" style={{ width: getIntensityWidth(product.concentration) }} />
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Meta Info (Simplified) */}
+                            {/* ─── Meta ─────────────────────────── */}
                             <div className="product-detail-meta">
                                 {product.fragranceFamily && (
                                     <div className="meta-item"><span>Family:</span> {product.fragranceFamily}</div>
                                 )}
                                 {product.stock > 0 ? (
-                                    <div className="meta-item">
-                                        <span className="badge badge-success">In Stock</span>
-                                    </div>
+                                    <div className="meta-item"><span className="badge badge-success">In Stock</span></div>
                                 ) : (
                                     <span className="badge badge-error">Out of Stock</span>
                                 )}
@@ -327,50 +362,27 @@ const ProductDetail = () => {
                     </div>
                 </div>
 
-                {/* FAQ Section */}
-                <div className="container" style={{ marginBottom: 'var(--space-3xl)' }}>
-                    <div className="product-faq-section" style={{ maxWidth: '800px', margin: '0 auto' }}>
-                        <h3 className="section-title" style={{ fontSize: '1.5rem', marginBottom: '20px', textAlign: 'center' }}>Scale & Common Questions</h3>
-                        <div className="faq-grid" style={{ display: 'grid', gap: '16px' }}>
-                            <details className="faq-item">
-                                <summary>How long does shipping take?</summary>
-                                <p>We usually ship within 24 hours. Delivery takes 3-5 business days across India.</p>
-                            </details>
-                            <details className="faq-item">
-                                <summary>Is Cash on Delivery available?</summary>
-                                <p>Yes! We offer COD on all orders across 20,000+ pincodes in India.</p>
-                            </details>
-                            <details className="faq-item">
-                                <summary>What is the return policy?</summary>
-                                <p>We offer a 7-day return policy for damaged or incorrect items. Please record an unboxing video for smooth processing.</p>
-                            </details>
-                            <details className="faq-item">
-                                <summary>Are these original perfumes?</summary>
-                                <p>These are high-quality <strong>inspired</strong> fragrances. We use premium imported oils to match the scent profile of expensive designer brands at a fraction of the cost.</p>
-                            </details>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Tabs */}
+                {/* ─── Tabs: Story / Dry-Down / Reviews ──────── */}
                 <div className="container">
                     <div className="product-tabs-section">
                         <div className="product-tabs-nav">
-                            {['description', 'reviews'].map((tab) => (
+                            {['story', 'drydown', 'reviews'].map((tab) => (
                                 <button
                                     key={tab}
                                     className={`product-tab ${activeTab === tab ? 'active' : ''}`}
                                     onClick={() => setActiveTab(tab)}
                                 >
-                                    {tab === 'description' ? 'Description' : `Reviews (${product.numReviews})`}
+                                    {tab === 'story' ? "Perfumer\u2019s Note" : tab === 'drydown' ? 'How It Wears' : `Reviews (${product.numReviews})`}
                                 </button>
                             ))}
                         </div>
 
                         <div className="product-tab-content">
-                            {activeTab === 'description' ? (
-                                <div className="product-description-content">
-                                    <p>{product.description}</p>
+                            {activeTab === 'story' && (
+                                <div className="product-story-content">
+                                    <div className="product-story-text">
+                                        <p className="product-story-lead">{perfumerNote}</p>
+                                    </div>
                                     {product.occasion?.length > 0 && (
                                         <div className="product-tags-section">
                                             <h4>Best for</h4>
@@ -392,12 +404,37 @@ const ProductDetail = () => {
                                         </div>
                                     )}
                                 </div>
-                            ) : (
+                            )}
+
+                            {activeTab === 'drydown' && (
+                                <div className="product-drydown-content">
+                                    <h3 className="product-drydown-title">The Dry-Down Experience</h3>
+                                    <p className="product-drydown-text">{dryDown}</p>
+                                    <div className="product-drydown-timeline">
+                                        <div className="drydown-phase">
+                                            <span className="drydown-phase-time">0\u201315 min</span>
+                                            <span className="drydown-phase-name">Opening</span>
+                                            <p>The top notes burst forward \u2014 bright, fresh, and immediate.</p>
+                                        </div>
+                                        <div className="drydown-phase">
+                                            <span className="drydown-phase-time">30 min\u20132 hr</span>
+                                            <span className="drydown-phase-name">Heart</span>
+                                            <p>The character of the fragrance reveals itself. This is the scent people notice.</p>
+                                        </div>
+                                        <div className="drydown-phase">
+                                            <span className="drydown-phase-time">2\u201310+ hr</span>
+                                            <span className="drydown-phase-name">Dry-Down</span>
+                                            <p>The base notes settle into skin. Warm, deep, and uniquely yours.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'reviews' && (
                                 <div className="product-reviews-content">
-                                    {/* Review Form */}
                                     {isAuthenticated && (
                                         <form className="review-form" onSubmit={handleReviewSubmit}>
-                                            <h4>Leave a Review</h4>
+                                            <h4>Share Your Experience</h4>
                                             <div className="review-rating-input">
                                                 {[1, 2, 3, 4, 5].map((star) => (
                                                     <button
@@ -422,23 +459,18 @@ const ProductDetail = () => {
                                             />
                                             <textarea
                                                 className="form-input form-textarea"
-                                                placeholder="Share your experience with this fragrance..."
+                                                placeholder="How does it wear on your skin? What occasions would you wear it?"
                                                 value={reviewForm.comment}
                                                 onChange={(e) => setReviewForm((p) => ({ ...p, comment: e.target.value }))}
                                                 required
                                             />
-                                            <div className="review-form-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
-                                                <button type="button" className="btn btn-outline btn-sm" onClick={() => toast('Photo upload coming soon!')}>
-                                                    <span style={{ marginRight: '8px' }}>📷</span> Add Photo
-                                                </button>
+                                            <div className="review-form-actions">
                                                 <button className="btn btn-primary" type="submit" disabled={submitting}>
                                                     {submitting ? 'Submitting...' : 'Submit Review'}
                                                 </button>
                                             </div>
                                         </form>
                                     )}
-
-                                    {/* Review List */}
                                     {product.reviews?.length > 0 ? (
                                         <div className="reviews-list">
                                             {product.reviews.map((review, i) => (
@@ -481,6 +513,28 @@ const ProductDetail = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* ─── You May Also Love — Cross-sell ─────────── */}
+                {related.length > 0 && (
+                    <section className="product-crosssell section">
+                        <div className="container">
+                            <div className="section-header">
+                                <span className="section-label">Complete Your Collection</span>
+                                <h2 className="section-title">You May Also Love</h2>
+                            </div>
+                            <div className="grid-products">
+                                {related.map((p, i) => (
+                                    <ProductCard key={p._id} product={p} index={i} />
+                                ))}
+                            </div>
+                            <div className="section-cta" style={{ marginTop: 'var(--space-2xl)' }}>
+                                <Link to="/shop" className="btn btn-outline btn-lg">
+                                    View All <FiArrowRight size={16} />
+                                </Link>
+                            </div>
+                        </div>
+                    </section>
+                )}
             </div>
         </>
     );

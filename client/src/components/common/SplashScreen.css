@@ -1,0 +1,113 @@
+/* ═══════════════════════════════════════════════════════════
+   Splash Screen — Cinematic Brand Reveal
+   ═══════════════════════════════════════════════════════════ */
+
+.splash-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0a0a0f;
+    overflow: hidden;
+}
+
+/* Subtle shimmer background */
+.splash-shimmer {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        ellipse at 50% 50%,
+        rgba(200, 160, 42, 0.06) 0%,
+        transparent 60%
+    );
+    animation: splashPulse 3s ease-in-out infinite;
+}
+
+@keyframes splashPulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Accent lines */
+.splash-line {
+    position: absolute;
+    left: 20%;
+    right: 20%;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(200, 160, 42, 0.5),
+        transparent
+    );
+    transform-origin: center;
+}
+
+.splash-line-top {
+    top: 30%;
+}
+
+.splash-line-bottom {
+    bottom: 30%;
+}
+
+/* Content */
+.splash-content {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.splash-logo-wrapper {
+    margin-bottom: 12px;
+}
+
+.splash-brand-sub {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(200, 160, 42, 0.7);
+}
+
+.splash-brand {
+    font-family: var(--font-display, 'Playfair Display', serif);
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-weight: 300;
+    color: #fff;
+    margin: 0;
+    line-height: 1.1;
+}
+
+.splash-divider {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(200, 160, 42, 0.8), transparent);
+    margin: 20px auto;
+    transform-origin: center;
+}
+
+.splash-tagline {
+    font-size: 0.9rem;
+    font-weight: 400;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 8px;
+}
+
+/* Floating particles */
+.splash-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.splash-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(200, 160, 42, 0.6);
+}

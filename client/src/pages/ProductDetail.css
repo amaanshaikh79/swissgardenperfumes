@@ -1,4 +1,7 @@
-/* ─── Product Detail ──────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   Product Detail — Luxury Sensory Storytelling
+   ═══════════════════════════════════════════════════════════ */
+
 .product-detail-page {
     padding-top: 100px;
 }
@@ -27,17 +30,44 @@
     padding-bottom: var(--space-3xl);
 }
 
+/* ─── Image Gallery with 360° ────────────────────────────── */
 .product-detail-main-image {
     aspect-ratio: 3 / 4;
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
     overflow: hidden;
     background: var(--bg-tertiary);
+    position: relative;
 }
 
 .product-detail-main-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.product-360-btn {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full);
+    color: var(--white);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    z-index: 3;
+}
+
+.product-360-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
 }
 
 .product-detail-thumbnails {
@@ -51,8 +81,19 @@
     height: 80px;
     border-radius: var(--radius-md);
     overflow: hidden;
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--border-color);
     cursor: pointer;
+    transition: border-color var(--transition-fast);
+    background: none;
+    padding: 0;
+}
+
+.product-detail-thumbnail.active {
+    border-color: var(--accent);
+}
+
+.product-detail-thumbnail:hover {
+    border-color: var(--text-primary);
 }
 
 .product-detail-thumbnail img {
@@ -61,6 +102,7 @@
     object-fit: cover;
 }
 
+/* ─── Product Info ────────────────────────────────────────── */
 .product-detail-brand {
     font-size: 0.7rem;
     font-weight: 600;
@@ -75,6 +117,14 @@
     font-weight: 400;
     color: var(--text-primary);
     margin: var(--space-sm) 0;
+}
+
+.product-detail-tagline {
+    font-size: 0.95rem;
+    color: var(--text-tertiary);
+    font-style: italic;
+    margin-bottom: var(--space-sm);
+    line-height: 1.5;
 }
 
 .product-detail-category {
@@ -100,7 +150,7 @@
 }
 
 .product-detail-current-price {
-    font-family: var(--font-heading);
+    font-family: var(--font-display);
     font-size: 2rem;
     font-weight: 600;
     color: var(--text-primary);
@@ -112,50 +162,74 @@
     text-decoration: line-through;
 }
 
-.product-detail-short-desc {
-    color: var(--text-secondary);
-    line-height: 1.8;
-    margin-bottom: var(--space-xl);
-}
-
-/* Fragrance Pyramid */
+/* ─── Scent Pyramid — Visual Tiers ───────────────────────── */
 .fragrance-pyramid {
     margin-bottom: var(--space-xl);
-    padding: var(--space-lg);
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-xl);
     border: 1px solid var(--border-color);
 }
 
 .fragrance-pyramid-title {
-    font-family: var(--font-heading);
+    font-family: var(--font-display);
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-lg);
     letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
-.fragrance-layers {
+.fragrance-pyramid-visual {
     display: flex;
     flex-direction: column;
-    gap: var(--space-md);
+    gap: var(--space-lg);
 }
 
-.fragrance-layer {
+.pyramid-tier {
     display: flex;
-    align-items: flex-start;
-    gap: var(--space-md);
+    gap: var(--space-lg);
+    align-items: stretch;
 }
 
-.fragrance-layer-label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--accent);
-    min-width: 50px;
-    padding-top: 4px;
+.pyramid-tier-bar {
+    width: 3px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.pyramid-tier--top .pyramid-tier-bar {
+    background: linear-gradient(180deg, var(--accent-300), var(--accent-200));
+}
+
+.pyramid-tier--heart .pyramid-tier-bar {
+    background: linear-gradient(180deg, var(--accent-500), var(--accent-400));
+}
+
+.pyramid-tier--base .pyramid-tier-bar {
+    background: linear-gradient(180deg, var(--accent-700), var(--accent-600));
+}
+
+.pyramid-tier-content {
+    flex: 1;
+}
+
+.pyramid-tier-label {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.pyramid-tier-desc {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: var(--space-sm);
+    font-style: italic;
 }
 
 .fragrance-notes-list {
@@ -173,7 +247,7 @@
     color: var(--text-secondary);
 }
 
-/* Actions */
+/* ─── Actions ─────────────────────────────────────────────── */
 .product-detail-actions {
     display: flex;
     align-items: center;
@@ -232,7 +306,63 @@
     border-color: var(--error);
 }
 
-/* Meta */
+/* ─── Performance Meter ───────────────────────────────────── */
+.product-performance-meter {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--divider);
+}
+
+.product-performance-meter .meter-title {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: var(--space-md);
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.meter-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.meter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.meter-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.meter-value {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.meter-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.meter-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: var(--radius-full);
+    transition: width 0.6s ease;
+}
+
+/* ─── Meta ────────────────────────────────────────────────── */
 .product-detail-meta {
     display: flex;
     flex-wrap: wrap;
@@ -254,7 +384,7 @@
     margin-right: 4px;
 }
 
-/* Tabs */
+/* ─── Tabs ────────────────────────────────────────────────── */
 .product-tabs-section {
     border-top: 1px solid var(--divider);
     padding: var(--space-3xl) 0;
@@ -295,11 +425,13 @@
     background: var(--accent);
 }
 
-.product-description-content {
+/* ─── Perfumer's Note Tab ─────────────────────────────────── */
+.product-story-content {
     max-width: 800px;
 }
 
-.product-description-content p {
+.product-story-lead {
+    font-size: 1.05rem;
     color: var(--text-secondary);
     line-height: 1.9;
     margin-bottom: var(--space-xl);
@@ -310,8 +442,11 @@
 }
 
 .product-tags-section h4 {
-    font-family: var(--font-heading);
-    font-size: 1rem;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     margin-bottom: var(--space-sm);
     color: var(--text-primary);
 }
@@ -322,7 +457,67 @@
     gap: var(--space-xs);
 }
 
-/* Reviews */
+/* ─── Dry-Down Tab ────────────────────────────────────────── */
+.product-drydown-content {
+    max-width: 800px;
+}
+
+.product-drydown-title {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-md);
+}
+
+.product-drydown-text {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.9;
+    margin-bottom: var(--space-2xl);
+    font-style: italic;
+}
+
+.product-drydown-timeline {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+}
+
+.drydown-phase {
+    padding: var(--space-xl);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+}
+
+.drydown-phase-time {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: var(--space-xs);
+}
+
+.drydown-phase-name {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: var(--space-sm);
+}
+
+.drydown-phase p {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* ─── Community Reviews ───────────────────────────────────── */
 .review-form {
     max-width: 600px;
     padding: var(--space-xl);
@@ -333,7 +528,7 @@
 }
 
 .review-form h4 {
-    font-family: var(--font-heading);
+    font-family: var(--font-display);
     font-size: 1.1rem;
     margin-bottom: var(--space-md);
 }
@@ -353,6 +548,12 @@
 
 .review-form .form-input {
     margin-bottom: var(--space-md);
+}
+
+.review-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--space-md);
 }
 
 .reviews-list {
@@ -423,10 +624,22 @@
     padding: var(--space-2xl) 0;
 }
 
+/* ─── Cross-sell ──────────────────────────────────────────── */
+.product-crosssell {
+    background: var(--bg-secondary);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
     .product-detail-grid {
         grid-template-columns: 1fr;
         gap: var(--space-2xl);
+    }
+
+    .product-drydown-timeline {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -466,12 +679,17 @@
 
     .product-tab {
         white-space: nowrap;
-        font-size: 0.78rem;
+        font-size: 0.72rem;
     }
 
-    .fragrance-layer {
+    .pyramid-tier {
         flex-direction: column;
-        gap: var(--space-xs);
+        gap: var(--space-sm);
+    }
+
+    .pyramid-tier-bar {
+        width: 100%;
+        height: 3px;
     }
 
     .product-detail-thumbnail {
@@ -493,108 +711,11 @@
         white-space: nowrap;
         -webkit-overflow-scrolling: touch;
     }
-}
 
-/* ─── Performance Meter ───────────────────────────────────── */
-.product-performance-meter {
-    margin-top: var(--space-xl);
-    padding-top: var(--space-lg);
-    border-top: 1px solid var(--divider);
-}
-
-.product-performance-meter .meter-title {
-    font-family: var(--font-heading);
-    font-size: 0.95rem;
-    font-weight: 600;
-    margin-bottom: var(--space-md);
-    color: var(--text-primary);
-}
-
-.meter-grid {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-}
-
-.meter-item {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.meter-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
-
-.meter-value {
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.meter-bar-bg {
-    width: 100%;
-    height: 6px;
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-full);
-    overflow: hidden;
-}
-
-.meter-bar-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: var(--radius-full);
-}
-
-/* ─── FAQ Section ─────────────────────────────────────────── */
-.product-faq-section {
-    padding: var(--space-xl);
-    background: var(--bg-card);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border-color);
-}
-
-.faq-item {
-    border-bottom: 1px solid var(--divider);
-    padding-bottom: var(--space-md);
-}
-
-.faq-item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.faq-item summary {
-    font-weight: 600;
-    cursor: pointer;
-    list-style: none;
-    position: relative;
-    padding-right: 20px;
-    color: var(--text-primary);
-}
-
-.faq-item summary::-webkit-details-marker {
-    display: none;
-}
-
-.faq-item summary::after {
-    content: '+';
-    position: absolute;
-    right: 0;
-    font-weight: 300;
-    font-size: 1.2rem;
-    line-height: 1;
-}
-
-.faq-item[open] summary::after {
-    content: '-';
-}
-
-.faq-item p {
-    margin-top: var(--space-sm);
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    line-height: 1.6;
+    .product-360-btn {
+        bottom: 10px;
+        right: 10px;
+        padding: 6px 10px;
+        font-size: 0.65rem;
+    }
 }

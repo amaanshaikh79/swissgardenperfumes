@@ -19,7 +19,7 @@ const Footer = () => {
                                 Premium fragrance profiles inspired by iconic luxury scents — crafted for everyday wear in India. Smart buyer's luxury alternative.
                             </p>
                             <div className="footer-socials">
-                                <a href="www.instagram.com/swissgardenperfumes" className="footer-social-link" aria-label="Instagram"><FiInstagram size={18} /></a>
+                                <a href="https://www.instagram.com/swissgardenperfumes.official_" target="_blank" rel="noopener noreferrer" className="footer-social-link" aria-label="Instagram"><FiInstagram size={18} /></a>
                                 <a href="www.whatsapp.com/swissgardenperfumes" className="footer-social-link" aria-label="WhatsApp"><FiMessageCircle size={18} /></a>
                                 <a href="www.gmail.com/swissgardenperfumes" className="footer-social-link" aria-label="Email"><FiMail size={18} /></a>
                                 <a href="https://www.facebook.com/swissgardenperfumes" className="footer-social-link" aria-label="Facebook"><FaFacebookF size={18} /></a>
@@ -57,11 +57,11 @@ const Footer = () => {
                             <h4 className="footer-heading">Get in Touch</h4>
                             <div className="footer-contact-item">
                                 <FiMapPin size={14} />
-                                <span>Delhi<br />India</span>
+                                <span>C-589 DDA Flat, Pocket 11<br />Jasola, New Delhi 110025</span>
                             </div>
                             <div className="footer-contact-item">
                                 <FiPhone size={14} />
-                                <span>+91 98765 43210</span>
+                                <span>+91 9354936369</span>
                             </div>
                             <div className="footer-contact-item">
                                 <FiMail size={14} />

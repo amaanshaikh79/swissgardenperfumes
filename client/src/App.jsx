@@ -1,11 +1,14 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { useAuth } from './context/AuthContext';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import CartDrawer from './components/cart/CartDrawer';
 
 import ExitIntentPopup from './components/common/ExitIntentPopup';
+import SplashScreen from './components/common/SplashScreen';
+import AIChatbox from './components/common/AIChatbox';
 
 // Pages
 import Home from './pages/Home';
@@ -18,6 +21,7 @@ import Profile from './pages/Profile';
 import Wishlist from './pages/Wishlist';
 import Contact from './pages/Contact';
 import About from './pages/About';
+import FragranceFinder from './pages/FragranceFinder';
 import AdminDashboard from './pages/Admin';
 import OrderSuccess from './pages/OrderSuccess';
 import ShippingPolicy from './pages/ShippingPolicy';
@@ -62,9 +66,18 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 function App() {
     const location = useLocation();
     const isAuthPage = ['/login', '/register'].includes(location.pathname);
+    const [showSplash, setShowSplash] = useState(() => !sessionStorage.getItem('sg_splash_shown'));
+
+    const handleSplashComplete = useCallback(() => {
+        setShowSplash(false);
+        sessionStorage.setItem('sg_splash_shown', '1');
+    }, []);
 
     return (
         <>
+            <AnimatePresence>
+                {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
+            </AnimatePresence>
             <ScrollToTop />
             <ExitIntentPopup />
             {!isAuthPage && <Navbar />}
@@ -77,6 +90,7 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/about" element={<About />} />
+                    <Route path="/fragrance-finder" element={<FragranceFinder />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/shipping-policy" element={<ShippingPolicy />} />
                     <Route path="/return-policy" element={<ReturnPolicy />} />
@@ -110,6 +124,7 @@ function App() {
                 </Routes>
             </main>
             {!isAuthPage && <Footer />}
+            {!isAuthPage && <AIChatbox />}
         </>
     );
 }

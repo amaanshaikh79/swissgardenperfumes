@@ -1,8 +1,17 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiX, FiMinus, FiPlus, FiTrash2, FiShoppingBag, FiTag } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
+import { FiX, FiMinus, FiPlus, FiTrash2, FiShoppingBag, FiTag, FiTruck, FiShield } from 'react-icons/fi';
+import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import './CartDrawer.css';
+
+const formatINR = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(amount);
+};
 
 const CartDrawer = () => {
     const {
@@ -23,6 +32,10 @@ const CartDrawer = () => {
         setIsCartOpen(false);
         navigate('/checkout');
     };
+
+    const freeShipThreshold = 799;
+    const freeShipProgress = Math.min((cartTotal / freeShipThreshold) * 100, 100);
+    const needsMore = freeShipThreshold - cartTotal;
 
     return (
         <AnimatePresence>
@@ -45,7 +58,7 @@ const CartDrawer = () => {
                         <div className="cart-header">
                             <h3 className="cart-title">
                                 <FiShoppingBag size={18} />
-                                Cart ({cartCount})
+                                Your Bag ({cartCount})
                             </h3>
                             <button className="cart-close" onClick={() => setIsCartOpen(false)}>
                                 <FiX size={22} />
@@ -55,7 +68,7 @@ const CartDrawer = () => {
                         {cartItems.length === 0 ? (
                             <div className="cart-empty">
                                 <FiShoppingBag size={48} />
-                                <p className="cart-empty-title">Your cart is empty</p>
+                                <p className="cart-empty-title">Your bag is empty</p>
                                 <p className="cart-empty-desc">Add items to start building your collection</p>
                                 <button
                                     className="btn btn-primary"
@@ -69,23 +82,46 @@ const CartDrawer = () => {
                             </div>
                         ) : (
                             <>
+                                {/* Free shipping progress */}
+                                {cartTotal > 0 && (
+                                    <div className="cart-ship-progress">
+                                        {needsMore > 0 ? (
+                                            <p className="cart-ship-text">
+                                                <FiTruck size={13} /> Add {formatINR(needsMore)} more for <strong>FREE shipping!</strong>
+                                            </p>
+                                        ) : (
+                                            <p className="cart-ship-text cart-ship-text--done">
+                                                <FiTruck size={13} /> You qualify for <strong>FREE shipping!</strong> 🎉
+                                            </p>
+                                        )}
+                                        <div className="cart-ship-bar">
+                                            <motion.div
+                                                className="cart-ship-bar-fill"
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${freeShipProgress}%` }}
+                                                transition={{ duration: 0.5 }}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* Combo upsell */}
                                 {cartCount === 1 && (
                                     <div className="cart-upsell">
                                         <FiTag size={14} />
-                                        <span>Add 1 more to save <strong>₹200!</strong></span>
+                                        <span>Add 1 more to save <strong>{formatINR(200)}!</strong></span>
                                     </div>
                                 )}
                                 {cartCount === 2 && (
                                     <div className="cart-upsell cart-upsell--success">
                                         <FiTag size={14} />
-                                        <span>🎉 Combo discount applied! Add 1 more to save <strong>₹400!</strong></span>
+                                        <span>🎉 Combo discount applied! Add 1 more to save <strong>{formatINR(400)}!</strong></span>
                                     </div>
                                 )}
                                 {cartCount >= 3 && (
                                     <div className="cart-upsell cart-upsell--success">
                                         <FiTag size={14} />
-                                        <span>🎉 You're saving ₹400 with combo discount!</span>
+                                        <span>🎉 You're saving {formatINR(400)} with combo discount!</span>
                                     </div>
                                 )}
 
@@ -99,12 +135,17 @@ const CartDrawer = () => {
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, x: 100 }}
                                         >
-                                            <div className="cart-item-image">
+                                            <Link
+                                                to={`/product/${item.slug || item._id}`}
+                                                className="cart-item-image"
+                                                onClick={() => setIsCartOpen(false)}
+                                            >
                                                 <img src={item.image} alt={item.name} />
-                                            </div>
+                                            </Link>
                                             <div className="cart-item-info">
                                                 <h4 className="cart-item-name">{item.name}</h4>
                                                 <span className="cart-item-size">{item.size}</span>
+                                                <span className="cart-item-unit-price">{formatINR(item.price)} each</span>
                                                 <div className="cart-item-bottom">
                                                     <div className="cart-qty-controls">
                                                         <button
@@ -119,13 +160,14 @@ const CartDrawer = () => {
                                                         </button>
                                                     </div>
                                                     <span className="cart-item-price">
-                                                        ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                                                        {formatINR(item.price * item.quantity)}
                                                     </span>
                                                 </div>
                                             </div>
                                             <button
                                                 className="cart-item-remove"
                                                 onClick={() => removeFromCart(item._id)}
+                                                title="Remove item"
                                             >
                                                 <FiTrash2 size={14} />
                                             </button>
@@ -136,39 +178,33 @@ const CartDrawer = () => {
                                 <div className="cart-footer">
                                     <div className="cart-summary">
                                         <div className="cart-summary-row">
-                                            <span>Subtotal</span>
-                                            <span>₹{cartTotal.toLocaleString('en-IN')}</span>
+                                            <span>Subtotal ({cartCount} item{cartCount > 1 ? 's' : ''})</span>
+                                            <span>{formatINR(cartTotal)}</span>
                                         </div>
                                         {comboDiscount > 0 && (
                                             <div className="cart-summary-row cart-summary-row--save">
                                                 <span>🎁 Combo Discount</span>
-                                                <span>-₹{comboDiscount}</span>
+                                                <span>-{formatINR(comboDiscount)}</span>
                                             </div>
                                         )}
                                         <div className="cart-summary-row">
                                             <span>Shipping</span>
-                                            <span>{shippingAmount === 0 ? 'FREE' : `₹${shippingAmount}`}</span>
+                                            <span>{shippingAmount === 0 ? <span className="cart-free-tag">FREE</span> : formatINR(shippingAmount)}</span>
                                         </div>
                                         <div className="cart-summary-row cart-summary-row--total">
                                             <span>Total</span>
-                                            <span>₹{orderTotal.toLocaleString('en-IN')}</span>
+                                            <span>{formatINR(orderTotal)}</span>
                                         </div>
+                                        <p className="cart-gst-note">Inclusive of all taxes</p>
                                     </div>
 
-                                    {cartTotal < 999 && (
-                                        <p className="cart-shipping-note">
-                                            Add ₹{(999 - cartTotal).toLocaleString('en-IN')} more for <strong>free shipping!</strong>
-                                        </p>
-                                    )}
-
                                     <button className="btn btn-primary btn-lg btn-block cart-checkout-btn" onClick={handleCheckout}>
-                                        Checkout — ₹{orderTotal.toLocaleString('en-IN')}
+                                        Checkout — {formatINR(orderTotal)}
                                     </button>
                                     <button
                                         className="btn btn-whatsapp btn-block"
-                                        style={{ marginBottom: '10px', backgroundColor: '#25D366', color: 'white', border: 'none' }}
                                         onClick={() => {
-                                            const message = `Hi swissgarden! I want to order:\n${cartItems.map(item => `- ${item.name} (${item.size}) x ${item.quantity}`).join('\n')}\n\nTotal: ₹${orderTotal}\nShipping: ${shippingAmount === 0 ? 'Free' : '₹' + shippingAmount}\n\nPlease confirm my order.`;
+                                            const message = `Hi SwissGarden! I want to order:\n${cartItems.map(item => `- ${item.name} (${item.size}) x ${item.quantity} = ${formatINR(item.price * item.quantity)}`).join('\n')}\n\nSubtotal: ${formatINR(cartTotal)}\nShipping: ${shippingAmount === 0 ? 'Free' : formatINR(shippingAmount)}${comboDiscount > 0 ? `\nCombo Discount: -${formatINR(comboDiscount)}` : ''}\nTotal: ${formatINR(orderTotal)}\n\nPlease confirm my order.`;
                                             window.open(`https://wa.me/9971836369?text=${encodeURIComponent(message)}`, '_blank');
                                         }}
                                     >
@@ -180,6 +216,11 @@ const CartDrawer = () => {
                                     >
                                         Continue Shopping
                                     </button>
+
+                                    <div className="cart-trust-badges">
+                                        <span><FiShield size={12} /> Secure Checkout</span>
+                                        <span><FiTruck size={12} /> COD Available</span>
+                                    </div>
                                 </div>
                             </>
                         )}

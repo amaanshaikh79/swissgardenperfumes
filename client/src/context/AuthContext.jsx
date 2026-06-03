@@ -28,24 +28,64 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    const register = async (userData) => {
-        const { data } = await authAPI.register(userData);
-        if (data.success) {
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-            setUser(data.user);
+    // Handle OAuth callback from URL
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const provider = urlParams.get('provider');
+
+        if (token) {
+            localStorage.setItem('token', token);
+            // Fetch user data with the token
+            fetchUserWithToken(token);
+            // Clear URL params
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
-        return data;
+    }, []);
+
+    const fetchUserWithToken = async (token) => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/auth/me`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const data = await response.json();
+            if (data.success) {
+                localStorage.setItem('user', JSON.stringify(data.user));
+                setUser(data.user);
+            }
+        } catch (error) {
+            console.error('Failed to fetch user after OAuth:', error);
+        }
+    };
+
+    const register = async (userData) => {
+        try {
+            const { data } = await authAPI.register(userData);
+            if (data.success) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                setUser(data.user);
+            }
+            return data;
+        } catch (error) {
+            throw error;
+        }
     };
 
     const login = async (credentials) => {
-        const { data } = await authAPI.login(credentials);
-        if (data.success) {
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-            setUser(data.user);
+        try {
+            const { data } = await authAPI.login(credentials);
+            if (data.success) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                setUser(data.user);
+            }
+            return data;
+        } catch (error) {
+            throw error;
         }
-        return data;
     };
 
     const logout = async () => {

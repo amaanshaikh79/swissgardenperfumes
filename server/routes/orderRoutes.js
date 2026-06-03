@@ -6,6 +6,7 @@ import {
     getAllOrders,
     updateOrderStatus,
     updateOrderToPaid,
+    cancelOrder,
 } from '../controllers/orderController.js';
 import { protect, authorize } from '../middleware/auth.js';
 import { orderRules, validate } from '../middleware/validators.js';
@@ -20,5 +21,8 @@ router.put('/:id/pay', protect, updateOrderToPaid);
 // Admin routes
 router.get('/', protect, authorize('admin'), getAllOrders);
 router.put('/:id/status', protect, authorize('admin'), updateOrderStatus);
+
+// User routes
+router.put('/:id/cancel', protect, cancelOrder);
 
 export default router;

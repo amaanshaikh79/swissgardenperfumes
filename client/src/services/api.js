@@ -67,6 +67,7 @@ export const ordersAPI = {
     getAll: (params) => API.get('/orders', { params }),
     updateStatus: (id, data) => API.put(`/orders/${id}/status`, data),
     updateToPaid: (id, data) => API.put(`/orders/${id}/pay`, data),
+    cancel: (id) => API.put(`/orders/${id}/cancel`),
 };
 
 // Contact API
@@ -83,6 +84,35 @@ export const paymentAPI = {
     createOrder: (data) => API.post('/payment/create-order', data),
     verify: (data) => API.post('/payment/verify', data),
     getDetails: (paymentId) => API.get(`/payment/${paymentId}`),
+};
+
+// Coupon API
+export const couponAPI = {
+    apply: (data) => API.post('/coupons/apply', data),
+    getAll: () => API.get('/coupons'),
+    create: (data) => API.post('/coupons', data),
+    update: (id, data) => API.put(`/coupons/${id}`, data),
+    delete: (id) => API.delete(`/coupons/${id}`),
+};
+
+// Delivery Partner API
+export const deliveryPartnerAPI = {
+    getAll: () => API.get('/delivery-partners'),
+    get: (id) => API.get(`/delivery-partners/${id}`),
+    create: (data) => API.post('/delivery-partners', data),
+    update: (id, data) => API.put(`/delivery-partners/${id}`, data),
+    delete: (id) => API.delete(`/delivery-partners/${id}`),
+    toggleStatus: (id) => API.patch(`/delivery-partners/${id}/toggle`),
+};
+
+// Return API
+export const returnAPI = {
+    getAll: () => API.get('/returns'),
+    getMy: () => API.get('/returns/my'),
+    get: (id) => API.get(`/returns/${id}`),
+    create: (data) => API.post('/returns', data),
+    updateStatus: (id, data) => API.put(`/returns/${id}/status`, data),
+    cancel: (id) => API.delete(`/returns/${id}`),
 };
 
 // Admin API

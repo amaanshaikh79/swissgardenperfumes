@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiUser, FiShoppingBag, FiMenu, FiX, FiChevronDown, FiLogOut, FiGrid, FiPackage, FiHeart } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
-import TopBar from './TopBar';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -90,7 +89,6 @@ const Navbar = () => {
 
     return (
         <>
-            <TopBar />
 
             <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}>
                 <div className="navbar-container">

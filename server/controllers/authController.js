@@ -12,7 +12,7 @@ const sendTokenResponse = (user, statusCode, res) => {
         expires: new Date(Date.now() + parseInt(process.env.JWT_COOKIE_EXPIRE) * 24 * 60 * 60 * 1000),
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
     };
 
     // Remove password from output
@@ -42,11 +42,14 @@ const generateOTP = () => {
  */
 export const register = async (req, res, next) => {
     try {
-        const { firstName, lastName, email, password, phone, countryCode } = req.body;
+        const { firstName, lastName, email, password, phone } = req.body;
+
+        console.log('📝 Registration attempt:', { email, firstName, lastName });
 
         // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
+            console.log('⚠️ User already exists:', email);
             return res.status(400).json({
                 success: false,
                 message: 'An account with this email already exists',
@@ -55,8 +58,9 @@ export const register = async (req, res, next) => {
 
         // Check if phone already exists (if provided)
         if (phone) {
-            const phoneUser = await User.findOne({ phone, countryCode: countryCode || '+91' });
+            const phoneUser = await User.findOne({ phone });
             if (phoneUser) {
+                console.log('⚠️ Phone already exists:', phone);
                 return res.status(400).json({
                     success: false,
                     message: 'An account with this phone number already exists',
@@ -70,11 +74,12 @@ export const register = async (req, res, next) => {
             email,
             password,
             phone: phone || undefined,
-            countryCode: countryCode || '+91',
         });
 
+        console.log('✅ User created successfully:', user.email);
         sendTokenResponse(user, 201, res);
     } catch (error) {
+        console.error('❌ Registration error:', error.message);
         next(error);
     }
 };

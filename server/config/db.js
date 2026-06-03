@@ -15,7 +15,8 @@ const connectDB = async () => {
   } catch (error) {
     console.error(`❌ MongoDB Connection Error: ${error.message}`);
     console.error('HINT: Set MONGO_URI in server/.env or your environment variables to a valid MongoDB connection string.');
-    process.exit(1);
+    console.error('⚠️ Server will continue running without database connection (for development only)');
+    // Don't exit - allow server to start without DB for development
   }
 };
 

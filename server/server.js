@@ -16,6 +16,11 @@ import orderRoutes from './routes/orderRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import couponRoutes from './routes/couponRoutes.js';
+import oauthRoutes from './routes/oauthRoutes.js';
+import deliveryPartnerRoutes from './routes/deliveryPartnerRoutes.js';
+import returnRoutes from './routes/returnRoutes.js';
+import passport from './config/passport.js';
 
 // ⚠️  CRITICAL: Load .env FIRST before any other code runs
 const __filename = fileURLToPath(import.meta.url);
@@ -108,6 +113,8 @@ app.use(
     cors({
         origin: process.env.CLIENT_URL || 'http://localhost:5173',
         credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
     })
 );
 
@@ -121,6 +128,14 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/coupons', couponRoutes);
+app.use('/api/auth', oauthRoutes);
+app.use('/api/delivery-partners', deliveryPartnerRoutes);
+app.use('/api/returns', returnRoutes);
+
+// ─── Passport Initialization ─────────────────────────────────────
+app.use(passport.initialize());
+app.use(passport.session());
 
 // ─── Health Check ───────────────────────────────────────────────
 app.get('/api/health', (req, res) => {

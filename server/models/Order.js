@@ -55,6 +55,22 @@ const orderSchema = new mongoose.Schema(
             required: true,
             default: 0.0,
         },
+        codCharge: {
+            type: Number,
+            default: 0,
+        },
+        comboDiscount: {
+            type: Number,
+            default: 0,
+        },
+        couponCode: {
+            type: String,
+            default: null,
+        },
+        couponDiscount: {
+            type: Number,
+            default: 0,
+        },
         totalPrice: {
             type: Number,
             required: true,
@@ -72,6 +88,10 @@ const orderSchema = new mongoose.Schema(
         },
         deliveredAt: Date,
         trackingNumber: String,
+        deliveryPartner: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'DeliveryPartner',
+        },
         notes: String,
     },
     {

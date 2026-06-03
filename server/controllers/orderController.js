@@ -1,5 +1,6 @@
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
+import Coupon from '../models/Coupon.js';
 import sendEmail, { orderConfirmationEmail } from '../utils/sendEmail.js';
 
 /**
@@ -9,7 +10,7 @@ import sendEmail, { orderConfirmationEmail } from '../utils/sendEmail.js';
  */
 export const createOrder = async (req, res, next) => {
     try {
-        const { orderItems, shippingAddress, paymentMethod } = req.body;
+        const { orderItems, shippingAddress, paymentMethod, couponCode } = req.body;
 
         if (!orderItems || orderItems.length === 0) {
             return res.status(400).json({ success: false, message: 'No order items' });
@@ -52,9 +53,43 @@ export const createOrder = async (req, res, next) => {
             await product.save();
         }
 
-        const taxPrice = Math.round(itemsPrice * 0.08 * 100) / 100; // 8% tax
-        const shippingPrice = itemsPrice > 200 ? 0 : 15; // Free shipping over $200
-        const totalPrice = Math.round((itemsPrice + taxPrice + shippingPrice) * 100) / 100;
+        // GST included in MRP — no separate tax for Indian e-commerce
+        const taxPrice = 0;
+
+        // Free shipping above ₹799, else ₹49 flat
+        const shippingPrice = itemsPrice >= 799 ? 0 : 49;
+
+        // COD extra charge ₹50
+        const codCharge = paymentMethod === 'cod' ? 50 : 0;
+
+        // Combo discount: 3+ items = ₹400, 2 items = ₹200
+        const totalQty = verifiedItems.reduce((sum, item) => sum + item.quantity, 0);
+        const comboDiscount = totalQty >= 3 ? 400 : totalQty >= 2 ? 200 : 0;
+
+        // Coupon discount
+        let couponDiscount = 0;
+        let appliedCoupon = null;
+
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ code: couponCode.toUpperCase().trim(), isActive: true });
+            if (coupon && new Date() <= new Date(coupon.expiryDate)) {
+                const userUsage = coupon.usedBy.filter((e) => e.user.toString() === req.user.id).length;
+                if (userUsage < coupon.perUserLimit && itemsPrice >= coupon.minOrderAmount) {
+                    if (coupon.discountType === 'percentage') {
+                        couponDiscount = Math.round((itemsPrice * coupon.discountValue) / 100);
+                        if (coupon.maxDiscount && couponDiscount > coupon.maxDiscount) {
+                            couponDiscount = coupon.maxDiscount;
+                        }
+                    } else {
+                        couponDiscount = coupon.discountValue;
+                    }
+                    if (couponDiscount > itemsPrice) couponDiscount = itemsPrice;
+                    appliedCoupon = coupon;
+                }
+            }
+        }
+
+        const totalPrice = Math.max(0, itemsPrice + shippingPrice + codCharge - comboDiscount - couponDiscount);
 
         const order = await Order.create({
             user: req.user.id,
@@ -64,8 +99,19 @@ export const createOrder = async (req, res, next) => {
             itemsPrice,
             taxPrice,
             shippingPrice,
+            codCharge,
+            comboDiscount,
+            couponCode: appliedCoupon ? appliedCoupon.code : null,
+            couponDiscount,
             totalPrice,
         });
+
+        // Mark coupon as used
+        if (appliedCoupon) {
+            appliedCoupon.usedCount += 1;
+            appliedCoupon.usedBy.push({ user: req.user.id });
+            await appliedCoupon.save();
+        }
 
         // Fetch populated order for email
         const populatedOrder = await Order.findById(order._id).populate('user', 'firstName email');
@@ -217,6 +263,37 @@ export const updateOrderToPaid = async (req, res, next) => {
         await order.save();
 
         res.status(200).json({ success: true, order });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Cancel order
+ * @route   PUT /api/orders/:id/cancel
+ * @access  Private
+ */
+export const cancelOrder = async (req, res, next) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        if (order.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, message: 'Not authorized to cancel this order' });
+        }
+
+        // Only allow cancellation if order is not yet shipped
+        if (['Shipped', 'Out for Delivery', 'Delivered'].includes(order.orderStatus)) {
+            return res.status(400).json({ success: false, message: 'Order cannot be cancelled after it has been shipped' });
+        }
+
+        order.orderStatus = 'Cancelled';
+        await order.save();
+
+        res.status(200).json({ success: true, message: 'Order cancelled successfully', order });
     } catch (error) {
         next(error);
     }

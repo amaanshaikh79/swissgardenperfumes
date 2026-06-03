@@ -278,6 +278,89 @@
     text-align: center;
 }
 
+/* ─── Unit Price ──────────────────────────────────────────── */
+.cart-item-unit-price {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+/* ─── Free Shipping Progress ─────────────────────────────── */
+.cart-ship-progress {
+    padding: var(--space-sm) var(--space-xl);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.cart-ship-text {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.cart-ship-text--done {
+    color: var(--save-green);
+}
+
+.cart-ship-bar {
+    height: 4px;
+    border-radius: 4px;
+    background: var(--border-color);
+    overflow: hidden;
+}
+
+.cart-ship-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--save-green));
+}
+
+/* ─── Free Tag ────────────────────────────────────────────── */
+.cart-free-tag {
+    color: var(--save-green);
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+/* ─── GST Note ────────────────────────────────────────────── */
+.cart-gst-note {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: right;
+    margin-top: 4px;
+}
+
+/* ─── WhatsApp Button ─────────────────────────────────────── */
+.btn-whatsapp {
+    background-color: #25D366;
+    color: white;
+    border: none;
+    margin-bottom: var(--space-sm);
+}
+
+.btn-whatsapp:hover {
+    background-color: #1DA851;
+}
+
+/* ─── Trust Badges ────────────────────────────────────────── */
+.cart-trust-badges {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-lg);
+    padding-top: var(--space-sm);
+    margin-top: var(--space-xs);
+}
+
+.cart-trust-badges span {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
 /* ═══════════════════════════════════════════════════════════
    Responsive
    ═══════════════════════════════════════════════════════════ */
