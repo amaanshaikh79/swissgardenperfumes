@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiGift, FiCopy } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import LazyImage from './LazyImage';
 import './ExitIntentPopup.css';
 
 const ExitIntentPopup = () => {
@@ -79,7 +80,7 @@ const ExitIntentPopup = () => {
 
                         <div className="exit-popup-grid">
                             <div className="exit-popup-image">
-                                <img src="https://images.unsplash.com/photo-1595535373192-fc8935bacd89?auto=format&fit=crop&q=80&w=600" alt="Perfume" />
+                                <LazyImage src="/Images/Swiss Flora.JPG" alt="SwissGarden Perfume" />
                             </div>
                             <div className="exit-popup-details">
                                 <div className="exit-icon-wrap">
