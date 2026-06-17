@@ -7,7 +7,41 @@ import User from '../models/User.js';
 dotenv.config();
 
 const products = [
-    // ── 01 SWISS FLORA ───────────────────────────────────────────────────────
+    // ── 01 ROYAL ASCENT ──────────────────────────────────────────────────────
+    {
+        name: 'Royal Ascent',
+        brand: 'Swiss Garden Perfumes',
+        description:
+            "Power doesn't announce itself. It reveals itself slowly to those paying attention. There is a kind of luxury that only reveals itself over time. You meet it briefly — intriguing, complex, impossible to fully understand in a first encounter. It stays with you. You find yourself thinking about it later, unable to quite place what made it extraordinary. And then it arrives again, and you understand. Royal Ascent is that experience. It opens with depth — rich, architectural, the kind of opening note that tells you immediately this is not a simple fragrance. There is something oud-adjacent in its character, a darkness that isn't heavy but is undeniably present. As it breathes on skin, it climbs. Layers emerge. A warmth. A mystery underneath the mystery. This fragrance was built for patience. For people who understand that the best things reveal themselves slowly. For the ones playing the long game.",
+        shortDescription: 'Deep, mysterious, architectural luxury roll-on attar. Reveals itself slowly and stays forever. 10ml · Non-Alcoholic · Long Lasting · ₹499.',
+        metaDescription: 'Royal Ascent by Swiss Garden Perfumes — premium woody oud-inspired non-alcoholic roll-on attar. Deep, long-lasting, layerable. 10ml. ₹499.',
+        wearFor: 'Important evenings. The first meeting with someone who matters. Every moment that deserves a fragrance equal to its significance.',
+        layeringStory: 'Layer Blue Dominion above Royal Ascent for a combination so confident it has its own gravitational field. Add Swiss Flora for a floral-dark contrast called The Royale.',
+        price: 499,
+        images: [
+            { url: '/Images/Royal Ascent.JPG', alt: 'Royal Ascent - Main View' },
+            { url: '/Images/Royal Ascent(2).JPG', alt: 'Royal Ascent - Hover View' },
+        ],
+        category: 'Attar',
+        gender: 'Unisex',
+        size: '10ml',
+        fragranceNotes: {
+            top: ['Dark Oud', 'Rich Resin', 'Black Pepper'],
+            middle: ['Aged Wood', 'Smoky Amber', 'Deep Spice'],
+            base: ['Sandalwood', 'Dark Musk', 'Warm Vanilla'],
+        },
+        fragranceFamily: 'Oriental',
+        stock: 100,
+        featured: true,
+        tags: ['oud', 'deep', 'mysterious', 'magnetic', 'evening', 'luxury', 'attar', 'non-alcoholic', 'roll-on', 'bestseller'],
+        concentration: 'Intense',
+        longevity: '8-12 hours',
+        sillage: 'Strong',
+        occasion: ['Evening', 'Special Occasion', 'Date Night'],
+        season: ['Fall', 'Winter'],
+    },
+
+    // ── 02 SWISS FLORA ───────────────────────────────────────────────────────
     {
         name: 'Swiss Flora',
         brand: 'Swiss Garden Perfumes',
