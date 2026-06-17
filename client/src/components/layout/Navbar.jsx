@@ -71,8 +71,8 @@ const Navbar = () => {
             { label: 'Unisex', to: '/shop?gender=Unisex' },
         ],
         'By Type': [
-            { label: 'Eau De Parfum', to: '/shop?category=Eau de Parfum' },
             { label: 'Attar Roll-On', to: '/shop?category=Attar' },
+            { label: 'Eau De Parfum', to: '/shop?category=Eau de Parfum' },
         ],
         'By Occasion': [
             { label: 'Office', to: '/shop?occasion=Office' },
