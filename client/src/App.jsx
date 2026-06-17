@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, lazy, Suspense } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useAuth } from './context/AuthContext';
 import Navbar from './components/layout/Navbar';
@@ -10,26 +10,35 @@ import ExitIntentPopup from './components/common/ExitIntentPopup';
 import SplashScreen from './components/common/SplashScreen';
 import AIChatbox from './components/common/AIChatbox';
 
-// Pages
+// Eager load critical pages
 import Home from './pages/Home';
-import Shop from './pages/Shop';
-import ProductDetail from './pages/ProductDetail';
 import { Login, Register } from './pages/Auth';
-import Checkout from './pages/Checkout';
-import Orders from './pages/Orders';
-import Profile from './pages/Profile';
-import Wishlist from './pages/Wishlist';
-import Contact from './pages/Contact';
-import About from './pages/About';
-import FragranceFinder from './pages/FragranceFinder';
-import AdminDashboard from './pages/Admin';
-import OrderSuccess from './pages/OrderSuccess';
-import ShippingPolicy from './pages/ShippingPolicy';
-import ReturnPolicy from './pages/ReturnPolicy';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import TermsConditions from './pages/TermsConditions';
-import OAuthCallback from './pages/OAuthCallback';
-import NotFound from './pages/NotFound';
+
+// Lazy load other pages
+const Shop = lazy(() => import('./pages/Shop'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const Orders = lazy(() => import('./pages/Orders'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Wishlist = lazy(() => import('./pages/Wishlist'));
+const Contact = lazy(() => import('./pages/Contact'));
+const About = lazy(() => import('./pages/About'));
+const FragranceFinder = lazy(() => import('./pages/FragranceFinder'));
+const AdminDashboard = lazy(() => import('./pages/Admin'));
+const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
+const ShippingPolicy = lazy(() => import('./pages/ShippingPolicy'));
+const ReturnPolicy = lazy(() => import('./pages/ReturnPolicy'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const TermsConditions = lazy(() => import('./pages/TermsConditions'));
+const OAuthCallback = lazy(() => import('./pages/OAuthCallback'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+
+// Loading fallback component
+const PageLoader = () => (
+    <div className="page-loader" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="spinner" />
+    </div>
+);
 
 // Scroll to top on every route change
 const ScrollToTop = () => {
@@ -84,46 +93,48 @@ function App() {
             {!isAuthPage && <Navbar />}
             <CartDrawer />
             <main>
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/shop" element={<Shop />} />
-                    <Route path="/product/:slug" element={<ProductDetail />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/fragrance-finder" element={<FragranceFinder />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/shipping-policy" element={<ShippingPolicy />} />
-                    <Route path="/return-policy" element={<ReturnPolicy />} />
-                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                    <Route path="/terms" element={<TermsConditions />} />
-                    <Route path="/auth/callback" element={<OAuthCallback />} />
+                <Suspense fallback={<PageLoader />}>
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/shop" element={<Shop />} />
+                        <Route path="/product/:slug" element={<ProductDetail />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/fragrance-finder" element={<FragranceFinder />} />
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/shipping-policy" element={<ShippingPolicy />} />
+                        <Route path="/return-policy" element={<ReturnPolicy />} />
+                        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                        <Route path="/terms" element={<TermsConditions />} />
+                        <Route path="/auth/callback" element={<OAuthCallback />} />
 
-                    {/* Protected Routes */}
-                    <Route path="/checkout" element={
-                        <ProtectedRoute><Checkout /></ProtectedRoute>
-                    } />
-                    <Route path="/orders" element={
-                        <ProtectedRoute><Orders /></ProtectedRoute>
-                    } />
-                    <Route path="/profile" element={
-                        <ProtectedRoute><Profile /></ProtectedRoute>
-                    } />
-                    <Route path="/wishlist" element={
-                        <ProtectedRoute><Wishlist /></ProtectedRoute>
-                    } />
-                    <Route path="/order-success/:orderId" element={
-                        <ProtectedRoute><OrderSuccess /></ProtectedRoute>
-                    } />
+                        {/* Protected Routes */}
+                        <Route path="/checkout" element={
+                            <ProtectedRoute><Checkout /></ProtectedRoute>
+                        } />
+                        <Route path="/orders" element={
+                            <ProtectedRoute><Orders /></ProtectedRoute>
+                        } />
+                        <Route path="/profile" element={
+                            <ProtectedRoute><Profile /></ProtectedRoute>
+                        } />
+                        <Route path="/wishlist" element={
+                            <ProtectedRoute><Wishlist /></ProtectedRoute>
+                        } />
+                        <Route path="/order-success/:orderId" element={
+                            <ProtectedRoute><OrderSuccess /></ProtectedRoute>
+                        } />
 
-                    {/* Admin Routes */}
-                    <Route path="/admin" element={
-                        <ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>
-                    } />
+                        {/* Admin Routes */}
+                        <Route path="/admin" element={
+                            <ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>
+                        } />
 
-                    {/* 404 */}
-                    <Route path="*" element={<NotFound />} />
-                </Routes>
+                        {/* 404 */}
+                        <Route path="*" element={<NotFound />} />
+                    </Routes>
+                </Suspense>
             </main>
             {!isAuthPage && <Footer />}
             {!isAuthPage && <AIChatbox />}

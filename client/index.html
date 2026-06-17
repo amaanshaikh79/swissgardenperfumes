@@ -18,17 +18,23 @@
     <meta property="og:description"
         content="Premium fragrance profiles inspired by iconic scents — crafted for everyday wear in India. Starting at ₹499." />
     <meta property="og:type" content="website" />
+    
+    <!-- Preconnect to external resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://checkout.razorpay.com" />
+    
+    <!-- Font loading with display swap for better performance -->
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
+    
     <title>swissgarden Perfumes — Luxury Inspired Scents at Smart Prices</title>
 </head>
 
 <body>
     <div id="root"></div>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
     <script type="module" src="/src/main.jsx"></script>
 </body>
 

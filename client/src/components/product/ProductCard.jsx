@@ -4,6 +4,7 @@ import { FiShoppingBag, FiStar, FiHeart } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import toast from 'react-hot-toast';
+import LazyImage from '../common/LazyImage';
 import './ProductCard.css';
 
 const ProductCard = ({ product, index = 0 }) => {
@@ -61,17 +62,15 @@ const ProductCard = ({ product, index = 0 }) => {
         >
             <Link to={`/product/${product.slug}`} className="product-card" id={`product-${product._id}`}>
                 <div className="product-card-image">
-                    <img
+                    <LazyImage
                         src={product.images?.[0]?.url || 'https://via.placeholder.com/400x500?text=Perfume'}
                         alt={product.images?.[0]?.alt || product.name}
-                        loading="lazy"
                         className="product-card-image-main"
                     />
                     {product.images?.[1]?.url && (
-                        <img
+                        <LazyImage
                             src={product.images[1].url}
                             alt={product.images[1].alt || `${product.name} - Hover`}
-                            loading="lazy"
                             className="product-card-image-hover"
                         />
                     )}

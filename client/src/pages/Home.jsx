@@ -7,6 +7,7 @@ import {
     FiDroplet, FiWind, FiFeather, FiSun
 } from 'react-icons/fi';
 import ProductCard from '../components/product/ProductCard';
+import LazyImage from '../components/common/LazyImage';
 import { productsAPI } from '../services/api';
 import './Home.css';
 
@@ -135,7 +136,7 @@ const Home = () => {
                         exit={{ opacity: 0 }}
                         transition={{ duration: 1.2, ease: 'easeInOut' }}
                     >
-                        <img
+                        <LazyImage
                             src={heroImages[heroSlide]}
                             alt="SwissGarden luxury perfume collection"
                             className="home-hero-img"
@@ -297,7 +298,7 @@ const Home = () => {
                             >
                                 <Link to={col.link} className="home-spotlight-card">
                                     <div className="home-spotlight-image">
-                                        <img src={col.image} alt={col.name} loading="lazy" />
+                                        <LazyImage src={col.image} alt={col.name} />
                                         <div className="home-spotlight-overlay" />
                                     </div>
                                     <div className="home-spotlight-info">

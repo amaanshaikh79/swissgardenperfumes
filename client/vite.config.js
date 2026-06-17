@@ -15,5 +15,25 @@ export default defineConfig({
     build: {
         outDir: 'dist',
         sourcemap: false,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+                    'framer-motion': ['framer-motion'],
+                    'ui-vendor': ['react-hot-toast', 'react-helmet-async'],
+                },
+            },
+        },
+        chunkSizeWarningLimit: 1000,
+        minify: 'terser',
+        terserOptions: {
+            compress: {
+                drop_console: true,
+                drop_debugger: true,
+            },
+        },
+    },
+    optimizeDeps: {
+        include: ['react', 'react-dom', 'react-router-dom'],
     },
 });
