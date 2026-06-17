@@ -31,7 +31,28 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--transition-slow);
+    transition: transform var(--transition-slow), opacity var(--transition-base);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.product-card-image-main {
+    opacity: 1;
+    z-index: 1;
+}
+
+.product-card-image-hover {
+    opacity: 0;
+    z-index: 2;
+}
+
+.product-card:hover .product-card-image-main {
+    opacity: 0;
+}
+
+.product-card:hover .product-card-image-hover {
+    opacity: 1;
 }
 
 .product-card:hover .product-card-image img {

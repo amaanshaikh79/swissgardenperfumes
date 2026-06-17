@@ -21,7 +21,7 @@ const products = [
         images: [
             { url: 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=800', alt: 'Alpine Savage' },
         ],
-        category: 'Attar Collection',
+        category: 'Attar',
         gender: 'Men',
         size: '10ml',
         fragranceNotes: {
@@ -33,7 +33,7 @@ const products = [
         stock: 100,
         featured: true,
         tags: ['woody', 'masculine', 'bold', 'commanding', 'evening', 'attar', 'non-alcoholic', 'roll-on', 'bestseller'],
-        concentration: 'Concentrated Attar',
+        concentration: 'Intense',
         longevity: '8-12 hours',
         sillage: 'Strong',
         occasion: ['Evening', 'Date Night', 'Special Occasion', 'Office'],
@@ -54,7 +54,7 @@ const products = [
         images: [
             { url: 'https://images.unsplash.com/photo-1615634260167-c8cdede054de?w=800', alt: 'Citrus Reverie' },
         ],
-        category: 'Attar Collection',
+        category: 'Attar',
         gender: 'Unisex',
         size: '10ml',
         fragranceNotes: {
@@ -66,7 +66,7 @@ const products = [
         stock: 100,
         featured: true,
         tags: ['citrus', 'fresh', 'bright', 'unisex', 'daily-wear', 'office', 'attar', 'non-alcoholic', 'roll-on'],
-        concentration: 'Concentrated Attar',
+        concentration: 'Intense',
         longevity: '8-12 hours',
         sillage: 'Moderate',
         occasion: ['Day', 'Office', 'Casual', 'Morning'],
@@ -87,7 +87,7 @@ const products = [
         images: [
             { url: 'https://images.unsplash.com/photo-1594035910387-fbd1a129de45?w=800', alt: 'Royal Ascent' },
         ],
-        category: 'Attar Collection',
+        category: 'Attar',
         gender: 'Unisex',
         size: '10ml',
         fragranceNotes: {
@@ -99,7 +99,7 @@ const products = [
         stock: 100,
         featured: true,
         tags: ['oud', 'deep', 'mysterious', 'magnetic', 'evening', 'luxury', 'attar', 'non-alcoholic', 'roll-on', 'bestseller'],
-        concentration: 'Concentrated Attar',
+        concentration: 'Intense',
         longevity: '8-12 hours',
         sillage: 'Strong',
         occasion: ['Evening', 'Special Occasion', 'Date Night'],
@@ -120,7 +120,7 @@ const products = [
         images: [
             { url: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=800', alt: 'Glacier Splash' },
         ],
-        category: 'Attar Collection',
+        category: 'Attar',
         gender: 'Unisex',
         size: '10ml',
         fragranceNotes: {
@@ -132,7 +132,7 @@ const products = [
         stock: 100,
         featured: true,
         tags: ['aquatic', 'clean', 'fresh', 'unisex', 'daily-wear', 'summer', 'attar', 'non-alcoholic', 'roll-on'],
-        concentration: 'Concentrated Attar',
+        concentration: 'Intense',
         longevity: '8-12 hours',
         sillage: 'Moderate',
         occasion: ['Day', 'Casual', 'Office', 'Active'],
@@ -151,9 +151,10 @@ const products = [
         layeringStory: 'Layer with Royal Ascent for Garden Royale — floral-dark contrast that is romantic and authoritative simultaneously. Pair with Citrus Reverie for warmth and brightness like a garden in peak summer.',
         price: 499,
         images: [
-            { url: 'https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=800', alt: 'Swiss Flora' },
+            { url: '/Images/Swiss Flora.JPG', alt: 'Swiss Flora - Main View' },
+            { url: '/Images/Swiss Flora(2).JPG', alt: 'Swiss Flora - Hover View' },
         ],
-        category: 'Attar Collection',
+        category: 'Attar',
         gender: 'Women',
         size: '10ml',
         fragranceNotes: {
@@ -165,7 +166,7 @@ const products = [
         stock: 100,
         featured: true,
         tags: ['floral', 'romantic', 'feminine', 'warm', 'gift', 'attar', 'non-alcoholic', 'roll-on', 'bestseller'],
-        concentration: 'Concentrated Attar',
+        concentration: 'Intense',
         longevity: '8-12 hours',
         sillage: 'Moderate',
         occasion: ['Day', 'Date Night', 'Celebrations', 'Gift'],
@@ -186,7 +187,7 @@ const products = [
         images: [
             { url: 'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=800', alt: 'Blue Dominion' },
         ],
-        category: 'Attar Collection',
+        category: 'Attar',
         gender: 'Men',
         size: '10ml',
         fragranceNotes: {
@@ -198,7 +199,7 @@ const products = [
         stock: 100,
         featured: true,
         tags: ['aquatic', 'woody', 'confident', 'electric', 'evening', 'masculine', 'attar', 'non-alcoholic', 'roll-on', 'bestseller'],
-        concentration: 'Concentrated Attar',
+        concentration: 'Intense',
         longevity: '8-12 hours',
         sillage: 'Strong',
         occasion: ['Evening', 'Date Night', 'Travel', 'Special Occasion'],

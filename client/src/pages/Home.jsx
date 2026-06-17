@@ -21,7 +21,7 @@ const Home = () => {
     const heroRef = useRef(null);
 
     const heroImages = [
-        'https://images.unsplash.com/photo-1615634260167-c8cdede054de?w=1920&q=80',
+        '/hero-products.jpg',
         'https://images.unsplash.com/photo-1541643600914-78b084683601?w=1920&q=80',
         'https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=1920&q=80',
         'https://images.unsplash.com/photo-1594035910387-fbd1a129de45?w=1920&q=80',
@@ -124,37 +124,48 @@ const Home = () => {
                 <meta name="description" content="Artisan-crafted luxury fragrances inspired by iconic scents. Rare ingredients, Indian-climate tested. Discover your signature scent." />
             </Helmet>
 
-            {/* ─── Full-Screen Cinematic Hero ─────────────────────── */}
+            {/* ─── Banner Hero ─────────────────────────────────────── */}
             <section className="home-hero" ref={heroRef}>
-                <motion.div className="home-hero-bg" style={{ scale: heroScale }}>
-                    <AnimatePresence mode="sync">
-                        <motion.img
-                            key={heroSlide}
+                <AnimatePresence mode="sync">
+                    <motion.div
+                        key={heroSlide}
+                        className="home-hero-bg"
+                        initial={{ opacity: 0, scale: 1.04 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1.2, ease: 'easeInOut' }}
+                    >
+                        <img
                             src={heroImages[heroSlide]}
-                            alt="SwissGarden editorial"
-                            initial={{ opacity: 0, scale: 1.05 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 1.5, ease: 'easeInOut' }}
-                            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                            alt="SwissGarden luxury perfume collection"
+                            className="home-hero-img"
                         />
-                    </AnimatePresence>
-                    <div className="home-hero-overlay" />
-                </motion.div>
-                <motion.div className="home-hero-content" style={{ opacity: heroOpacity }}>
+                    </motion.div>
+                </AnimatePresence>
+                
+                <div className="home-hero-overlay"></div>
+                
+                <motion.div
+                    className="home-hero-content"
+                    style={{ opacity: heroOpacity }}
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.9, ease: 'easeOut', delay: 0.3 }}
+                >
                     <motion.span
                         className="home-hero-label"
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.3 }}
+                        transition={{ duration: 0.7, delay: 0.5 }}
                     >
-                        The Art of Fragrance
+                        THE ART OF FRAGRANCE
                     </motion.span>
+
                     <motion.h1
                         className="home-hero-title"
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.9, delay: 0.5 }}
+                        transition={{ duration: 0.9, delay: 0.7 }}
                     >
                         Scent is the
                         <br />
@@ -162,27 +173,29 @@ const Home = () => {
                         <br />
                         of the soul.
                     </motion.h1>
-                    <motion.div
-                        className="home-hero-cta"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.9 }}
-                    >
-                        <Link to="/shop" className="btn btn-white btn-lg">
-                            Explore Collection <FiArrowRight size={16} />
-                        </Link>
-                        <Link to="/fragrance-finder" className="btn btn-outline-light btn-lg">
-                            Find Your Scent
-                        </Link>
-                    </motion.div>
+
                     <motion.div
                         className="home-hero-scroll-hint"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ delay: 1.5 }}
+                        transition={{ duration: 0.8, delay: 1.2 }}
                     >
-                        <span>Scroll to discover</span>
-                        <div className="scroll-line" />
+                        SCROLL TO DISCOVER
+                        <div className="scroll-line"></div>
+                    </motion.div>
+
+                    <motion.div
+                        className="home-hero-cta"
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.9 }}
+                    >
+                        <Link to="/shop" className="btn btn-light btn-lg">
+                            EXPLORE COLLECTION <FiArrowRight size={16} />
+                        </Link>
+                        <Link to="/fragrance-finder" className="btn btn-outline-light btn-lg">
+                            FIND YOUR SCENT
+                        </Link>
                     </motion.div>
                 </motion.div>
             </section>

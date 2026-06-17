@@ -12,44 +12,48 @@
     margin-top: var(--space-3xl);
 }
 
-/* ─── Full-Screen Cinematic Hero ─────────────────────────── */
+/* ─── Banner Hero ─────────────────────────────────────── */
 .home-hero {
     position: relative;
-    height: 100vh;
-    min-height: 600px;
+    min-height: 520px;
+    height: 90vh;
+    max-height: 800px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    background: #333;
 }
 
 .home-hero-bg {
     position: absolute;
     inset: 0;
-    z-index: 0;
-    will-change: transform;
+    z-index: 1;
 }
 
-.home-hero-bg img {
+.home-hero-bg img,
+.home-hero-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
+    display: block;
 }
 
 .home-hero-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(
-        180deg,
-        rgba(0, 0, 0, 0.35) 0%,
-        rgba(0, 0, 0, 0.15) 40%,
-        rgba(0, 0, 0, 0.5) 100%
+        to bottom,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.4) 100%
     );
+    z-index: 2;
 }
 
 .home-hero-content {
     position: relative;
-    z-index: 2;
+    z-index: 3;
     text-align: center;
     max-width: 800px;
     padding: 0 var(--space-xl);
@@ -60,46 +64,27 @@
 
 .home-hero-label {
     font-family: var(--font-body);
-    font-size: 0.7rem;
-    font-weight: 600;
+    font-size: 0.65rem;
+    font-weight: 700;
     letter-spacing: 5px;
     text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: var(--space-xl);
+    color: var(--accent, #c8a02a);
+    margin-bottom: var(--space-xl, 2rem);
 }
 
 .home-hero-title {
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-size: clamp(2rem, 5vw, 4.5rem);
     font-weight: 300;
-    line-height: 1.15;
-    color: var(--white);
-    margin-bottom: var(--space-2xl);
+    line-height: 1.2;
+    color: #ffffff;
+    margin-bottom: var(--space-3xl, 3rem);
     letter-spacing: -0.5px;
 }
 
 .home-hero-title em {
     font-style: italic;
-    color: var(--accent-200);
-}
-
-.home-hero-cta {
-    display: flex;
-    gap: var(--space-md);
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.btn-outline-light {
-    background: transparent;
-    color: var(--white);
-    border: 2px solid rgba(255, 255, 255, 0.5);
-}
-
-.btn-outline-light:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--white);
-    transform: translateY(-2px);
+    color: var(--accent, #c8a02a);
 }
 
 .home-hero-scroll-hint {
@@ -111,10 +96,12 @@
     flex-direction: column;
     align-items: center;
     gap: var(--space-sm);
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.7);
     font-size: 0.65rem;
     letter-spacing: 3px;
     text-transform: uppercase;
+    font-weight: 600;
+    z-index: 3;
 }
 
 .scroll-line {
@@ -128,6 +115,48 @@
     0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
     50% { opacity: 1; transform: scaleY(1); }
 }
+
+.home-hero-cta {
+    display: flex;
+    gap: var(--space-md, 1rem);
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.btn-light {
+    background: #ffffff;
+    color: #1a1a1a;
+    border: 2px solid #ffffff;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+}
+
+.btn-light:hover {
+    background: transparent;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.btn-outline-light {
+    background: transparent;
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+}
+
+.btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #ffffff;
+    transform: translateY(-2px);
+}
+
+
 
 /* ─── Press & Media Logos ────────────────────────────────── */
 .home-press {
@@ -607,23 +636,34 @@
 
 @media (max-width: 768px) {
     .home-hero {
-        min-height: 100vh;
+        height: 70vh;
+        min-height: 400px;
     }
 
     .home-hero-title {
-        font-size: clamp(2rem, 8vw, 3rem);
+        font-size: clamp(1.8rem, 7vw, 2.8rem);
+    }
+
+    .home-hero-label {
+        font-size: 0.55rem;
+        letter-spacing: 4px;
     }
 
     .home-hero-cta {
         flex-direction: column;
-        align-items: center;
         width: 100%;
-        max-width: 300px;
+        max-width: 280px;
     }
 
     .home-hero-cta .btn {
         width: 100%;
     }
+
+    .home-hero-scroll-hint {
+        bottom: 20px;
+        font-size: 0.55rem;
+    }
+
 
     .home-press-logos {
         gap: var(--space-xl);
