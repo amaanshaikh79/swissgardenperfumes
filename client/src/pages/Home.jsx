@@ -80,19 +80,19 @@ const Home = () => {
 
     const spotlightCollections = [
         {
-            name: 'The Noir Edit',
+            name: 'Royal Ascent',
             mood: 'Dark. Mysterious. Unforgettable.',
             image: '/Images/Royal Ascent.JPG',
             link: '/shop?fragranceFamily=Oriental',
         },
         {
-            name: 'Garden Botanicals',
+            name: 'Swiss Flora',
             mood: 'Fresh florals meet crisp greens.',
             image: '/Images/Swiss Flora.JPG',
             link: '/shop?fragranceFamily=Floral',
         },
         {
-            name: 'Oud Heritage',
+            name: 'Alpine Savage',
             mood: 'Rich. Regal. Timeless.',
             image: '/Images/Alpine Savage.JPG',
             link: '/shop?fragranceFamily=Woody',
