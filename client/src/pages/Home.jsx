@@ -21,10 +21,10 @@ const Home = () => {
     const heroRef = useRef(null);
 
     const heroImages = [
-        '/hero-products.jpg',
-        'https://images.unsplash.com/photo-1541643600914-78b084683601?w=1920&q=80',
-        'https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=1920&q=80',
-        'https://images.unsplash.com/photo-1594035910387-fbd1a129de45?w=1920&q=80',
+        '/Images/Alpine Savage(2).JPG',
+        '/Images/Royal Ascent(2).JPG',
+        '/Images/Swiss Flora(2).JPG',
+        '/Images/Blue Dominion(2).JPG',
     ];
 
     useEffect(() => {
@@ -81,19 +81,19 @@ const Home = () => {
         {
             name: 'The Noir Edit',
             mood: 'Dark. Mysterious. Unforgettable.',
-            image: 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&q=80',
+            image: '/Images/Royal Ascent.JPG',
             link: '/shop?fragranceFamily=Oriental',
         },
         {
             name: 'Garden Botanicals',
             mood: 'Fresh florals meet crisp greens.',
-            image: 'https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=600&q=80',
+            image: '/Images/Swiss Flora.JPG',
             link: '/shop?fragranceFamily=Floral',
         },
         {
             name: 'Oud Heritage',
             mood: 'Rich. Regal. Timeless.',
-            image: 'https://images.unsplash.com/photo-1594035910387-fbd1a129de45?w=600&q=80',
+            image: '/Images/Alpine Savage.JPG',
             link: '/shop?fragranceFamily=Woody',
         },
     ];
