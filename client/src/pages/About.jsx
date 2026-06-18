@@ -64,10 +64,10 @@ const About = () => {
     ];
 
     const gallery = [
-        'https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&q=80',
-        'https://images.unsplash.com/photo-1615634260167-c8cdede054de?w=500&q=80',
-        'https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=500&q=80',
-        'https://images.unsplash.com/photo-1594035910387-fbd1a129de45?w=500&q=80',
+        '/Images/Alpine Savage(2).JPG',
+        '/Images/Blue Dominion(2).JPG',
+        '/Images/Glacier Splash(2).JPG',
+        '/Images/Royal Ascent(2).JPG',
     ];
 
     return (
