@@ -32,9 +32,9 @@ const ingredientOrigins = [
 
 const collectionMoods = {
     default: { title: 'The Collection', mood: 'Every scent tells a story. Find the one that speaks yours.' },
-    Floral: { title: 'Floral Garden', mood: 'Petals, softness, and sun-warmed elegance.' },
-    Oriental: { title: 'The Noir Edit', mood: 'Dark. Mysterious. Unforgettable.' },
-    Woody: { title: 'Oud Heritage', mood: 'Rich. Regal. Timeless.' },
+    Floral: { title: 'Swiss Flora', mood: 'Warm, Alpine , and sun-warmed elegance.' },
+    Oriental: { title: 'Royal Ascent', mood: 'Dark. Mysterious. Unforgettable.' },
+    Woody: { title: 'Alpine Savage', mood: 'Rich. Regal. Timeless.' },
     Fresh: { title: 'Aqua Botanicals', mood: 'Crisp greens and morning dew.' },
     Citrus: { title: 'Citrus Sun', mood: 'Bright, zesty, and alive.' },
     Aquatic: { title: 'Ocean Breeze', mood: 'Cool waves and salt air.' },
