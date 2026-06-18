@@ -201,7 +201,7 @@ const products = [
         images: [
             { url: '/Images/Glacier Splash.JPG', alt: 'Glacier Splash - Main View' },
             { url: '/Images/Glacier Splash(2).JPG', alt: 'Glacier Splash - Hover View' },
-            { url: '/Images/Glacier Splash(3).JPG', alt: 'Glacier Splash - Alternate View' },
+            { url: '/Images/Glacier Splash(3).jpg', alt: 'Glacier Splash - Alternate View' },
         ],
         video: '/Video/Glacier Splash.mp4',
         category: 'Attar',
