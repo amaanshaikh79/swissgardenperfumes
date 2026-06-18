@@ -22,7 +22,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background: #333;
+    background: #1a1a1a;
 }
 
 .home-hero-bg {
@@ -40,13 +40,21 @@
     display: block;
 }
 
+.home-hero-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
 .home-hero-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(
         to bottom,
-        rgba(0, 0, 0, 0.2) 0%,
-        rgba(0, 0, 0, 0.4) 100%
+        rgba(0, 0, 0, 0.3) 0%,
+        rgba(0, 0, 0, 0.5) 100%
     );
     z-index: 2;
 }

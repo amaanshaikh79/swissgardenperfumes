@@ -13,6 +13,7 @@ import AIChatbox from './components/common/AIChatbox';
 // Eager load critical pages
 import Home from './pages/Home';
 import { Login, Register } from './pages/Auth';
+import ComboSet from './pages/ComboSet';
 
 // Lazy load other pages
 const Shop = lazy(() => import('./pages/Shop'));
@@ -98,6 +99,7 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/shop" element={<Shop />} />
                         <Route path="/product/:slug" element={<ProductDetail />} />
+                        <Route path="/combo-set" element={<ComboSet />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
                         <Route path="/about" element={<About />} />

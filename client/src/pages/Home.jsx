@@ -21,19 +21,21 @@ const Home = () => {
     const [heroSlide, setHeroSlide] = useState(0);
     const heroRef = useRef(null);
 
-    const heroImages = [
-        '/Images/Alpine Savage(2).JPG',
-        '/Images/Royal Ascent(2).JPG',
-        '/Images/Swiss Flora(2).JPG',
-        '/Images/Blue Dominion(2).JPG',
+    const heroVideos = [
+        '/Video/Alpine Savage.mp4',
+        '/Video/Royal Ascent.mp4',
+        '/Video/Swiss Flora.mp4',
+        '/Video/Blue Dominion.mp4',
+        '/Video/Citrus Reverie.mp4',
+        '/Video/Glacier Splash.mp4',
     ];
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setHeroSlide((prev) => (prev + 1) % heroImages.length);
-        }, 5000);
+            setHeroSlide((prev) => (prev + 1) % heroVideos.length);
+        }, 8000); // Change video every 8 seconds
         return () => clearInterval(interval);
-    }, [heroImages.length]);
+    }, [heroVideos.length]);
 
     const { scrollYProgress } = useScroll({
         target: heroRef,
@@ -131,15 +133,18 @@ const Home = () => {
                     <motion.div
                         key={heroSlide}
                         className="home-hero-bg"
-                        initial={{ opacity: 0, scale: 1.04 }}
-                        animate={{ opacity: 1, scale: 1 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 1.2, ease: 'easeInOut' }}
+                        transition={{ duration: 1.5, ease: 'easeInOut' }}
                     >
-                        <LazyImage
-                            src={heroImages[heroSlide]}
-                            alt="SwissGarden luxury perfume collection"
-                            className="home-hero-img"
+                        <video
+                            src={heroVideos[heroSlide]}
+                            className="home-hero-video"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
                         />
                     </motion.div>
                 </AnimatePresence>

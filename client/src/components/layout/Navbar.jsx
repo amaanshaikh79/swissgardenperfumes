@@ -60,7 +60,7 @@ const Navbar = () => {
         { to: '/shop?tag=bestseller', label: 'Bestsellers' },
         { to: '/shop?gender=Men', label: 'For Him' },
         { to: '/shop?gender=Women', label: 'For Her' },
-        { to: '/shop?tag=combo', label: 'Combo Sets' },
+        { to: '/combo-set', label: 'Combo Sets' },
         { to: '/about', label: 'About' },
     ];
 

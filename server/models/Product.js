@@ -70,6 +70,9 @@ const productSchema = new mongoose.Schema(
                 alt: { type: String, default: '' },
             },
         ],
+        video: {
+            type: String,
+        },
         category: {
             type: String,
             required: [true, 'Please provide a category'],
