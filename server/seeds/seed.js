@@ -21,7 +21,9 @@ const products = [
         images: [
             { url: '/Images/Alpine Savage.JPG', alt: 'Alpine Savage - Main View' },
             { url: '/Images/Alpine Savage(2).JPG', alt: 'Alpine Savage - Hover View' },
+            { url: '/Images/Alpine Savage(3).jpg', alt: 'Alpine Savage - Alternate View' },
         ],
+        video: '/Video/Alpine Savage.mp4',
         category: 'Attar',
         gender: 'Men',
         size: '10ml',
@@ -55,7 +57,9 @@ const products = [
         images: [
             { url: '/Images/Blue Dominion.JPG', alt: 'Blue Dominion - Main View' },
             { url: '/Images/Blue Dominion(2).JPG', alt: 'Blue Dominion - Hover View' },
+            { url: '/Images/Blue Dominion(3).jpg', alt: 'Blue Dominion - Alternate View' },
         ],
+        video: '/Video/Blue Dominion.mp4',
         category: 'Attar',
         gender: 'Men',
         size: '10ml',
@@ -89,7 +93,9 @@ const products = [
         images: [
             { url: '/Images/Citrus Reverie.JPG', alt: 'Citrus Reverie - Main View' },
             { url: '/Images/Citrus Reverie(2).JPG', alt: 'Citrus Reverie - Hover View' },
+            { url: '/Images/Citrus Reverie(3).jpg', alt: 'Citrus Reverie - Alternate View' },
         ],
+        video: '/Video/Citrus Reverie.mp4',
         category: 'Attar',
         gender: 'Unisex',
         size: '10ml',
@@ -123,7 +129,9 @@ const products = [
         images: [
             { url: '/Images/Royal Ascent.JPG', alt: 'Royal Ascent - Main View' },
             { url: '/Images/Royal Ascent(2).JPG', alt: 'Royal Ascent - Hover View' },
+            { url: '/Images/Royal Ascent(3).jpg', alt: 'Royal Ascent - Alternate View' },
         ],
+        video: '/Video/Royal Ascent.mp4',
         category: 'Attar',
         gender: 'Unisex',
         size: '10ml',
@@ -157,7 +165,9 @@ const products = [
         images: [
             { url: '/Images/Swiss Flora.JPG', alt: 'Swiss Flora - Main View' },
             { url: '/Images/Swiss Flora(2).JPG', alt: 'Swiss Flora - Hover View' },
+            { url: '/Images/Swiss Flora(3).jpg', alt: 'Swiss Flora - Alternate View' },
         ],
+        video: '/Video/Swiss Flora.mp4',
         category: 'Attar',
         gender: 'Women',
         size: '10ml',
@@ -191,7 +201,9 @@ const products = [
         images: [
             { url: '/Images/Glacier Splash.JPG', alt: 'Glacier Splash - Main View' },
             { url: '/Images/Glacier Splash(2).JPG', alt: 'Glacier Splash - Hover View' },
+            { url: '/Images/Glacier Splash(3).JPG', alt: 'Glacier Splash - Alternate View' },
         ],
+        video: '/Video/Glacier Splash.mp4',
         category: 'Attar',
         gender: 'Unisex',
         size: '10ml',
