@@ -76,21 +76,8 @@ const Shop = () => {
                 if (maxPrice) params.maxPrice = maxPrice;
 
                 const { data } = await productsAPI.getAll(params);
-                // TEMPORARY: Add test API image for checking
-                const testProduct = {
-                    _id: 'test-shop-api-123',
-                    name: 'Test Shop Product (API Image)',
-                    price: 799,
-                    images: [{ url: 'https://images.unsplash.com/photo-1615634260167-c8cdede054de?w=600&q=80' }],
-                    slug: 'test-shop-product',
-                    stock: 10,
-                    size: '50ml',
-                    tags: ['test'],
-                    fragranceFamily: 'Floral',
-                    gender: 'Unisex',
-                };
-                setProducts(data.products ? [testProduct, ...data.products.slice(0, 11)] : [testProduct]);
-                setTotal(data.total ? data.total + 1 : 1);
+                setProducts(data.products || []);
+                setTotal(data.total || 0);
                 setPages(data.pages || 1);
             } catch (err) {
                 console.error('Failed to fetch products:', err);
