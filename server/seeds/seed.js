@@ -176,6 +176,40 @@ const products = [
         occasion: ['Day', 'Date Night', 'Celebrations', 'Gift'],
         season: ['Spring', 'Summer', 'All Year'],
     },
+
+    // ── 06 GLACIER SPLASH ────────────────────────────────────────────────────
+    {
+        name: 'Glacier Splash',
+        brand: 'Swiss Garden Perfumes',
+        description:
+            "Clean is not simple. Clean is the hardest thing to get right. There is a particular shock of clarity that happens when glacial water meets warm skin. Not cold for its own sake. Not clean as an absence of complexity. But clean as the highest form of precision — every unnecessary thing removed, every essential thing present, nothing wasted. Glacier Splash was built around that moment. It opens with an aquatic clarity that is immediate and completely honest. No tricks. No layers hiding behind layers. Just the pure, physical sensation of something impossibly clean. As it settles, a subtle warmth emerges — because even glacial water carries heat when it meets something alive. This is the fragrance for people who have nothing to hide. Who have done the work, who know who they are, and who no longer need complexity to prove it. Simplicity, when it's this precise, is its own kind of power.",
+        shortDescription: 'Pure aquatic, relentlessly clean unisex roll-on attar. Glacial clarity for every day. 10ml · Non-Alcoholic · Long Lasting · ₹499.',
+        metaDescription: 'Glacier Splash by Swiss Garden Perfumes — fresh aquatic non-alcoholic unisex roll-on attar. Clean, long-lasting, layerable. 10ml. ₹499.',
+        wearFor: 'Active days. Gym to office. The morning after a great night. Summer. Every moment when you want to feel as clean as you actually are.',
+        layeringStory: 'Glacier Splash is your top layer. Layer over Alpine Savage for The Arctic King — cold on dark, sharp on deep. Add to Citrus Reverie for a relentlessly fresh pairing.',
+        price: 499,
+        images: [
+            { url: '/Images/Glacier Splash.JPG', alt: 'Glacier Splash - Main View' },
+            { url: '/Images/Glacier Splash(2).JPG', alt: 'Glacier Splash - Hover View' },
+        ],
+        category: 'Attar',
+        gender: 'Unisex',
+        size: '10ml',
+        fragranceNotes: {
+            top: ['Glacial Water', 'Marine Accord', 'Arctic Air'],
+            middle: ['Aquatic Accord', 'Clean Woods', 'White Musk'],
+            base: ['Warm Skin Accord', 'Soft Amber', 'White Cedar'],
+        },
+        fragranceFamily: 'Aquatic',
+        stock: 100,
+        featured: true,
+        tags: ['aquatic', 'clean', 'fresh', 'unisex', 'daily-wear', 'summer', 'attar', 'non-alcoholic', 'roll-on'],
+        concentration: 'Intense',
+        longevity: '8-12 hours',
+        sillage: 'Moderate',
+        occasion: ['Day', 'Casual', 'Office', 'Active'],
+        season: ['Spring', 'Summer', 'All Year'],
+    },
 ];
 
 const adminUser = {
