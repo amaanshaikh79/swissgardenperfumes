@@ -54,13 +54,14 @@ const Navbar = () => {
         navigate('/');
     };
 
-    // Center Menu: Shop | Bestsellers | For Him | For Her | Combo Sets | Pairing Guide | About
+    // Center Menu: Shop | Bestsellers | For Him | For Her | Combo Sets | Gifting | Pairing Guide | About
     const navLinks = [
         { to: '/shop', label: 'Shop', hasDropdown: true },
         { to: '/shop?tag=bestseller', label: 'Bestsellers' },
         { to: '/shop?gender=Men', label: 'For Him' },
         { to: '/shop?gender=Women', label: 'For Her' },
         { to: '/combo-set', label: 'Combo Sets' },
+        { to: '/gifting', label: 'Gifting' },
         { to: '/pairing-guide', label: 'Pairing Guide' },
         { to: '/about', label: 'About' },
     ];

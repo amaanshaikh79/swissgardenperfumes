@@ -1,0 +1,398 @@
+/* ═══════════════════════════════════════════════════════════
+   Gifting Page
+   ═══════════════════════════════════════════════════════════ */
+
+.gifting-page {
+    min-height: 100vh;
+    background: var(--bg-primary);
+}
+
+/* ─── Hero Section ───────────────────────────────────────── */
+.gifting-hero {
+    padding: var(--space-5xl) 0;
+    background: linear-gradient(135deg, #1a3a2a 0%, #0d1f17 100%);
+    color: var(--white);
+    text-align: center;
+}
+
+.gifting-hero-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.gifting-hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 300;
+    letter-spacing: -0.5px;
+    margin-bottom: var(--space-xl);
+    color: var(--white);
+}
+
+.gifting-hero-subtitle {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.85);
+    font-style: italic;
+}
+
+/* ─── Gifting Proposition ────────────────────────────────── */
+.gifting-proposition {
+    padding: var(--space-5xl) 0;
+}
+
+.gifting-prop-visual {
+    margin-bottom: var(--space-3xl);
+    text-align: center;
+}
+
+.gifting-case-image {
+    max-width: 400px;
+    margin: 0 auto;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+.gifting-case-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.gifting-prop-text {
+    text-align: center;
+}
+
+.gifting-prop-desc {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xl);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.gifting-prop-desc strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* ─── Gifting Features ───────────────────────────────────── */
+.gifting-features {
+    padding: var(--space-5xl) 0;
+}
+
+.gifting-features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-2xl);
+}
+
+.gifting-feature-card {
+    background: var(--white);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3xl) var(--space-2xl);
+    text-align: center;
+    transition: all var(--transition-base);
+}
+
+.gifting-feature-card:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
+}
+
+.gifting-feature-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: var(--accent-subtle);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-xl);
+}
+
+.gifting-feature-title {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-md);
+}
+
+.gifting-feature-desc {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+}
+
+/* ─── Gifting Occasions ──────────────────────────────────── */
+.gifting-occasions {
+    padding: var(--space-5xl) 0;
+}
+
+.gifting-occasions-list {
+    max-width: 700px;
+    margin: var(--space-3xl) auto 0;
+}
+
+.gifting-occasion-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-lg) 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.gifting-occasion-item:last-child {
+    border-bottom: none;
+}
+
+.gifting-occasion-bullet {
+    color: var(--accent);
+    font-size: 1.5rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+/* ─── Corporate Gifting ──────────────────────────────────── */
+.section-dark {
+    background: var(--bg-dark-section);
+    color: var(--white);
+}
+
+.gifting-corporate {
+    padding: var(--space-5xl) 0;
+}
+
+.gifting-corporate-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.gifting-corporate-icon {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(200, 160, 42, 0.15);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-xl);
+}
+
+.gifting-corporate-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 300;
+    color: var(--white);
+    margin-bottom: var(--space-lg);
+}
+
+.gifting-corporate-desc {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: var(--space-2xl);
+}
+
+.gifting-corporate-desc strong {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.gifting-corporate-benefits {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-3xl);
+    text-align: left;
+}
+
+.gifting-benefit {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-md);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+}
+
+.gifting-benefit svg {
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+/* ─── Product Showcase ───────────────────────────────────── */
+.gifting-showcase {
+    padding: var(--space-5xl) 0;
+}
+
+.gifting-showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-2xl);
+    margin-top: var(--space-3xl);
+}
+
+.gifting-showcase-item {
+    text-align: center;
+}
+
+.gifting-showcase-image {
+    width: 100%;
+    max-width: 250px;
+    height: 300px;
+    margin: 0 auto var(--space-lg);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.gifting-showcase-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gifting-showcase-item h4 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.gifting-showcase-item p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* ─── CTA Section ────────────────────────────────────────── */
+.section-accent {
+    background: linear-gradient(135deg, var(--accent-subtle) 0%, rgba(200, 160, 42, 0.08) 100%);
+}
+
+.gifting-cta {
+    padding: var(--space-5xl) 0;
+}
+
+.gifting-cta-content {
+    text-align: center;
+}
+
+.gifting-cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 300;
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+}
+
+.gifting-cta-desc {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2xl);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.gifting-cta-actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-dark {
+    background: var(--text-primary);
+    color: var(--white);
+    border: 2px solid var(--text-primary);
+}
+
+.btn-dark:hover {
+    background: transparent;
+    color: var(--text-primary);
+}
+
+.btn-outline-dark {
+    background: transparent;
+    color: var(--text-primary);
+    border: 2px solid var(--text-primary);
+}
+
+.btn-outline-dark:hover {
+    background: var(--text-primary);
+    color: var(--white);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .gifting-hero-title {
+        font-size: 2rem;
+    }
+
+    .gifting-hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .gifting-case-image {
+        max-width: 300px;
+    }
+
+    .gifting-features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gifting-corporate-benefits {
+        grid-template-columns: 1fr;
+    }
+
+    .gifting-showcase-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gifting-cta-actions {
+        flex-direction: column;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .gifting-cta-actions .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .gifting-feature-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .gifting-corporate-icon {
+        width: 70px;
+        height: 70px;
+    }
+
+    .gifting-showcase-image {
+        height: 250px;
+    }
+}
