@@ -180,10 +180,18 @@
     margin-bottom: var(--space-xs);
 }
 
-.combo-price-save {
+.combo-price-detail {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.combo-cart-confirmation {
     font-size: 0.85rem;
     color: var(--save-green);
     font-weight: 600;
+    font-style: italic;
+    margin-top: var(--space-sm);
 }
 
 .combo-add-btn {
@@ -369,6 +377,81 @@
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.combo-info-precision {
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text-primary);
+    margin: var(--space-xl) 0;
+}
+
+.combo-whats-included {
+    margin: var(--space-3xl) 0;
+    padding: var(--space-2xl);
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-color);
+}
+
+.combo-section-title {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+    text-align: center;
+}
+
+.combo-included-list {
+    list-style: none;
+    padding: 0;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.combo-included-list li {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    padding: var(--space-sm) 0;
+    padding-left: var(--space-xl);
+    position: relative;
+    line-height: 1.6;
+}
+
+.combo-included-list li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.combo-gifting-banner {
+    margin: var(--space-3xl) 0;
+    padding: var(--space-3xl);
+    background: linear-gradient(135deg, #1a3a2a 0%, #0d1f17 100%);
+    border-radius: var(--radius-xl);
+    text-align: center;
+    color: var(--white);
+}
+
+.combo-gifting-title {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 300;
+    margin-bottom: var(--space-lg);
+    color: var(--white);
+}
+
+.combo-gifting-desc {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 700px;
+    margin: 0 auto;
 }
 
 .combo-features {

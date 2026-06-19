@@ -13,7 +13,7 @@ const ComboSet = () => {
     const [loading, setLoading] = useState(true);
     const { addToCart } = useCart();
 
-    const COMBO_PRICE = 1499;
+    const COMBO_PRICE = 1497;
     const SINGLE_PRICE = 499;
     const SAVINGS = (SINGLE_PRICE * 3) - COMBO_PRICE;
 
@@ -86,8 +86,8 @@ const ComboSet = () => {
     return (
         <>
             <Helmet>
-                <title>Trio Combo - Choose Any 3 Attars | SwissGarden Perfumes</title>
-                <meta name="description" content="Create your perfect trio. Choose any 3 attars for ₹1,499. Save ₹0 on our signature collection." />
+                <title>Build Your Signature Trio | SwissGarden Perfumes</title>
+                <meta name="description" content="Create your personal fragrance system. Choose any 3 precision attars for ₹1,497. Presented in The Mood Collection emerald gift case with gold foil detailing." />
             </Helmet>
 
             <div className="combo-page">
@@ -99,8 +99,8 @@ const ComboSet = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6 }}
                         >
-                            <h1 className="combo-hero-title">sgp-trio-combo</h1>
-                            <p className="combo-hero-subtitle">Choose Any 3 Attars</p>
+                            <h1 className="combo-hero-title">Build Your Signature Trio</h1>
+                            <p className="combo-hero-subtitle">Three attars. One identity. Choose any three from the collection and make the combination yours.</p>
                         </motion.div>
                     </div>
                 </section>
@@ -119,7 +119,7 @@ const ComboSet = () => {
                                 >
                                     <div className="combo-slot-header">
                                         <span className="combo-slot-label">ATTAR {String(slotIndex + 1).padStart(2, '0')}</span>
-                                        <span className="combo-slot-instruction">Choose below</span>
+                                        <span className="combo-slot-instruction">Select Your Three Attars</span>
                                     </div>
                                     <div className="combo-slot-content">
                                         {selectedAttars[slotIndex] ? (
@@ -152,7 +152,7 @@ const ComboSet = () => {
                         <div className="combo-add-section">
                             <div className="combo-price-info">
                                 <div className="combo-price-main">₹{COMBO_PRICE.toLocaleString('en-IN')}</div>
-                                <div className="combo-price-save">Save ₹{SAVINGS} vs single</div>
+                                <div className="combo-price-detail">₹499 × 3</div>
                             </div>
                             <button
                                 className={`btn btn-primary btn-lg combo-add-btn ${!canAddToCart ? 'disabled' : ''}`}
@@ -160,8 +160,11 @@ const ComboSet = () => {
                                 disabled={!canAddToCart}
                             >
                                 <FiShoppingBag size={20} />
-                                Add Trio to Cart ({allSlotsFilledCount}/3)
+                                Add to Cart ({allSlotsFilledCount}/3 selected)
                             </button>
+                            {canAddToCart && (
+                                <p className="combo-cart-confirmation">Your Signature Trio has been added.</p>
+                            )}
                         </div>
                     </div>
                 </section>
@@ -233,24 +236,48 @@ const ComboSet = () => {
                             viewport={{ once: true }}
                             transition={{ duration: 0.6 }}
                         >
-                            <h2 className="combo-info-title">The Signature Collection</h2>
+                            <h2 className="combo-info-title">The Signature Trio</h2>
                             <p className="combo-info-desc">
-                                The Signature Collection is not a sampler. It is a <strong>curated fragrance system</strong> — three precision attars chosen by you, 
-                                engineered to work individually and in concert. Each 10ml roll-on is crafted without alcohol, so the scent settles close to the skin, 
-                                evolving with your body heat across the day. Whether you reach for a single note in the morning or layer two at pulse points and a third 
-                                through your hair, the Signature Trio gives you a wardrobe of scent in one deliberately small package.
+                                The Signature Trio is not a curated sampler. It is a <strong>personal fragrance system</strong> — three precision attars, selected by you, 
+                                engineered to work individually and in concert.
                             </p>
                             <p className="combo-info-desc">
-                                Swiss Garden Perfumes was built on one conviction: <strong>luxury in fragrance is precision, not price.</strong> Every attar in this 
-                                collection is formulated to the same exacting standard — a structured three-act pyramid, long-wearing concentration, and a roll-on format 
-                                designed for control. Choose three. Make them yours.
+                                Each 10ml roll-on arrives in its own distinctive individual box, presented together inside <strong>The Mood Collection gift case</strong>: 
+                                a deep emerald sleeve with gold foil detailing, closed flat for a reveal that is part of the experience. The packaging is considered because 
+                                we believe the unboxing is part of the product.
                             </p>
+                            <p className="combo-info-desc">
+                                Wear one attar for a clean, single-note presence. Apply two at different pulse points for layered depth. Use all three across wrist, collar, 
+                                and hair for a fragrance that is entirely and only yours. The Signature Trio gives you a wardrobe of scent in one deliberate, portable system.
+                            </p>
+                            <p className="combo-info-precision"><strong>This is precision, personalised.</strong></p>
+                            
+                            <div className="combo-whats-included">
+                                <h3 className="combo-section-title">What's Included</h3>
+                                <ul className="combo-included-list">
+                                    <li>Any 3 attars of your choice from The Mood Collection</li>
+                                    <li>3 × 10ml precision roll-on attars</li>
+                                    <li>Presented in individual branded boxes</li>
+                                    <li>Housed in The Mood Collection emerald gift case</li>
+                                    <li>Gold foil branding, gift-ready presentation</li>
+                                </ul>
+                            </div>
+
+                            <div className="combo-gifting-banner">
+                                <h3 className="combo-gifting-title">The gift for someone whose taste you respect.</h3>
+                                <p className="combo-gifting-desc">
+                                    The Signature Trio is the ideal gifting format — personalised enough to feel considered, flexible enough that the recipient 
+                                    builds exactly what they want. Available as a ready-gift (three attars pre-selected) or as a gift-your-choice option where 
+                                    the recipient makes their own selection.
+                                </p>
+                            </div>
+
                             <div className="combo-features">
-                                <div className="combo-feature">CHOOSE ANY 3</div>
-                                <div className="combo-feature">CHOOSE YOUR OWN COMBINATION</div>
-                                <div className="combo-feature">ALL-DAY WEAR</div>
-                                <div className="combo-feature">SKIN-SAFE FORMULA</div>
-                                <div className="combo-feature">₹1,499 · SAVE ₹-2 VS SINGLE </div>
+                                <div className="combo-feature">ANY 3 ATTARS</div>
+                                <div className="combo-feature">EMERALD GIFT CASE</div>
+                                <div className="combo-feature">INDIVIDUAL BOXES</div>
+                                <div className="combo-feature">GOLD FOIL DETAILS</div>
+                                <div className="combo-feature">₹1,497 · ₹499 × 3</div>
                             </div>
                         </motion.div>
                     </div>
