@@ -905,3 +905,268 @@ ol {
     background: rgba(200, 160, 42, 0.25);
     color: var(--text-primary);
 }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   PERFORMANCE OPTIMIZATIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Hardware Acceleration for Better Performance */
+.btn,
+.product-card,
+.nav-link,
+.modal,
+.drawer,
+[class*="animation"],
+[class*="transition"] {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000px;
+    perspective: 1000px;
+}
+
+/* Optimize Transforms & Opacity for GPU */
+.smooth-transform {
+    will-change: transform;
+    transition: transform 0.3s ease;
+}
+
+.smooth-opacity {
+    will-change: opacity;
+    transition: opacity 0.3s ease;
+}
+
+/* Remove will-change after animation completes */
+.animation-complete {
+    will-change: auto;
+}
+
+/* Mobile-Specific Performance */
+@media (max-width: 768px) {
+    /* Reduce animation complexity on mobile */
+    * {
+        animation-duration: 0.3s !important;
+        transition-duration: 0.3s !important;
+    }
+    
+    /* Simplify box shadows on mobile */
+    [class*="shadow"] {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* Optimize text rendering */
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeSpeed;
+    }
+    
+    /* Reduce blur effects */
+    [class*="blur"] {
+        filter: none !important;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    .lazy-image--in-view {
+        animation: none;
+    }
+}
+
+/* Content Visibility for Off-Screen Content */
+.section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+}
+
+/* Optimize Images */
+img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+/* Optimize Video Playback */
+video {
+    object-fit: cover;
+    background: var(--bg-secondary);
+}
+
+/* Low-End Device Optimizations */
+@media (max-width: 480px) and (max-resolution: 1.5dppx) {
+    /* Disable expensive effects on low-end mobile */
+    .backdrop-blur,
+    [class*="glass"] {
+        backdrop-filter: none !important;
+        background: var(--bg-glass) !important;
+    }
+    
+    /* Simplify gradients */
+    [class*="gradient"] {
+        background: var(--bg-secondary) !important;
+    }
+    
+    /* Reduce transition complexity */
+    * {
+        transition: opacity 0.2s ease, transform 0.2s ease !important;
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    /* Larger touch targets */
+    .btn,
+    a,
+    button,
+    input[type="checkbox"],
+    input[type="radio"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Remove hover effects on touch devices */
+    .btn:hover,
+    a:hover,
+    [class*="hover"]:hover {
+        transform: none !important;
+    }
+    
+    /* Optimize scrolling */
+    * {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Print Optimizations */
+@media print {
+    video,
+    .animation,
+    .modal,
+    .drawer,
+    nav,
+    footer {
+        display: none !important;
+    }
+    
+    * {
+        animation: none !important;
+        transition: none !important;
+        box-shadow: none !important;
+    }
+}
+
+/* Connection-Based Optimizations */
+@media (prefers-reduced-data: reduce) {
+    /* Disable background images/videos on data saver mode */
+    [style*="background-image"],
+    video {
+        background-image: none !important;
+        display: none !important;
+    }
+    
+    /* Simplify animations */
+    * {
+        animation: none !important;
+        transition: opacity 0.2s ease !important;
+    }
+}
+
+/* Focus Visible for Accessibility */
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Prevent Layout Shift */
+.aspect-ratio-box {
+    position: relative;
+    overflow: hidden;
+}
+
+.aspect-ratio-box::before {
+    content: '';
+    display: block;
+    padding-top: var(--aspect-ratio, 100%);
+}
+
+.aspect-ratio-box > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Smooth Scrolling with Performance */
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+/* Loading States */
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--gray-100) 0%,
+        var(--gray-50) 50%,
+        var(--gray-100) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Optimized Fade Animations */
+@keyframes optimizedFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: optimizedFadeIn 0.3s ease-out;
+}
+
+/* GPU-Accelerated Slide */
+@keyframes optimizedSlideUp {
+    from {
+        transform: translate3d(0, 20px, 0);
+        opacity: 0;
+    }
+    to {
+        transform: translate3d(0, 0, 0);
+        opacity: 1;
+    }
+}
+
+.slide-up {
+    animation: optimizedSlideUp 0.4s ease-out;
+}

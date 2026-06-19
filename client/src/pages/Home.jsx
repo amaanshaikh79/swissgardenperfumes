@@ -7,6 +7,7 @@ import {
 } from 'react-icons/fi';
 import ProductCard from '../components/product/ProductCard';
 import LazyImage from '../components/common/LazyImage';
+import LazyVideo from '../components/common/LazyVideo';
 import { productsAPI } from '../services/api';
 import './Home.css';
 
@@ -138,6 +139,7 @@ const Home = () => {
                             loop
                             muted
                             playsInline
+                            preload="auto"
                         />
                     </motion.div>
                 </AnimatePresence>
@@ -157,7 +159,7 @@ const Home = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.7, delay: 0.5 }}
                     >
-                        Swiss precision. Indian craft. The Mood Collection — non-alcoholic, long-lasting, yours.
+                        THE ART OF FRAGRANCE
                     </motion.span>
 
                     <motion.h1
@@ -166,17 +168,10 @@ const Home = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.9, delay: 0.7 }}
                     >
-                        Craft Your <em>Signature.</em>
+                        Scent is the<br />
+                        <em>invisible signature</em><br />
+                        of the soul.
                     </motion.h1>
-
-                    <motion.p
-                        className="home-hero-subtitle"
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.85 }}
-                    >
-                        Six precision roll-on attars. One collection built around who you are.
-                    </motion.p>
 
                     <motion.div
                         className="home-hero-scroll-hint"
@@ -195,10 +190,10 @@ const Home = () => {
                         transition={{ duration: 0.8, delay: 0.9 }}
                     >
                         <Link to="/shop" className="btn btn-light btn-lg">
-                            SHOP THE COLLECTION <FiArrowRight size={16} />
+                            EXPLORE COLLECTION
                         </Link>
                         <Link to="/fragrance-finder" className="btn btn-outline-light btn-lg">
-                            BUILD YOUR TRIO
+                            FIND YOUR SCENT
                         </Link>
                     </motion.div>
                 </motion.div>
@@ -333,6 +328,60 @@ const Home = () => {
                             <Link to="/shop" className="btn btn-primary">Check Shop Page</Link>
                         </div>
                     )}
+                </div>
+            </section>
+
+            {/* ─── Product Videos Gallery ─────────────────────────── */}
+            <section className="home-videos-gallery section">
+                <div className="container">
+                    <div className="section-header">
+                        <span className="section-label">Experience</span>
+                        <h2 className="section-title">The Collection in Motion</h2>
+                        <p className="section-subtitle">
+                            Explore each fragrance through cinematic visuals
+                        </p>
+                    </div>
+                </div>
+                <div className="home-videos-scroll-container">
+                    <motion.div 
+                        className="home-videos-track"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        {[
+                            { name: 'Alpine Savage', video: '/Video/Alpine Savage.mp4' },
+                            { name: 'Blue Dominion', video: '/Video/Blue Dominion.mp4' },
+                            { name: 'Citrus Reverie', video: '/Video/Citrus Reverie.mp4' },
+                            { name: 'Glacier Splash', video: '/Video/Glacier Splash.mp4' },
+                            { name: 'Royal Ascent', video: '/Video/Royal Ascent.mp4' },
+                            { name: 'Swiss Flora', video: '/Video/Swiss Flora.mp4' },
+                        ].map((item, index) => (
+                            <motion.div
+                                key={item.name}
+                                className="home-video-card"
+                                initial={{ opacity: 0, x: 50 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true, margin: '-100px' }}
+                                transition={{ delay: index * 0.1, duration: 0.5 }}
+                            >
+                                <div className="home-video-wrapper">
+                                    <LazyVideo
+                                        src={item.video}
+                                        className="home-video-player"
+                                        autoPlay
+                                        loop
+                                        muted
+                                        playsInline
+                                    />
+                                    <div className="home-video-overlay">
+                                        <h3 className="home-video-title">{item.name}</h3>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </motion.div>
                 </div>
             </section>
 

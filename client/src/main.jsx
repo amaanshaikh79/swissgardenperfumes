@@ -6,7 +6,13 @@ import { Toaster } from 'react-hot-toast';
 import App from './App';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { initPerformanceMonitoring } from './utils/performanceMonitor';
 import './styles/index.css';
+
+// Initialize performance monitoring in development
+if (import.meta.env.DEV) {
+    initPerformanceMonitoring();
+}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>

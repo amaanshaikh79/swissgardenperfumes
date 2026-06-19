@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { FiCheck, FiShoppingBag, FiX } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { productsAPI } from '../services/api';
+import LazyVideo from '../components/common/LazyVideo';
 import toast from 'react-hot-toast';
 import './ComboSet.css';
 
@@ -93,8 +94,20 @@ const ComboSet = () => {
             <div className="combo-page">
                 {/* Hero Section */}
                 <section className="combo-hero">
+                    <div className="combo-hero-bg">
+                        <LazyVideo
+                            src="/Video/Combo-set.mov"
+                            className="combo-hero-video"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                        />
+                    </div>
+                    <div className="combo-hero-overlay"></div>
                     <div className="container">
                         <motion.div
+                            className="combo-hero-content"
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6 }}
