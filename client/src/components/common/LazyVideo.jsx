@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 
 /**
  * LazyVideo Component - Loads video only when in viewport
@@ -8,7 +7,7 @@ import PropTypes from 'prop-types';
  */
 const LazyVideo = ({ 
     src, 
-    poster, 
+    poster = '', 
     className = '', 
     autoPlay = true, 
     loop = true, 
@@ -99,20 +98,6 @@ const LazyVideo = ({
             {...props}
         />
     );
-};
-
-LazyVideo.propTypes = {
-    src: PropTypes.string.isRequired,
-    poster: PropTypes.string,
-    className: PropTypes.string,
-    autoPlay: PropTypes.bool,
-    loop: PropTypes.bool,
-    muted: PropTypes.bool,
-    playsInline: PropTypes.bool,
-    controls: PropTypes.bool,
-    preload: PropTypes.string,
-    onLoad: PropTypes.func,
-    mobileSrc: PropTypes.string,
 };
 
 export default LazyVideo;
