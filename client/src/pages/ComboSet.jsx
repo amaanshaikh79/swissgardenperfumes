@@ -13,7 +13,7 @@ const ComboSet = () => {
     const [loading, setLoading] = useState(true);
     const { addToCart } = useCart();
 
-    const COMBO_PRICE = 1497;
+    const COMBO_PRICE = 1499;
     const SINGLE_PRICE = 499;
     const SAVINGS = (SINGLE_PRICE * 3) - COMBO_PRICE;
 
@@ -87,7 +87,7 @@ const ComboSet = () => {
         <>
             <Helmet>
                 <title>Build Your Signature Trio | SwissGarden Perfumes</title>
-                <meta name="description" content="Create your personal fragrance system. Choose any 3 precision attars for ₹1,497. Presented in The Mood Collection emerald gift case with gold foil detailing." />
+                <meta name="description" content="Create your personal fragrance system. Choose any 3 precision attars for ₹1,499. Presented in The Mood Collection emerald gift case with gold foil detailing." />
             </Helmet>
 
             <div className="combo-page">
@@ -277,7 +277,7 @@ const ComboSet = () => {
                                 <div className="combo-feature">EMERALD GIFT CASE</div>
                                 <div className="combo-feature">INDIVIDUAL BOXES</div>
                                 <div className="combo-feature">GOLD FOIL DETAILS</div>
-                                <div className="combo-feature">₹1,497 · ₹499 × 3</div>
+                                <div className="combo-feature">₹1,499 · ₹499 × 3</div>
                             </div>
                         </motion.div>
                     </div>
