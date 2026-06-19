@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import {
-    FiArrowRight, FiStar, FiCheck, FiSend, FiChevronLeft, FiChevronRight,
-    FiDroplet, FiWind, FiFeather, FiSun
+    FiArrowRight, FiStar, FiCheck, FiSend, FiChevronLeft, FiChevronRight
 } from 'react-icons/fi';
 import ProductCard from '../components/product/ProductCard';
 import LazyImage from '../components/common/LazyImage';
@@ -101,12 +100,6 @@ const Home = () => {
         },
     ];
 
-    const craftSteps = [
-        { icon: <FiDroplet size={28} />, title: 'Sourced Globally', desc: 'Rare oils from Grasse, Mysore sandalwood, Bulgarian roses, and Cambodian oud — sourced at origin.' },
-        { icon: <FiWind size={28} />, title: 'Blended by Hand', desc: 'Each composition is layered by our master perfumer, balanced note by note over weeks of refinement.' },
-        { icon: <FiFeather size={28} />, title: 'Climate-Tuned', desc: 'Formulations tested in Indian heat and humidity — so every scent lasts and projects beautifully.' },
-        { icon: <FiSun size={28} />, title: 'Bottled with Care', desc: 'Hand-filled, sealed, and inspected. Every bottle is a promise of quality you can smell.' },
-    ];
 
     const reviews = [
         { name: 'Rahul S.', location: 'Mumbai', rating: 5, text: 'Honestly shocked at the quality. The oud one lasts 10+ hours on me. Already ordered 3 more.', tag: 'Repeat Buyer' },
@@ -164,7 +157,7 @@ const Home = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.7, delay: 0.5 }}
                     >
-                        THE ART OF FRAGRANCE
+                        Swiss precision. Indian craft. The Mood Collection — non-alcoholic, long-lasting, yours.
                     </motion.span>
 
                     <motion.h1
@@ -173,12 +166,17 @@ const Home = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.9, delay: 0.7 }}
                     >
-                        Scent is the
-                        <br />
-                        <em>invisible signature</em>
-                        <br />
-                        of the soul.
+                        Craft Your <em>Signature.</em>
                     </motion.h1>
+
+                    <motion.p
+                        className="home-hero-subtitle"
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.85 }}
+                    >
+                        Six precision roll-on attars. One collection built around who you are.
+                    </motion.p>
 
                     <motion.div
                         className="home-hero-scroll-hint"
@@ -197,58 +195,111 @@ const Home = () => {
                         transition={{ duration: 0.8, delay: 0.9 }}
                     >
                         <Link to="/shop" className="btn btn-light btn-lg">
-                            EXPLORE COLLECTION <FiArrowRight size={16} />
+                            SHOP THE COLLECTION <FiArrowRight size={16} />
                         </Link>
                         <Link to="/fragrance-finder" className="btn btn-outline-light btn-lg">
-                            FIND YOUR SCENT
+                            BUILD YOUR TRIO
                         </Link>
                     </motion.div>
                 </motion.div>
             </section>
 
 
-            {/* ─── Brand Philosophy ───────────────────────────────── */}
+            {/* ─── Introductory Strip ──────────────────────────────── */}
             <section className="home-philosophy">
                 <div className="container-sm">
+                    <motion.h2
+                        className="home-philosophy-heading"
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: '-100px' }}
+                        transition={{ duration: 0.7 }}
+                    >
+                        Three lines. One identity.
+                    </motion.h2>
                     <motion.p
                         className="home-philosophy-text"
                         initial={{ opacity: 0, y: 40 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, margin: '-100px' }}
-                        transition={{ duration: 0.8 }}
+                        transition={{ duration: 0.8, delay: 0.15 }}
                     >
-                        We believe luxury is not a price tag — it is the <em>intention</em> behind every drop, every note, every breath.
+                        Swiss Garden Perfumes was built on a single conviction — that fragrance at any price point can be precise, intentional, and deeply personal. The Mood Collection translates that conviction into six attars: each one a distinct mood, engineered to last, formulated without alcohol, and delivered in a roll-on that puts the scent exactly where you intend it.
+                    </motion.p>
+                    <motion.p
+                        className="home-philosophy-closing"
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: '-100px' }}
+                        transition={{ duration: 0.7, delay: 0.3 }}
+                    >
+                        This is not a shelf fragrance. This is yours.
                     </motion.p>
                 </div>
             </section>
 
-            {/* ─── Craft & Ingredients Storytelling ───────────────── */}
-            <section className="home-craft section">
+            {/* ─── Value Pillars Strip ──────────────────────────────── */}
+            <section className="home-pillars section">
+                <div className="container">
+                    <div className="home-pillars-grid">
+                        <motion.div
+                            className="home-pillar"
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6 }}
+                        >
+                            <h3 className="home-pillar-title">Precision Formula</h3>
+                            <p className="home-pillar-desc">
+                                Every attar follows a structured three-act note pyramid — top, heart, base — crafted for progression and longevity.
+                            </p>
+                        </motion.div>
+                        <motion.div
+                            className="home-pillar"
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.12 }}
+                        >
+                            <h3 className="home-pillar-title">Non-Alcoholic</h3>
+                            <p className="home-pillar-desc">
+                                No alcohol means no harsh opening. The scent settles close to the skin and evolves with your body heat across the day.
+                            </p>
+                        </motion.div>
+                        <motion.div
+                            className="home-pillar"
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.24 }}
+                        >
+                            <h3 className="home-pillar-title">Roll-On Control</h3>
+                            <p className="home-pillar-desc">
+                                A precision roll-on applies scent exactly where intended — pulse points, wrist, collar — no spray waste, no overuse.
+                            </p>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── Collection Preview Banner ───────────────────────── */}
+            <section className="home-collection-banner section">
                 <div className="container-sm">
-                    <div className="section-header">
-                        <span className="section-label">The Craft</span>
-                        <h2 className="section-title">From Raw Ingredient to Your Skin</h2>
-                        <p className="section-subtitle">
-                            Each bottle holds months of sourcing, blending, and refinement — a slow craft in a fast world.
+                    <motion.div
+                        className="home-collection-banner-inner"
+                        initial={{ opacity: 0, y: 40 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: '-80px' }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <h2 className="home-collection-banner-title">Six Attars. Every Mood.</h2>
+                        <p className="home-collection-banner-text">
+                            From the cool clarity of Glacier Splash to the commanding warmth of Royal Ascent — each fragrance in The Mood Collection is a complete expression. Wear one. Layer two. Make the combination yours.
                         </p>
-                    </div>
-                    <div className="home-craft-grid">
-                        {craftSteps.map((step, i) => (
-                            <motion.div
-                                key={step.title}
-                                className="home-craft-card"
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.12, duration: 0.6 }}
-                            >
-                                <div className="home-craft-icon">{step.icon}</div>
-                                <span className="home-craft-step">0{i + 1}</span>
-                                <h3 className="home-craft-title">{step.title}</h3>
-                                <p className="home-craft-desc">{step.desc}</p>
-                            </motion.div>
-                        ))}
-                    </div>
+                        <Link to="/shop" className="btn btn-accent btn-lg home-collection-banner-cta">
+                            Explore The Collection <FiArrowRight size={16} />
+                        </Link>
+                    </motion.div>
                 </div>
             </section>
 
@@ -282,6 +333,27 @@ const Home = () => {
                             <Link to="/shop" className="btn btn-primary">Check Shop Page</Link>
                         </div>
                     )}
+                </div>
+            </section>
+
+            {/* ─── Trio / Gifting Teaser ───────────────────────────── */}
+            <section className="home-trio-teaser section">
+                <div className="container-sm">
+                    <motion.div
+                        className="home-trio-teaser-inner"
+                        initial={{ opacity: 0, y: 40 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: '-80px' }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <h2 className="home-trio-teaser-title">Choose Three. Call It Yours.</h2>
+                        <p className="home-trio-teaser-text">
+                            The Signature Trio lets you build a personal fragrance wardrobe from any three attars in the collection. Gift it. Keep it. Own it completely.
+                        </p>
+                        <Link to="/fragrance-finder" className="btn btn-outline btn-lg home-trio-teaser-cta">
+                            Build Your Trio <FiArrowRight size={16} />
+                        </Link>
+                    </motion.div>
                 </div>
             </section>
 

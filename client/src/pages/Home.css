@@ -95,6 +95,15 @@
     color: var(--accent, #c8a02a);
 }
 
+.home-hero-subtitle {
+    font-size: clamp(1rem, 2vw, 1.35rem);
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 540px;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
+}
+
 .home-hero-scroll-hint {
     position: absolute;
     bottom: 40px;
@@ -217,72 +226,142 @@
     text-align: center;
 }
 
-.home-philosophy-text {
+.home-philosophy-heading {
     font-family: var(--font-display);
-    font-size: clamp(1.5rem, 3.5vw, 2.8rem);
+    font-size: clamp(1.6rem, 3vw, 2.5rem);
     font-weight: 300;
-    line-height: 1.4;
     color: var(--text-primary);
-    max-width: 900px;
-    margin: 0 auto;
+    margin-bottom: var(--space-xl);
     letter-spacing: -0.3px;
 }
 
-.home-philosophy-text em {
+.home-philosophy-text {
+    font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    max-width: 780px;
+    margin: 0 auto;
+    letter-spacing: 0.1px;
+}
+
+.home-philosophy-closing {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    font-weight: 400;
     font-style: italic;
     color: var(--accent);
+    margin-top: var(--space-xl);
+    letter-spacing: 0.2px;
 }
 
-/* ─── Craft & Ingredients ────────────────────────────────── */
-.home-craft-grid {
+/* ─── Value Pillars ──────────────────────────────────────── */
+.home-pillars {
+    border-top: 1px solid var(--divider);
+    border-bottom: 1px solid var(--divider);
+}
+
+.home-pillars-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-xl);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
 }
 
-.home-craft-card {
+.home-pillar {
     padding: var(--space-2xl) var(--space-xl);
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-xl);
-    transition: all var(--transition-base);
+    text-align: center;
     position: relative;
 }
 
-.home-craft-card:hover {
-    border-color: var(--accent-border);
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
-}
-
-.home-craft-icon {
-    color: var(--accent);
-    margin-bottom: var(--space-lg);
-}
-
-.home-craft-step {
-    font-family: var(--font-display);
-    font-size: 3rem;
-    font-weight: 800;
-    color: var(--bg-tertiary);
+.home-pillar:not(:last-child)::after {
+    content: '';
     position: absolute;
-    top: 16px;
-    right: 20px;
-    line-height: 1;
+    right: 0;
+    top: 20%;
+    height: 60%;
+    width: 1px;
+    background: var(--divider);
 }
 
-.home-craft-title {
+.home-pillar-title {
     font-family: var(--font-display);
     font-size: 1.1rem;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: var(--space-sm);
+    margin-bottom: var(--space-md);
+    letter-spacing: 0.3px;
 }
 
-.home-craft-desc {
-    font-size: 0.88rem;
+.home-pillar-desc {
+    font-size: 0.9rem;
     color: var(--text-secondary);
     line-height: 1.7;
+    max-width: 340px;
+    margin: 0 auto;
+}
+
+/* ─── Collection Preview Banner ─────────────────────────── */
+.home-collection-banner {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--divider);
+    border-bottom: 1px solid var(--divider);
+}
+
+.home-collection-banner-inner {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.home-collection-banner-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2.5rem);
+    font-weight: 300;
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+    letter-spacing: -0.3px;
+}
+
+.home-collection-banner-text {
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--space-2xl);
+}
+
+.home-collection-banner-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ─── Trio / Gifting Teaser ──────────────────────────────── */
+.home-trio-teaser-inner {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+.home-trio-teaser-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2.5rem);
+    font-weight: 300;
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+    letter-spacing: -0.3px;
+}
+
+.home-trio-teaser-text {
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--space-2xl);
+}
+
+.home-trio-teaser-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* ─── Featured Collection Spotlight ──────────────────────── */
@@ -633,8 +712,8 @@
    Responsive
    ═══════════════════════════════════════════════════════════ */
 @media (max-width: 1024px) {
-    .home-craft-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .home-pillars-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 
     .home-carousel-slide {
@@ -683,11 +762,19 @@
     }
 
     .home-philosophy-text {
-        font-size: clamp(1.2rem, 5vw, 1.8rem);
+        font-size: 0.95rem;
     }
 
-    .home-craft-grid {
+    .home-pillars-grid {
         grid-template-columns: 1fr;
+    }
+
+    .home-pillar:not(:last-child)::after {
+        display: none;
+    }
+
+    .home-pillar:not(:last-child) {
+        border-bottom: 1px solid var(--divider);
     }
 
     .home-spotlight-grid {

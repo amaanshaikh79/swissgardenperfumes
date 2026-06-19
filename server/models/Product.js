@@ -159,6 +159,42 @@ const productSchema = new mongoose.Schema(
         },
         occasion: [String],
         season: [String],
+        moodProfile: [String],
+        bestFor: {
+            type: String,
+            maxlength: 500,
+        },
+        perfumerNote: {
+            type: String,
+            maxlength: 5000,
+        },
+        dryDown: {
+            type: String,
+            maxlength: 3000,
+        },
+        pairsWith: [
+            {
+                name: { type: String, required: true },
+                slug: { type: String, required: true },
+                description: { type: String },
+            },
+        ],
+        format: {
+            type: String,
+            maxlength: 200,
+        },
+        metaDescription: {
+            type: String,
+            maxlength: 300,
+        },
+        wearFor: {
+            type: String,
+            maxlength: 1000,
+        },
+        layeringStory: {
+            type: String,
+            maxlength: 1000,
+        },
     },
     {
         timestamps: true,
