@@ -15,8 +15,8 @@ const Footer = () => {
                                 <span className="logo-text">swissgarden</span>
                                 <span className="logo-sub">PERFUMES</span>
                             </Link>
-                            <p className="footer-brand-desc">
-                                Premium fragrance profiles inspired by iconic luxury scents — crafted for everyday wear in India. Smart buyer's luxury alternative.
+                            <p className="footer-brand-statement">
+                                <em>Swiss precision. Indian craft.</em> · The Mood Collection
                             </p>
                             <div className="footer-socials">
                                 <a href="https://www.instagram.com/swissgardenperfumes.official_" target="_blank" rel="noopener noreferrer" className="footer-social-link" aria-label="Instagram"><FiInstagram size={18} /></a>
@@ -30,22 +30,20 @@ const Footer = () => {
                             </div>
                         </div>
 
-                        {/* Shop */}
+                        {/* Navigation */}
                         <div className="footer-section">
-                            <h4 className="footer-heading">Shop</h4>
-                            <Link to="/shop" className="footer-link">All Fragrances</Link>
-                            <Link to="/shop?gender=Men" className="footer-link">For Him</Link>
-                            <Link to="/shop?gender=Women" className="footer-link">For Her</Link>
-                            <Link to="/shop?gender=Unisex" className="footer-link">Unisex</Link>
-                            <Link to="/shop?tag=combo" className="footer-link">Combo Deals</Link>
-                            <Link to="/shop?category=Gift Set" className="footer-link">Gift Sets</Link>
+                            <h4 className="footer-heading">Explore</h4>
+                            <Link to="/shop" className="footer-link">Shop the Collection</Link>
+                            <Link to="/combo-set" className="footer-link">Build Your Trio</Link>
+                            <Link to="/pairing-guide" className="footer-link">Scent Pairing Guide</Link>
+                            <Link to="/about" className="footer-link">About Swiss Garden Perfumes</Link>
+                            <Link to="/gifting" className="footer-link">Gifting</Link>
+                            <Link to="/contact" className="footer-link">Contact Us</Link>
                         </div>
 
-                        {/* Company */}
+                        {/* Policies */}
                         <div className="footer-section">
-                            <h4 className="footer-heading">Company</h4>
-                            <Link to="/about" className="footer-link">About Us</Link>
-                            <Link to="/contact" className="footer-link">Contact Us</Link>
+                            <h4 className="footer-heading">Customer Care</h4>
                             <Link to="/shipping-policy" className="footer-link">Shipping Policy</Link>
                             <Link to="/return-policy" className="footer-link">Return Policy</Link>
                             <Link to="/privacy-policy" className="footer-link">Privacy Policy</Link>
@@ -76,28 +74,20 @@ const Footer = () => {
                 </div>
             </div>
 
-            {/* Legal Disclaimer */}
-            <div className="footer-disclaimer">
+            {/* Legal Block */}
+            <div className="footer-legal">
                 <div className="container">
-                    <p>
-                        We create independent fragrance interpretations and are not affiliated with, endorsed by, or connected to any designer brands. All product names, trademarks, and images used are for descriptive reference only and belong to their respective owners.
-                    </p>
-                </div>
-            </div>
-
-            <div className="footer-bottom">
-                <div className="container">
-                    <div className="footer-bottom-content">
-                        <p>© {new Date().getFullYear()} swissgarden Perfumes. All rights reserved.</p>
-                        <div className="footer-payments">
-                            <span>UPI</span>
-                            <span>•</span>
-                            <span>Cards</span>
-                            <span>•</span>
-                            <span>Net Banking</span>
-                            <span>•</span>
-                            <span>COD</span>
-                        </div>
+                    <div className="footer-legal-content">
+                        <p className="footer-legal-brand">
+                            Swiss Garden Perfumes is a brand of <strong>Golden Buck Private Limited</strong>.
+                        </p>
+                        <p className="footer-legal-manufacturing">
+                            <em><strong>Manufacturing note:</strong> Swiss Garden Perfumes products are manufactured in India. 
+                            The Swiss identity represents our standard of precision in formulation — not geographic origin.</em>
+                        </p>
+                        <p className="footer-legal-copyright">
+                            © 2025 Golden Buck Private Limited. All rights reserved. Swiss Garden Perfumes™
+                        </p>
                     </div>
                 </div>
             </div>
