@@ -1,0 +1,403 @@
+/* ═══════════════════════════════════════════════════════════
+   Pairing Guide Page
+   ═══════════════════════════════════════════════════════════ */
+
+.pairing-guide-page {
+    min-height: 100vh;
+    background: var(--bg-primary);
+}
+
+/* ─── Hero Section ───────────────────────────────────────── */
+.pairing-hero {
+    padding: var(--space-5xl) 0;
+    background: linear-gradient(135deg, #1a3a2a 0%, #0d1f17 100%);
+    color: var(--white);
+    text-align: center;
+}
+
+.pairing-hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 300;
+    letter-spacing: -0.5px;
+    margin-bottom: var(--space-xl);
+    color: var(--white);
+}
+
+.pairing-hero-intro {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 900px;
+    margin: 0 auto var(--space-xl);
+}
+
+.pairing-hero-note {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 800px;
+    margin: 0 auto;
+    font-style: italic;
+}
+
+/* ─── How to Layer Section ──────────────────────────────── */
+.pairing-how-to {
+    padding: var(--space-5xl) 0;
+}
+
+.pairing-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-2xl);
+    margin-top: var(--space-3xl);
+}
+
+.pairing-step {
+    display: flex;
+    gap: var(--space-lg);
+    align-items: flex-start;
+}
+
+.pairing-step-number {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.pairing-step-content h3 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.pairing-step-content p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* ─── Recommended Combinations ──────────────────────────── */
+.pairing-combinations {
+    padding: var(--space-5xl) 0;
+}
+
+.pairing-combos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--space-2xl);
+    margin-top: var(--space-3xl);
+}
+
+.pairing-combo-card {
+    background: var(--white);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    transition: all var(--transition-base);
+}
+
+.pairing-combo-card:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+}
+
+.pairing-combo-header {
+    display: flex;
+    gap: var(--space-md);
+    align-items: flex-start;
+    margin-bottom: var(--space-xl);
+}
+
+.pairing-combo-number {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--bg-tertiary);
+    line-height: 1;
+}
+
+.pairing-combo-title-block {
+    flex: 1;
+}
+
+.pairing-combo-name {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.pairing-combo-mood {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+.pairing-combo-images {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.pairing-combo-image {
+    width: 100px;
+    height: 125px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.pairing-combo-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pairing-combo-plus {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.pairing-combo-attars {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--accent-subtle);
+    border-radius: var(--radius-full);
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: var(--space-xl);
+}
+
+.pairing-combo-section {
+    margin-bottom: var(--space-lg);
+}
+
+.pairing-combo-section h4 {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.pairing-combo-section p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.pairing-combo-works {
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.pairing-combo-works strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.pairing-combo-works em {
+    color: var(--text-tertiary);
+}
+
+/* ─── Pairing Matrix ────────────────────────────────────── */
+.pairing-matrix {
+    padding: var(--space-5xl) 0;
+}
+
+.pairing-matrix-table-wrapper {
+    overflow-x: auto;
+    margin: var(--space-3xl) 0;
+}
+
+.pairing-matrix-table {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    border-collapse: collapse;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.pairing-matrix-table thead {
+    background: var(--accent);
+    color: var(--white);
+}
+
+.pairing-matrix-table th {
+    padding: var(--space-md) var(--space-lg);
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.pairing-matrix-table td {
+    padding: var(--space-md) var(--space-lg);
+    text-align: center;
+    border: 1px solid var(--border-color);
+    font-size: 1.1rem;
+}
+
+.pairing-matrix-row-header {
+    background: var(--bg-secondary);
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: left !important;
+}
+
+.pairing-matrix-highlight {
+    background: var(--accent-subtle);
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.pairing-matrix-legend {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-3xl);
+    flex-wrap: wrap;
+    margin-top: var(--space-2xl);
+}
+
+.pairing-legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.pairing-legend-symbol {
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 1.1rem;
+}
+
+/* ─── CTA Section ───────────────────────────────────────── */
+.section-dark {
+    background: var(--bg-dark-section);
+    color: var(--white);
+}
+
+.pairing-cta {
+    padding: var(--space-5xl) 0;
+}
+
+.pairing-cta-content {
+    text-align: center;
+}
+
+.pairing-cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 300;
+    color: var(--white);
+    margin-bottom: var(--space-lg);
+}
+
+.pairing-cta-desc {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: var(--space-2xl);
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+    .pairing-steps {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pairing-combos-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .pairing-hero-title {
+        font-size: 2rem;
+    }
+
+    .pairing-hero-intro {
+        font-size: 1rem;
+    }
+
+    .pairing-steps {
+        grid-template-columns: 1fr;
+    }
+
+    .pairing-combo-images {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+
+    .pairing-combo-plus {
+        transform: rotate(90deg);
+    }
+
+    .pairing-matrix-table {
+        font-size: 0.85rem;
+    }
+
+    .pairing-matrix-table th,
+    .pairing-matrix-table td {
+        padding: var(--space-sm);
+    }
+
+    .pairing-matrix-legend {
+        flex-direction: column;
+        gap: var(--space-md);
+        align-items: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .pairing-combo-number {
+        font-size: 2rem;
+    }
+
+    .pairing-combo-name {
+        font-size: 1.2rem;
+    }
+
+    .pairing-combo-image {
+        width: 80px;
+        height: 100px;
+    }
+}

@@ -25,6 +25,7 @@ const Wishlist = lazy(() => import('./pages/Wishlist'));
 const Contact = lazy(() => import('./pages/Contact'));
 const About = lazy(() => import('./pages/About'));
 const FragranceFinder = lazy(() => import('./pages/FragranceFinder'));
+const PairingGuide = lazy(() => import('./pages/PairingGuide'));
 const AdminDashboard = lazy(() => import('./pages/Admin'));
 const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
 const ShippingPolicy = lazy(() => import('./pages/ShippingPolicy'));
@@ -100,6 +101,7 @@ function App() {
                         <Route path="/shop" element={<Shop />} />
                         <Route path="/product/:slug" element={<ProductDetail />} />
                         <Route path="/combo-set" element={<ComboSet />} />
+                        <Route path="/pairing-guide" element={<PairingGuide />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
                         <Route path="/about" element={<About />} />
