@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
-import { FiFilter, FiX, FiArrowRight, FiMapPin } from 'react-icons/fi';
+import { FiFilter, FiX, FiArrowRight } from 'react-icons/fi';
 import ProductCard from '../components/product/ProductCard';
 import { productsAPI } from '../services/api';
 import './Shop.css';
@@ -21,14 +21,6 @@ const SORT_OPTIONS = [
     { value: 'name_asc', label: 'A\u2013Z' },
 ];
 
-const ingredientOrigins = [
-    { name: 'Grasse Rose', origin: 'France', emoji: '\uD83C\uDDEB\uD83C\uDDF7' },
-    { name: 'Mysore Sandalwood', origin: 'India', emoji: '\uD83C\uDDEE\uD83C\uDDF3' },
-    { name: 'Bulgarian Rose', origin: 'Bulgaria', emoji: '\uD83C\uDDE7\uD83C\uDDEC' },
-    { name: 'Cambodian Oud', origin: 'Cambodia', emoji: '\uD83C\uDDF0\uD83C\uDDED' },
-    { name: 'Madagascar Vanilla', origin: 'Madagascar', emoji: '\uD83C\uDDF2\uD83C\uDDEC' },
-    { name: 'Italian Bergamot', origin: 'Italy', emoji: '\uD83C\uDDEE\uD83C\uDDF9' },
-];
 
 const collectionMoods = {
     default: { title: 'The Collection', mood: 'Every scent tells a story. Find the one that speaks yours.' },
@@ -127,32 +119,49 @@ const Shop = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.7 }}
                         >
-                            <span className="section-label" style={{ color: 'var(--accent-200)' }}>Collection</span>
+                            <span className="section-label" style={{ color: 'var(--accent-200)' }}>The Mood Collection</span>
                             <h1 className="shop-hero-title">
-                                {search ? `Results for \u201C${search}\u201D` : currentMood.title}
+                                {search ? `Results for \u201C${search}\u201D` : 'Six Attars. Six Moods. One Standard.'}
                             </h1>
-                            <p className="shop-hero-mood">{currentMood.mood}</p>
-                            <p className="shop-hero-count">{total} fragrance{total !== 1 ? 's' : ''}</p>
+                            <p className="shop-hero-mood">
+                                {search ? currentMood.mood : 'Every fragrance in The Mood Collection is formulated to the same uncompromising standard — a structured note pyramid, non-alcoholic precision base, and roll-on delivery — and expresses a completely distinct emotional register. There is no hierarchy in this collection. There is only the mood you choose to wear today.'}
+                            </p>
                         </motion.div>
                     </div>
                 </div>
 
-                {/* ─── Ingredient Origin Map ──────────────────── */}
-                <section className="shop-origins">
+                {/* ─── Collection Overview Strips ──────────────── */}
+                <section className="shop-overview">
                     <div className="container">
-                        <div className="shop-origins-inner">
-                            <div className="shop-origins-label">
-                                <FiMapPin size={14} />
-                                <span>Sourced from</span>
-                            </div>
-                            <div className="shop-origins-list">
-                                {ingredientOrigins.map((ing) => (
-                                    <span key={ing.name} className="shop-origin-tag">
-                                        <span className="shop-origin-emoji">{ing.emoji}</span>
-                                        {ing.name}
-                                    </span>
-                                ))}
-                            </div>
+                        <div className="shop-overview-grid">
+                            <motion.div
+                                className="shop-overview-block"
+                                initial={{ opacity: 0, y: 25 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.6 }}
+                            >
+                                <h3 className="shop-overview-title">Collection Grid</h3>
+                                <p className="shop-overview-text">
+                                    Below each product you will find its mood profile, its note structure, and the occasions it is engineered for. Every attar in the collection pairs with at least two others. The Scent Pairing Guide on this site shows you every recommended combination.
+                                </p>
+                            </motion.div>
+                            <motion.div
+                                className="shop-overview-block"
+                                initial={{ opacity: 0, y: 25 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.6, delay: 0.12 }}
+                            >
+                                <h3 className="shop-overview-title">Format & Formula</h3>
+                                <ul className="shop-overview-specs">
+                                    <li><strong>Format:</strong> 10ml precision roll-on attar</li>
+                                    <li><strong>Base:</strong> Non-alcoholic carrier oil</li>
+                                    <li><strong>Concentration:</strong> Long-lasting attar concentration</li>
+                                    <li><strong>Application:</strong> Roll directly onto pulse points — inner wrist, base of throat, behind ear, inner elbow</li>
+                                    <li><strong>Wear:</strong> Full-day progression from top note through base</li>
+                                </ul>
+                            </motion.div>
                         </div>
                     </div>
                 </section>

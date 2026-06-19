@@ -90,10 +90,9 @@ const About = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.7 }}
                         >
-                            <span className="section-label" style={{ color: 'var(--accent-200)' }}>The Story Behind the House</span>
-                            <h1 className="about-hero-title">Engineered for the Skin.<br /><em>Designed for the Soul.</em></h1>
+                            <h1 className="about-hero-title">Precision. Presence. <em>Personality.</em></h1>
                             <p className="about-hero-subtitle">
-                                A Fragrance House Built for Modern India. Precision-crafted. Identity-driven. Just getting started.
+                                Swiss Garden Perfumes is a fragrance house built around one idea: that a scent should mean something.
                             </p>
                         </motion.div>
                     </div>
@@ -109,84 +108,92 @@ const About = () => {
                             viewport={{ once: true }}
                             transition={{ duration: 0.6 }}
                         >
-                            <span className="section-label">The Origin Story</span>
-                            <h2 className="about-founding-title">The Story of Swiss Garden Perfumes</h2>
+                            <span className="section-label">Brand Story</span>
                             <div className="about-founding-text">
                                 <p>
-                                    There is a particular kind of frustration that only a true fragrance lover understands. You walk into a store. The shelves are full. Hundreds of options. And yet — nothing feels like you. Everything smells like it was made for someone else. A mass-produced idea of what you should want.
+                                    Fragrance in India has always carried weight — in ritual, in memory, in identity. But the modern Indian consumer has been underserved: caught between mass-market body sprays that fade by noon and luxury imports priced out of everyday reach.
                                 </p>
                                 <p>
-                                    Or the opposite problem. You find something extraordinary — a niche fragrance, a real masterpiece of perfumery — and the price tag tells you it wasn't made for you either.
+                                    Swiss Garden Perfumes was created to occupy the space between those two extremes. A precision fragrance house — digital-native, quality-obsessed, and uncompromisingly positioned at the affordable luxury tier — built for the generation that wants to smell considered without being told what a luxury buyer is supposed to look like.
                                 </p>
                                 <p>
-                                    <em>Swiss Garden Perfumes was born in the space between those two frustrations.</em>
+                                    The name carries both a philosophy and a standard. Swiss precision — in formulation, in structure, in the discipline of every note pyramid. Indian craft — in the attar tradition, in the understanding of how fragrance sits on Indian skin in Indian climates, and in the ambition to build a homegrown luxury house without apology.
                                 </p>
                                 <p>
-                                    The conviction was simple: India deserves a fragrance house. Not a perfume brand. Not an attar seller. Not an imported name slapped onto a bottle. A house — with a point of view, a philosophy, a long-term vision of what scent can mean in modern Indian life.
-                                </p>
-                                <p>
-                                    We chose the name deliberately. Switzerland is the global capital of precision — watchmaking, engineering, the relentless pursuit of getting things exactly right. The garden is something alive, growing, layered with depth. That tension — between precision and nature, between structure and soul — is what drives every fragrance we create.
-                                </p>
-                                <p>
-                                    Our first collection, the Attar Collection, is six roll-on fragrances. Non-alcoholic. Concentrated. Precise. But these six are not simply products. They are the vocabulary of a larger language we are building — a system of scent that lets you construct your own identity, your own combinations, your own signature.
-                                </p>
-                                <p>
-                                    We call what's coming <em>the Layering Matrix</em>. And it will change how India thinks about fragrance. But that story is still unfolding.
-                                </p>
-                                <p>
-                                    For now — six fragrances. One house. Infinite identities. <strong>This is Swiss Garden Perfumes.</strong>
+                                    <em>The Mood Collection is the first expression of that standard. Six attars. Six moods. One system.</em>
                                 </p>
                             </div>
-                            <Link to="/shop" className="btn btn-outline btn-lg" style={{ marginTop: 'var(--space-xl)' }}>
-                                Explore the Collection <FiArrowRight size={16} />
-                            </Link>
                         </motion.div>
                     </div>
                 </section>
 
-                {/* ─── We Are Not a Brand ───────────────────────── */}
-                <section className="about-sustainability section section-gray">
+                {/* ─── Founder's Note ─────────────────────────────── */}
+                <section className="about-founder-note section">
                     <div className="container-sm">
-                        <div className="section-header">
-                            <span className="section-label">Our Philosophy</span>
-                            <h2 className="section-title">We Are Not a Perfume Brand.</h2>
-                            <p className="section-subtitle">
-                                Most perfume brands start with a product. We started with a belief — that fragrance is the most personal form of self-expression available to us. More intimate than fashion. More lasting than a haircut. More honest than almost anything else we put on before we face the world.
+                        <motion.blockquote
+                            className="about-founder-quote"
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.7 }}
+                        >
+                            <p>
+                                "We built Swiss Garden Perfumes because we believe precision is not a luxury — it is a baseline. Every fragrance in this collection is formulated to a standard, not a price point. Wear it as it is. Layer it your way. Make it yours."
                             </p>
-                            <p className="section-subtitle" style={{ marginTop: '1rem' }}>
-                                Swiss Garden Perfumes is a fragrance house — an institution built around the art, science, and philosophy of scent. We make fragrances for people who take their identity seriously. Who understand that how you smell is not vanity. <em>It is vocabulary.</em>
-                            </p>
-                        </div>
+                            <footer className="about-founder-attribution">
+                                — Founder, Swiss Garden Perfumes
+                            </footer>
+                        </motion.blockquote>
                     </div>
                 </section>
 
-                {/* ─── Swiss Precision. Indian Soul. ───────────── */}
-                <section className="about-founding section">
+                {/* ─── Brand Philosophy & Pillars ──────────────────── */}
+                <section className="about-pillars section">
                     <div className="container-sm">
                         <motion.div
-                            className="about-founding-content"
+                            className="about-pillars-header"
                             initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.7 }}
+                        >
+                            <span className="section-label">Brand Philosophy</span>
+                            <h2 className="about-pillars-tagline">Swiss precision. Indian craft.</h2>
+                            <p className="about-pillars-sub">Crafted around emotion, presence, and individuality.</p>
+                        </motion.div>
+
+                        <div className="about-pillars-grid">
+                            <motion.div className="about-pillar-card" initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+                                <span className="about-pillar-num">01</span>
+                                <h3 className="about-pillar-title">Precision</h3>
+                                <p className="about-pillar-desc">Every product is built to a specification. Fragrance notes are structured — top, heart, base — with defined progression. The roll-on format is not convenience for its own sake; it is precision of application. We do not do vague. We do not do accidental.</p>
+                            </motion.div>
+                            <motion.div className="about-pillar-card" initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}>
+                                <span className="about-pillar-num">02</span>
+                                <h3 className="about-pillar-title">Presence</h3>
+                                <p className="about-pillar-desc">A Swiss Garden Perfumes attar is not background noise. It is a statement of presence — quiet enough to be worn in a boardroom, distinct enough to be remembered in a crowd. Long-wear concentration ensures that statement lasts.</p>
+                            </motion.div>
+                            <motion.div className="about-pillar-card" initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.2 }}>
+                                <span className="about-pillar-num">03</span>
+                                <h3 className="about-pillar-title">Personality</h3>
+                                <p className="about-pillar-desc">The Mood Collection is named for a reason. Each attar is a mood — an emotional register that the wearer chooses deliberately. Fragrance is identity. We build identity into every formula.</p>
+                            </motion.div>
+                            <motion.div className="about-pillar-card" initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.3 }}>
+                                <span className="about-pillar-num">04</span>
+                                <h3 className="about-pillar-title">Accessibility</h3>
+                                <p className="about-pillar-desc">Precision does not require a premium import price. Swiss Garden Perfumes sits at the affordable luxury tier — ₹499 per attar, ₹1,499 for the Signature Trio — because we believe quality of formulation should not be gated by margin structures.</p>
+                            </motion.div>
+                        </div>
+
+                        <motion.blockquote
+                            className="about-pillars-positioning"
+                            initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.6 }}
                         >
-                            <span className="section-label">Two Worlds. One House.</span>
-                            <h2 className="about-founding-title">Swiss Precision. Indian Soul.</h2>
-                            <div className="about-founding-text">
-                                <p>
-                                    Every fragrance we create lives at the intersection of two worlds.
-                                </p>
-                                <p>
-                                    The first world is <em>Swiss</em> — disciplined, architectural, precise. The kind of precision that goes into a movement with 200 parts, each one exactly where it belongs. We bring that discipline to fragrance formulation. Every note is intentional. Every combination is engineered.
-                                </p>
-                                <p>
-                                    The second world is <em>Indian</em> — layered, rich, sensory, emotional. A civilization that has understood the power of scent for thousands of years. Attar traditions that predate modern perfumery by centuries. We bring that depth to everything we make.
-                                </p>
-                                <p>
-                                    The result is something that feels both new and ancient. Both global and deeply ours.
-                                </p>
-                            </div>
-                        </motion.div>
+                            "The precision fragrance house for the generation that wears scent with intention."
+                        </motion.blockquote>
                     </div>
                 </section>
 

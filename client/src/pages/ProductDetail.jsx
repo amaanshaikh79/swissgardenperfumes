@@ -208,6 +208,25 @@ const ProductDetail = () => {
                             {product.shortDescription && (
                                 <p className="product-detail-tagline">{product.shortDescription}</p>
                             )}
+
+                            {product.moodProfile?.length > 0 && (
+                                <div className="mood-profile">
+                                    <span className="mood-profile-label">Mood</span>
+                                    <div className="mood-profile-tags">
+                                        {product.moodProfile.map((mood) => (
+                                            <span key={mood} className="mood-tag">{mood}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {product.bestFor && (
+                                <div className="best-for-section">
+                                    <span className="best-for-label">Best For</span>
+                                    <p className="best-for-text">{product.bestFor}</p>
+                                </div>
+                            )}
+
                             <p className="product-detail-category">
                                 {product.category} · {product.size} · {product.gender}
                             </p>
@@ -313,6 +332,22 @@ const ProductDetail = () => {
                                 </button>
                             </div>
 
+                            {/* ─── Format & Tags ──────────────────── */}
+                            {(product.format || product.tags?.length > 0) && (
+                                <div className="product-format-tags">
+                                    {product.tags?.length > 0 && (
+                                        <div className="product-tag-strip">
+                                            {product.tags.filter(t => ['intense', 'long-wear', 'evening', 'gift', 'daily-wear', 'summer', 'bold', 'romantic', 'clean', 'fresh', 'bestseller'].includes(t.toLowerCase())).slice(0, 4).map((tag) => (
+                                                <span key={tag} className="format-tag">{tag.charAt(0).toUpperCase() + tag.slice(1)}</span>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {product.format && (
+                                        <p className="product-format-line">{product.format}</p>
+                                    )}
+                                </div>
+                            )}
+
                             {/* ─── Performance Meter ────────────── */}
                             <div className="product-performance-meter">
                                 <h4 className="meter-title">How It Wears</h4>
@@ -381,7 +416,9 @@ const ProductDetail = () => {
                             {activeTab === 'story' && (
                                 <div className="product-story-content">
                                     <div className="product-story-text">
-                                        <p className="product-story-lead">{perfumerNote}</p>
+                                        {(product.perfumerNote || perfumerNote).split(/\r?\n\r?\n|\\n\\n/).map((para, i) => (
+                                            <p key={i} className={i === 0 ? 'product-story-lead' : 'product-story-para'}>{para}</p>
+                                        ))}
                                     </div>
                                     {product.occasion?.length > 0 && (
                                         <div className="product-tags-section">
@@ -513,6 +550,34 @@ const ProductDetail = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* ─── Pairs Well With ─────────────────── */}
+                {product.pairsWith?.length > 0 && (
+                    <section className="pairs-well-section">
+                        <div className="container">
+                            <div className="section-header">
+                                <span className="section-label">Fragrance Layering</span>
+                                <h2 className="section-title">Pairs Well With</h2>
+                            </div>
+                            <div className="pairs-well-grid">
+                                {product.pairsWith.map((pair) => (
+                                    <Link key={pair.slug} to={`/product/${pair.slug}`} className="pair-card">
+                                        <div className="pair-card-content">
+                                            <h3 className="pair-card-name">{pair.name}</h3>
+                                            <p className="pair-card-desc">{pair.description}</p>
+                                            <span className="pair-card-link">Explore <FiArrowRight size={14} /></span>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                            {product.layeringStory && (
+                                <div className="layering-story">
+                                    <p>{product.layeringStory}</p>
+                                </div>
+                            )}
+                        </div>
+                    </section>
+                )}
 
                 {/* ─── You May Also Love — Cross-sell ─────────── */}
                 {related.length > 0 && (
