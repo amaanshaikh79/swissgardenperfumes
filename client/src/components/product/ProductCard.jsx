@@ -66,12 +66,14 @@ const ProductCard = ({ product, index = 0 }) => {
                         src={product.images?.[0]?.url || 'https://via.placeholder.com/400x500?text=Perfume'}
                         alt={product.images?.[0]?.alt || product.name}
                         className="product-card-image-main"
+                        priority={index < 6}
                     />
                     {product.images?.[1]?.url && (
                         <LazyImage
                             src={product.images[1].url}
                             alt={product.images[1].alt || `${product.name} - Hover`}
                             className="product-card-image-hover"
+                            priority={index < 6}
                         />
                     )}
                     {badge && (
