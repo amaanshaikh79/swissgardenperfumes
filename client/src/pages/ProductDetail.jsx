@@ -138,7 +138,7 @@ const ProductDetail = () => {
     const perfumerNote = product.perfumerNote || (product.description ? product.description.slice(0, 300) : '');
 
     // Dry-down description
-    const dryDown = product.dryDown || 'As the fragrance settles, the base notes emerge slowly \u2014 warm, rich, and deeply personal. The dry-down is where this scent truly becomes yours, evolving on your skin over hours into something intimate and unforgettable.';
+    const dryDown = product.dryDown || 'As the fragrance settles, the base notes emerge slowly — warm, rich, and deeply personal. The dry-down is where this scent truly becomes yours, evolving on your skin over hours into something intimate and unforgettable.';
 
     return (
         <>
@@ -176,9 +176,9 @@ const ProductDetail = () => {
                                     style={{ rotate: imageRotation }}
                                     transition={{ type: 'spring', stiffness: 200, damping: 20 }}
                                 />
-                                <button className="product-360-btn" onClick={handle360Rotate} title="360\u00b0 Rotate">
+                                <button className="product-360-btn" onClick={handle360Rotate} title="360° Rotate">
                                     <FiRotateCw size={18} />
-                                    <span>360\u00b0</span>
+                                    <span>360°</span>
                                 </button>
                             </div>
                             {product.images?.length > 1 && (
@@ -248,13 +248,13 @@ const ProductDetail = () => {
                             )}
 
                             <div className="product-detail-price">
-                                <span className="product-detail-current-price">\u20B9{product.price.toLocaleString('en-IN')}</span>
+                                <span className="product-detail-current-price">₹{product.price.toLocaleString('en-IN')}</span>
                                 {product.compareAtPrice && (
-                                    <span className="product-detail-compare-price">\u20B9{product.compareAtPrice.toLocaleString('en-IN')}</span>
+                                    <span className="product-detail-compare-price">₹{product.compareAtPrice.toLocaleString('en-IN')}</span>
                                 )}
                                 {product.compareAtPrice && (
                                     <span className="badge badge-gold">
-                                        Save \u20B9{Math.round(product.compareAtPrice - product.price)}
+                                        Save ₹{Math.round(product.compareAtPrice - product.price)}
                                     </span>
                                 )}
                             </div>
@@ -269,7 +269,7 @@ const ProductDetail = () => {
                                                 <div className="pyramid-tier-bar" />
                                                 <div className="pyramid-tier-content">
                                                     <span className="pyramid-tier-label">Top Notes</span>
-                                                    <span className="pyramid-tier-desc">First impression \u2014 fades in 15\u201330 min</span>
+                                                    <span className="pyramid-tier-desc">First impression — fades in 15–30 min</span>
                                                     <div className="fragrance-notes-list">
                                                         {product.fragranceNotes.top.map((note) => (
                                                             <span key={note} className="fragrance-note">{note}</span>
@@ -283,7 +283,7 @@ const ProductDetail = () => {
                                                 <div className="pyramid-tier-bar" />
                                                 <div className="pyramid-tier-content">
                                                     <span className="pyramid-tier-label">Heart Notes</span>
-                                                    <span className="pyramid-tier-desc">The soul \u2014 emerges after 30 min</span>
+                                                    <span className="pyramid-tier-desc">The soul — emerges after 30 min</span>
                                                     <div className="fragrance-notes-list">
                                                         {product.fragranceNotes.middle.map((note) => (
                                                             <span key={note} className="fragrance-note">{note}</span>
@@ -297,7 +297,7 @@ const ProductDetail = () => {
                                                 <div className="pyramid-tier-bar" />
                                                 <div className="pyramid-tier-content">
                                                     <span className="pyramid-tier-label">Base Notes</span>
-                                                    <span className="pyramid-tier-desc">The foundation \u2014 lasts for hours</span>
+                                                    <span className="pyramid-tier-desc">The foundation — lasts for hours</span>
                                                     <div className="fragrance-notes-list">
                                                         {product.fragranceNotes.base.map((note) => (
                                                             <span key={note} className="fragrance-note">{note}</span>
@@ -322,7 +322,7 @@ const ProductDetail = () => {
                                     </button>
                                 </div>
                                 <button className="btn btn-primary btn-lg product-detail-add-btn" onClick={handleAddToCart}>
-                                    <FiShoppingBag size={18} /> Add to Bag — \u20B9{(product.price * quantity).toLocaleString('en-IN')}
+                                    <FiShoppingBag size={18} /> Add to Bag — ₹{(product.price * quantity).toLocaleString('en-IN')}
                                 </button>
                                 <button
                                     className={`btn btn-icon btn-outline product-detail-wish-btn ${inWishlist ? 'in-wishlist' : ''}`}
@@ -407,7 +407,7 @@ const ProductDetail = () => {
                                     className={`product-tab ${activeTab === tab ? 'active' : ''}`}
                                     onClick={() => setActiveTab(tab)}
                                 >
-                                    {tab === 'story' ? "Perfumer\u2019s Note" : tab === 'drydown' ? 'How It Wears' : `Reviews (${product.numReviews})`}
+                                    {tab === 'story' ? "Perfumer's Note" : tab === 'drydown' ? 'How It Wears' : `Reviews (${product.numReviews})`}
                                 </button>
                             ))}
                         </div>
@@ -449,17 +449,17 @@ const ProductDetail = () => {
                                     <p className="product-drydown-text">{dryDown}</p>
                                     <div className="product-drydown-timeline">
                                         <div className="drydown-phase">
-                                            <span className="drydown-phase-time">0\u201315 min</span>
+                                            <span className="drydown-phase-time">0–15 min</span>
                                             <span className="drydown-phase-name">Opening</span>
-                                            <p>The top notes burst forward \u2014 bright, fresh, and immediate.</p>
+                                            <p>The top notes burst forward — bright, fresh, and immediate.</p>
                                         </div>
                                         <div className="drydown-phase">
-                                            <span className="drydown-phase-time">30 min\u20132 hr</span>
+                                            <span className="drydown-phase-time">30 min–2 hr</span>
                                             <span className="drydown-phase-name">Heart</span>
                                             <p>The character of the fragrance reveals itself. This is the scent people notice.</p>
                                         </div>
                                         <div className="drydown-phase">
-                                            <span className="drydown-phase-time">2\u201310+ hr</span>
+                                            <span className="drydown-phase-time">2–10+ hr</span>
                                             <span className="drydown-phase-name">Dry-Down</span>
                                             <p>The base notes settle into skin. Warm, deep, and uniquely yours.</p>
                                         </div>

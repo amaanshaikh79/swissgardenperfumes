@@ -28,37 +28,37 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    // Handle OAuth callback from URL
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const provider = urlParams.get('provider');
-
-        if (token) {
-            localStorage.setItem('token', token);
-            // Fetch user data with the token
-            fetchUserWithToken(token);
-            // Clear URL params
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    }, []);
-
-    const fetchUserWithToken = async (token) => {
+    /**
+     * Login with OAuth token.
+     * Called by OAuthCallback after receiving a JWT from the server's OAuth redirect.
+     * Stores the token, fetches the user profile, and updates React state.
+     */
+    const loginWithToken = useCallback(async (token) => {
         try {
+            localStorage.setItem('token', token);
+
             const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/auth/me`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
             const data = await response.json();
+
             if (data.success) {
                 localStorage.setItem('user', JSON.stringify(data.user));
                 setUser(data.user);
+                return data.user;
+            } else {
+                // Token was invalid — clean up
+                localStorage.removeItem('token');
+                return null;
             }
         } catch (error) {
-            console.error('Failed to fetch user after OAuth:', error);
+            console.error('Failed to login with OAuth token:', error);
+            localStorage.removeItem('token');
+            return null;
         }
-    };
+    }, []);
 
     const register = async (userData) => {
         try {
@@ -149,6 +149,7 @@ export const AuthProvider = ({ children }) => {
                 isAdmin: user?.role === 'admin',
                 register,
                 login,
+                loginWithToken,
                 logout,
                 updateProfile,
                 toggleWishlist,

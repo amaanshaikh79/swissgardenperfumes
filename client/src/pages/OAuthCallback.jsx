@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+import { useAuth } from '../context/AuthContext';
 
 const OAuthCallback = () => {
     const navigate = useNavigate();
+    const { loginWithToken } = useAuth();
     const [status, setStatus] = useState('loading'); // loading | success | error
     const [message, setMessage] = useState('Completing sign in...');
 
@@ -15,6 +15,9 @@ const OAuthCallback = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
             const error = urlParams.get('error');
+
+            // Clean URL params immediately to prevent re-processing
+            window.history.replaceState({}, document.title, window.location.pathname);
 
             if (error || !token) {
                 setStatus('error');
@@ -25,27 +28,19 @@ const OAuthCallback = () => {
             }
 
             try {
-                // Store token
-                localStorage.setItem('token', token);
+                // Use AuthContext's loginWithToken to properly sync state
+                const user = await loginWithToken(token);
 
-                // Fetch user profile
-                const res = await fetch(`${API_BASE}/auth/me`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                const data = await res.json();
-
-                if (data.success) {
-                    localStorage.setItem('user', JSON.stringify(data.user));
+                if (user) {
                     setStatus('success');
-                    setMessage(`Welcome, ${data.user.firstName}! 🎉`);
-                    toast.success(`Welcome back, ${data.user.firstName}!`);
+                    setMessage(`Welcome, ${user.firstName}! 🎉`);
+                    toast.success(`Welcome back, ${user.firstName}!`);
                     setTimeout(() => navigate('/'), 1500);
                 } else {
-                    throw new Error(data.message || 'Failed to fetch user');
+                    throw new Error('Failed to fetch user profile');
                 }
             } catch (err) {
                 console.error('OAuth callback error:', err);
-                localStorage.removeItem('token');
                 setStatus('error');
                 setMessage('Something went wrong. Redirecting...');
                 toast.error('Login failed. Please try again.');
@@ -54,7 +49,7 @@ const OAuthCallback = () => {
         };
 
         handleCallback();
-    }, [navigate]);
+    }, [navigate, loginWithToken]);
 
     return (
         <div className="oauth-callback-page">

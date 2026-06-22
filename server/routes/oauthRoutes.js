@@ -3,6 +3,8 @@ import passport from '../config/passport.js';
 
 const router = express.Router();
 
+const CLIENT_URL = () => process.env.CLIENT_URL || 'http://localhost:5173';
+
 // Guard: check if OAuth credentials are configured
 const requireGoogleConfig = (req, res, next) => {
     if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
@@ -24,31 +26,67 @@ const requireFacebookConfig = (req, res, next) => {
     next();
 };
 
-// Google OAuth
-router.get('/google', requireGoogleConfig, passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
+// ─── Google OAuth ──────────────────────────────────────────────────
+router.get('/google', requireGoogleConfig, passport.authenticate('google', { scope: ['profile', 'email'], session: false, prompt: 'select_account' }));
 
 router.get(
     '/google/callback',
     requireGoogleConfig,
-    passport.authenticate('google', { failureRedirect: '/login?error=google_failed', session: false }),
-    (req, res) => {
-        const token = req.user.getSignedJwtToken();
-        res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}&provider=google`);
+    (req, res, next) => {
+        passport.authenticate('google', { session: false }, (err, user, info) => {
+            // Handle passport/strategy errors
+            if (err) {
+                console.error('❌ Google OAuth error:', err.message);
+                return res.redirect(`${CLIENT_URL()}/auth/callback?error=google_failed&message=${encodeURIComponent(err.message)}`);
+            }
+
+            // Handle authentication failure (user denied access, etc.)
+            if (!user) {
+                console.warn('⚠️ Google OAuth: No user returned');
+                return res.redirect(`${CLIENT_URL()}/auth/callback?error=google_failed`);
+            }
+
+            // Success — generate JWT and redirect to client
+            try {
+                const token = user.getSignedJwtToken();
+                console.log('✅ Google OAuth success:', user.email);
+                return res.redirect(`${CLIENT_URL()}/auth/callback?token=${token}&provider=google`);
+            } catch (tokenErr) {
+                console.error('❌ JWT generation error:', tokenErr.message);
+                return res.redirect(`${CLIENT_URL()}/auth/callback?error=token_failed`);
+            }
+        })(req, res, next);
     }
 );
 
-// Facebook OAuth
+// ─── Facebook OAuth ────────────────────────────────────────────────
 router.get('/facebook', requireFacebookConfig, passport.authenticate('facebook', { scope: ['email'], session: false }));
 
 router.get(
     '/facebook/callback',
     requireFacebookConfig,
-    passport.authenticate('facebook', { failureRedirect: '/login?error=facebook_failed', session: false }),
-    (req, res) => {
-        const token = req.user.getSignedJwtToken();
-        res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${token}&provider=facebook`);
+    (req, res, next) => {
+        passport.authenticate('facebook', { session: false }, (err, user, info) => {
+            if (err) {
+                console.error('❌ Facebook OAuth error:', err.message);
+                return res.redirect(`${CLIENT_URL()}/auth/callback?error=facebook_failed&message=${encodeURIComponent(err.message)}`);
+            }
+
+            if (!user) {
+                console.warn('⚠️ Facebook OAuth: No user returned');
+                return res.redirect(`${CLIENT_URL()}/auth/callback?error=facebook_failed`);
+            }
+
+            try {
+                const token = user.getSignedJwtToken();
+                console.log('✅ Facebook OAuth success:', user.email);
+                return res.redirect(`${CLIENT_URL()}/auth/callback?token=${token}&provider=facebook`);
+            } catch (tokenErr) {
+                console.error('❌ JWT generation error:', tokenErr.message);
+                return res.redirect(`${CLIENT_URL()}/auth/callback?error=token_failed`);
+            }
+        })(req, res, next);
     }
 );
 
 export default router;
-

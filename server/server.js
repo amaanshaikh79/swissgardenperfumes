@@ -2,27 +2,8 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import cookieParser from 'cookie-parser';
-import rateLimit from 'express-rate-limit';
-import mongoSanitize from 'express-mongo-sanitize';
-import connectDB from './config/db.js';
-import errorHandler from './middleware/errorHandler.js';
-import authRoutes from './routes/authRoutes.js';
-import productRoutes from './routes/productRoutes.js';
-import orderRoutes from './routes/orderRoutes.js';
-import contactRoutes from './routes/contactRoutes.js';
-import paymentRoutes from './routes/paymentRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
-import couponRoutes from './routes/couponRoutes.js';
-import oauthRoutes from './routes/oauthRoutes.js';
-import deliveryPartnerRoutes from './routes/deliveryPartnerRoutes.js';
-import returnRoutes from './routes/returnRoutes.js';
-import passport from './config/passport.js';
 
-// ⚠️  Load .env in development. On Render/production, env vars are injected by the platform.
+// ⚠️  Load .env IMMEDIATELY before any other imports that need env vars
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const envPath = path.resolve(__dirname, '.env');
@@ -47,8 +28,8 @@ console.log(`   NODE_ENV: ${process.env.NODE_ENV}`);
 console.log(`   RAZORPAY_KEY_ID: ${process.env.RAZORPAY_KEY_ID ? '✓ Loaded' : '✗ Missing'}`);
 console.log(`   RAZORPAY_KEY_SECRET: ${process.env.RAZORPAY_KEY_SECRET ? '✓ Loaded' : '✗ Missing'}`);
 console.log(`   MONGO_URI: ${process.env.MONGO_URI ? '✓ Loaded' : '✗ Missing'}`);
-console.log(`   JWT_SECRET: ${process.env.JWT_SECRET ? '✓ Loaded' : '✗ Missing'}\n`);
-
+console.log(`   JWT_SECRET: ${process.env.JWT_SECRET ? '✓ Loaded' : '✗ Missing'}`);
+console.log(`   GOOGLE_CLIENT_ID: ${process.env.GOOGLE_CLIENT_ID ? '✓ Loaded' : '✗ Missing'}\n`);
 
 // Set fallback values for development
 if (!process.env.JWT_SECRET) {
@@ -61,6 +42,31 @@ if (!process.env.JWT_EXPIRE) {
 if (!process.env.JWT_COOKIE_EXPIRE) {
     process.env.JWT_COOKIE_EXPIRE = '30';
 }
+
+// NOW import everything else that depends on env vars
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import rateLimit from 'express-rate-limit';
+import mongoSanitize from 'express-mongo-sanitize';
+import connectDB from './config/db.js';
+import errorHandler from './middleware/errorHandler.js';
+import authRoutes from './routes/authRoutes.js';
+import productRoutes from './routes/productRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import couponRoutes from './routes/couponRoutes.js';
+import oauthRoutes from './routes/oauthRoutes.js';
+import deliveryPartnerRoutes from './routes/deliveryPartnerRoutes.js';
+import returnRoutes from './routes/returnRoutes.js';
+import passport, { initializePassport } from './config/passport.js';
+
+// Register OAuth strategies NOW (after dotenv has loaded env vars)
+console.log('\n🔐 OAuth Strategies:');
+initializePassport();
 
 // Connect to database
 connectDB();
@@ -125,6 +131,9 @@ app.use(
 // ─── Static Files ───────────────────────────────────────────────
 app.use('/uploads', express.static('uploads'));
 
+// ─── Passport Initialization (MUST be before routes) ──────────────
+app.use(passport.initialize());
+
 // ─── API Routes ─────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -136,9 +145,6 @@ app.use('/api/coupons', couponRoutes);
 app.use('/api/auth', oauthRoutes);
 app.use('/api/delivery-partners', deliveryPartnerRoutes);
 app.use('/api/returns', returnRoutes);
-
-// ─── Passport Initialization (JWT mode — no sessions needed) ──────
-app.use(passport.initialize());
 
 // ─── Health Check ───────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
