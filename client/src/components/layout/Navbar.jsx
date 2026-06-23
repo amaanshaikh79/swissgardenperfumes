@@ -165,7 +165,7 @@ const Navbar = () => {
 
                     {/* Actions */}
                     <div className="navbar-actions">
-                        <button className="navbar-action-btn" onClick={() => setSearchOpen(!searchOpen)} aria-label="Search">
+                        <button className="navbar-action-btn navbar-search-btn" onClick={() => setSearchOpen(!searchOpen)} aria-label="Search">
                             <FiSearch size={18} />
                         </button>
 
@@ -271,6 +271,31 @@ const Navbar = () => {
                             </div>
 
                             <div className="mobile-menu-content">
+                                {/* Mobile Search Bar */}
+                                <div className="mobile-search-section">
+                                    <form className="mobile-search-form" onSubmit={handleSearch}>
+                                        <FiSearch size={18} className="mobile-search-icon" />
+                                        <input
+                                            type="text"
+                                            className="mobile-search-input"
+                                            placeholder="Search fragrances..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                        />
+                                        {searchQuery && (
+                                            <button 
+                                                type="button" 
+                                                className="mobile-search-clear"
+                                                onClick={() => setSearchQuery('')}
+                                            >
+                                                <FiX size={16} />
+                                            </button>
+                                        )}
+                                    </form>
+                                </div>
+
+                                <div className="mobile-menu-divider" />
+
                                 {/* Main Navigation */}
                                 <div className="mobile-menu-section">
                                     <div className="mobile-menu-section-title">Explore</div>

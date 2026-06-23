@@ -287,6 +287,7 @@
     z-index: 2000;
     padding: var(--space-xl) 0;
     box-shadow: var(--shadow-lg);
+    border-bottom: 1px solid var(--divider);
 }
 
 .search-form {
@@ -324,10 +325,13 @@
     padding: 8px;
     background: none;
     border: none;
+    transition: all var(--transition-fast);
 }
 
 .search-close:hover {
     color: var(--text-primary);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-full);
 }
 
 /* ─── Mobile Menu Toggle ──────────────────────────────────── */
@@ -435,6 +439,70 @@
         flex: 1;
         padding: var(--space-sm) 0;
         overflow-y: auto;
+    }
+
+    /* Mobile Search */
+    .mobile-search-section {
+        padding: var(--space-md) var(--space-lg);
+    }
+
+    .mobile-search-form {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        background: var(--bg-secondary);
+        border: 2px solid var(--divider);
+        border-radius: var(--radius-lg);
+        padding: var(--space-sm) var(--space-md);
+        transition: all var(--transition-fast);
+    }
+
+    .mobile-search-form:focus-within {
+        border-color: var(--accent);
+        background: var(--white);
+        box-shadow: 0 0 0 3px rgba(255, 119, 0, 0.1);
+    }
+
+    .mobile-search-icon {
+        color: var(--text-muted);
+        flex-shrink: 0;
+    }
+
+    .mobile-search-input {
+        flex: 1;
+        border: none;
+        background: none;
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        outline: none;
+        padding: var(--space-xs) 0;
+    }
+
+    .mobile-search-input::placeholder {
+        color: var(--text-muted);
+    }
+
+    .mobile-search-clear {
+        color: var(--text-muted);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-full);
+        transition: all var(--transition-fast);
+    }
+
+    .mobile-search-clear:hover {
+        background: var(--white);
+        color: var(--text-primary);
+    }
+
+    /* Hide desktop search button on mobile */
+    .navbar-search-btn {
+        display: none;
     }
 
     .mobile-menu-section {
@@ -560,6 +628,23 @@
 
     .mobile-menu-divider {
         margin: var(--space-md) var(--space-md);
+    }
+
+    .mobile-search-section {
+        padding: var(--space-md) var(--space-md);
+    }
+
+    /* Improve search overlay on mobile */
+    .search-overlay {
+        padding: var(--space-lg) 0;
+    }
+
+    .search-form {
+        padding: 0 var(--space-md);
+    }
+
+    .search-input {
+        font-size: 1rem;
     }
 
     .announcement-bar {
