@@ -2,6 +2,13 @@
    Home Page — Luxury Editorial, Cinematic, Confident
    ═══════════════════════════════════════════════════════════ */
 
+/* Prevent horizontal page scrolling */
+.home-page {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+}
+
 /* ─── Section Variants ────────────────────────────────────── */
 .section-gray {
     background: var(--bg-secondary);
@@ -731,6 +738,19 @@
 }
 
 @media (max-width: 768px) {
+    /* Prevent horizontal overflow on mobile */
+    .home-page,
+    .home-hero,
+    .home-philosophy,
+    .home-pillars,
+    .home-spotlight-grid,
+    .home-newsletter-grid,
+    .home-all-products,
+    .section {
+        overflow-x: hidden;
+        max-width: 100%;
+    }
+
     .home-hero {
         height: 70vh;
         min-height: 400px;
