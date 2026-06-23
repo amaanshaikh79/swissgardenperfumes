@@ -1,13 +1,25 @@
 /* ═══════════════════════════════════════════════════════════
-   Lazy Image Component — Performance Optimized
+   Lazy Image Component — Ultra-Optimized with Thumbnail-First Loading
    ═══════════════════════════════════════════════════════════ */
 
 .lazy-image {
     opacity: 0;
-    transition: opacity 0.4s ease-in-out;
-    will-change: opacity;
+    transition: opacity 0.4s ease-in-out, filter 0.3s ease-in-out;
+    will-change: opacity, filter;
     backface-visibility: hidden;
     transform: translateZ(0);
+}
+
+/* Thumbnail state - slightly blurred for smooth transition */
+.lazy-image--thumb {
+    filter: blur(4px);
+    transform: scale(1.01);
+}
+
+/* Full-size loaded - crisp and clear */
+.lazy-image--full {
+    filter: blur(0);
+    transform: scale(1);
 }
 
 .lazy-image--in-view {
@@ -34,10 +46,19 @@
     }
 }
 
-/* Blur-up effect for placeholders */
+/* Enhanced blur-up effect for thumbnails */
 .lazy-image:not(.lazy-image--loaded) {
     filter: blur(8px);
     transform: scale(1.02);
+}
+
+/* Smooth transition from thumbnail to full-size */
+.lazy-image--thumb.lazy-image--loaded {
+    filter: blur(2px);
+}
+
+.lazy-image--full.lazy-image--loaded {
+    filter: blur(0);
 }
 
 /* Prevent layout shift */
@@ -69,6 +90,11 @@
         image-rendering: crisp-edges;
     }
     
+    /* Faster animations on mobile */
+    .lazy-image {
+        transition: opacity 0.3s ease-in-out, filter 0.2s ease-in-out;
+    }
+    
     @keyframes fadeInUp {
         from {
             opacity: 0;
@@ -89,7 +115,8 @@
         transition: opacity 0.2s ease;
     }
     
-    .lazy-image:not(.lazy-image--loaded) {
+    .lazy-image:not(.lazy-image--loaded),
+    .lazy-image--thumb {
         filter: none;
         transform: none;
     }

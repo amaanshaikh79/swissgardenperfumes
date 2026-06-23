@@ -17,3 +17,7 @@ client/public/Images-compressed
 client/public/Video-compressed
 backups/media-originals
 scripts/node_modules
+
+# Keep thumbnail directories in version control
+!client/public/Images/thumbs
+!client/public/Video/thumbs

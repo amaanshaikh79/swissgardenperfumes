@@ -7,6 +7,7 @@
     "compress": "node compress-media.js",
     "compress:images": "node compress-images-only.js",
     "compress:videos": "node compress-videos-only.js",
+    "thumbnails": "node create-thumbnails.js",
     "replace": "node replace-originals.js",
     "update-refs": "node update-image-refs.js",
     "install-deps": "npm install"
