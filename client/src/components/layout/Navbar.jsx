@@ -261,42 +261,111 @@ const Navbar = () => {
                             transition={{ type: 'tween', duration: 0.3 }}
                         >
                             <div className="mobile-menu-header">
-                                <span className="logo-text">swissgarden</span>
-                                <button onClick={() => setMobileOpen(false)}>
-                                    <FiX size={22} />
+                                <div className="mobile-logo">
+                                    <span className="logo-text">swissgarden</span>
+                                    <span className="logo-sub">PERFUMES</span>
+                                </div>
+                                <button onClick={() => setMobileOpen(false)} className="mobile-close-btn">
+                                    <FiX size={24} />
                                 </button>
                             </div>
-                            <div className="mobile-menu-links">
-                                <Link to="/shop" className="mobile-menu-link">Shop All</Link>
-                                <Link to="/shop?tag=bestseller" className="mobile-menu-link">Bestsellers</Link>
-                                <Link to="/shop?gender=Men" className="mobile-menu-link">For Him</Link>
-                                <Link to="/shop?gender=Women" className="mobile-menu-link">For Her</Link>
-                                <Link to="/shop?gender=Unisex" className="mobile-menu-link">Unisex</Link>
-                                <Link to="/shop?tag=combo" className="mobile-menu-link mobile-menu-link--highlight">
-                                    🔥 Combo Deals
-                                </Link>
+
+                            <div className="mobile-menu-content">
+                                {/* Main Navigation */}
+                                <div className="mobile-menu-section">
+                                    <div className="mobile-menu-section-title">Explore</div>
+                                    <Link to="/shop" className="mobile-menu-link">
+                                        <FiGrid size={18} />
+                                        <span>Shop</span>
+                                    </Link>
+                                    <Link to="/shop?tag=bestseller" className="mobile-menu-link mobile-menu-link--featured">
+                                        <FiHeart size={18} />
+                                        <span>Bestsellers</span>
+                                    </Link>
+                                    <Link to="/shop?gender=Men" className="mobile-menu-link">
+                                        <span className="mobile-menu-icon">👔</span>
+                                        <span>For Him</span>
+                                    </Link>
+                                    <Link to="/shop?gender=Women" className="mobile-menu-link">
+                                        <span className="mobile-menu-icon">👗</span>
+                                        <span>For Her</span>
+                                    </Link>
+                                </div>
+
                                 <div className="mobile-menu-divider" />
-                                <Link to="/about" className="mobile-menu-link">About Us</Link>
-                                <Link to="/contact" className="mobile-menu-link">Contact</Link>
+
+                                {/* Special Offerings */}
+                                <div className="mobile-menu-section">
+                                    <div className="mobile-menu-section-title">Special Offers</div>
+                                    <Link to="/combo-set" className="mobile-menu-link">
+                                        <FiPackage size={18} />
+                                        <span>Combo Sets</span>
+                                    </Link>
+                                    <Link to="/gifting" className="mobile-menu-link">
+                                        <span className="mobile-menu-icon">🎁</span>
+                                        <span>Gifting</span>
+                                    </Link>
+                                </div>
+
+                                <div className="mobile-menu-divider" />
+
+                                {/* Information */}
+                                <div className="mobile-menu-section">
+                                    <div className="mobile-menu-section-title">Discover</div>
+                                    <Link to="/pairing-guide" className="mobile-menu-link">
+                                        <span className="mobile-menu-icon">🌟</span>
+                                        <span>Pairing Guide</span>
+                                    </Link>
+                                    <Link to="/about" className="mobile-menu-link">
+                                        <span className="mobile-menu-icon">ℹ️</span>
+                                        <span>About</span>
+                                    </Link>
+                                    <Link to="/contact" className="mobile-menu-link">
+                                        <span className="mobile-menu-icon">📧</span>
+                                        <span>Contact</span>
+                                    </Link>
+                                </div>
+
+                                {/* User Account Section */}
                                 {isAuthenticated && (
                                     <>
                                         <div className="mobile-menu-divider" />
-                                        <Link to="/profile" className="mobile-menu-link">My Profile</Link>
-                                        <Link to="/orders" className="mobile-menu-link">My Orders</Link>
-                                        <Link to="/wishlist" className="mobile-menu-link">Wishlist</Link>
-                                        {isAdmin && <Link to="/admin" className="mobile-menu-link">Admin Dashboard</Link>}
-                                        <button className="mobile-menu-link mobile-logout-btn" onClick={handleLogout}>
-                                            Logout
-                                        </button>
+                                        <div className="mobile-menu-section">
+                                            <div className="mobile-menu-section-title">Account</div>
+                                            <Link to="/profile" className="mobile-menu-link">
+                                                <FiUser size={18} />
+                                                <span>My Profile</span>
+                                            </Link>
+                                            <Link to="/orders" className="mobile-menu-link">
+                                                <FiPackage size={18} />
+                                                <span>My Orders</span>
+                                            </Link>
+                                            <Link to="/wishlist" className="mobile-menu-link">
+                                                <FiHeart size={18} />
+                                                <span>Wishlist</span>
+                                            </Link>
+                                            {isAdmin && (
+                                                <Link to="/admin" className="mobile-menu-link">
+                                                    <FiGrid size={18} />
+                                                    <span>Admin Dashboard</span>
+                                                </Link>
+                                            )}
+                                            <button className="mobile-menu-link mobile-logout-btn" onClick={handleLogout}>
+                                                <FiLogOut size={18} />
+                                                <span>Logout</span>
+                                            </button>
+                                        </div>
                                     </>
                                 )}
+
+                                {/* Sign In CTA */}
                                 {!isAuthenticated && (
-                                    <>
-                                        <div className="mobile-menu-divider" />
+                                    <div className="mobile-menu-footer">
                                         <Link to="/login" className="btn btn-primary btn-block mobile-menu-cta">
+                                            <FiUser size={18} />
                                             Sign In / Register
                                         </Link>
-                                    </>
+                                    </div>
                                 )}
                             </div>
                         </motion.div>
