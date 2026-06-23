@@ -11,3 +11,9 @@ server/node_modules
 server/uploads
 coverage
 *.log
+
+# Media compression temporary folders
+client/public/Images-compressed
+client/public/Video-compressed
+backups/media-originals
+scripts/node_modules
