@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import './LazyImage.css';
 
 /**
@@ -6,7 +6,6 @@ import './LazyImage.css';
  * Features:
  * - Shows 1/10 size thumbnail immediately (98% smaller)
  * - Lazy loads full-size image when in viewport
- * - WebP auto-resolution with JPG fallback
  * - CLS prevention with optional width/height attributes
  * - fetchpriority support for critical above-the-fold images
  */
@@ -19,32 +18,27 @@ const LazyImage = ({
     sizes = null,
     onLoad = null,
     priority = false,
-    useThumbnail = true, // New: Enable thumbnail-first loading
+    useThumbnail = true, // Enable thumbnail-first loading
     width,
     height,
     ...props 
 }) => {
-    // Generate thumbnail path by injecting /thumbs/ before filename
+    // Generate thumbnail path: /Images/photo.webp -> /Images/thumbs/photo.webp
     const getThumbnailSrc = (originalSrc) => {
         if (!originalSrc || typeof originalSrc !== 'string') return null;
-        const parts = originalSrc.split('/');
-        const filename = parts.pop();
-        const basePath = parts.join('/');
+        const lastSlashIndex = originalSrc.lastIndexOf('/');
+        if (lastSlashIndex === -1) return null;
+        const basePath = originalSrc.substring(0, lastSlashIndex);
+        const filename = originalSrc.substring(lastSlashIndex + 1);
         return `${basePath}/thumbs/${filename}`;
     };
 
-    // Resolve optimized WebP path if the src points to Images directory
-    const isJpg = typeof src === 'string' && src.startsWith('/Images/') && /\.(jpe?g|png)$/i.test(src);
-    const webpSrc = isJpg ? src.replace(/\.(jpe?g|png)$/i, '.webp') : null;
-    
-    const thumbnailSrc = useThumbnail ? getThumbnailSrc(src) : null;
-    const thumbnailWebpSrc = useThumbnail && webpSrc ? getThumbnailSrc(webpSrc) : null;
+    // Determine what to show initially
+    const thumbnailSrc = useThumbnail && !priority ? getThumbnailSrc(src) : null;
+    const initialSrc = priority ? src : (thumbnailSrc || placeholder);
 
-    const [imageSrc, setImageSrc] = useState(priority ? src : (thumbnailSrc || placeholder));
+    const [imageSrc, setImageSrc] = useState(initialSrc);
     const [imageSrcSet, setImageSrcSet] = useState(priority && srcSet ? srcSet : null);
-    const [webpSrcCurrent, setWebpSrcCurrent] = useState(
-        priority && webpSrc ? webpSrc : thumbnailWebpSrc
-    );
     const [imageRef, setImageRef] = useState();
     const [isLoaded, setIsLoaded] = useState(false);
     const [isInView, setIsInView] = useState(false);
@@ -52,7 +46,7 @@ const LazyImage = ({
     const [hasError, setHasError] = useState(false);
 
     useEffect(() => {
-        // Skip lazy loading for priority images (above fold)
+        // Skip lazy loading for priority images
         if (priority) {
             setIsInView(true);
             setIsLoaded(true);
@@ -68,15 +62,11 @@ const LazyImage = ({
                 observer = new IntersectionObserver(
                     entries => {
                         entries.forEach(entry => {
-                            if (
-                                !didCancel &&
-                                (entry.intersectionRatio > 0 || entry.isIntersecting)
-                            ) {
+                            if (!didCancel && (entry.intersectionRatio > 0 || entry.isIntersecting)) {
                                 setIsInView(true);
                                 // Load full-size image
                                 setImageSrc(src);
                                 if (srcSet) setImageSrcSet(srcSet);
-                                if (webpSrc) setWebpSrcCurrent(webpSrc);
                                 setIsFullSizeLoaded(true);
                                 observer.unobserve(imageRef);
                             }
@@ -84,7 +74,7 @@ const LazyImage = ({
                     },
                     {
                         threshold: 0.01,
-                        rootMargin: '100px', // Load full-size images 100px before viewport
+                        rootMargin: '100px',
                     }
                 );
                 observer.observe(imageRef);
@@ -93,7 +83,6 @@ const LazyImage = ({
                 setIsInView(true);
                 setImageSrc(src);
                 if (srcSet) setImageSrcSet(srcSet);
-                if (webpSrc) setWebpSrcCurrent(webpSrc);
                 setIsFullSizeLoaded(true);
             }
         }
@@ -103,7 +92,7 @@ const LazyImage = ({
                 observer.unobserve(imageRef);
             }
         };
-    }, [src, srcSet, webpSrc, imageRef, priority, isFullSizeLoaded]);
+    }, [src, srcSet, imageRef, priority, isFullSizeLoaded]);
 
     const handleLoad = () => {
         setIsLoaded(true);
@@ -112,47 +101,36 @@ const LazyImage = ({
 
     const handleError = () => {
         setHasError(true);
-        // Fallback to original src or placeholder
-        if (useThumbnail && imageSrc === thumbnailSrc) {
-            // If thumbnail fails, try full size
+        // Fallback strategy: if thumbnail fails, load full-size immediately
+        if (useThumbnail && imageSrc === thumbnailSrc && src !== thumbnailSrc) {
             setImageSrc(src);
-            if (webpSrc) setWebpSrcCurrent(webpSrc);
-        } else if (imageSrc !== src) {
+            setIsFullSizeLoaded(true);
+        } else if (imageSrc !== placeholder && imageSrc !== src) {
+            // Try the original src
             setImageSrc(src);
         } else {
+            // Last resort: use placeholder
             setImageSrc(placeholder);
         }
     };
 
     return (
-        <picture style={{ display: 'contents' }}>
-            {webpSrcCurrent && (
-                <source
-                    srcSet={webpSrcCurrent}
-                    type="image/webp"
-                />
-            )}
-            {srcSet && (
-                <source
-                    srcSet={imageSrcSet || placeholder}
-                />
-            )}
-            <img
-                ref={setImageRef}
-                src={imageSrc}
-                sizes={sizes}
-                alt={alt}
-                width={width}
-                height={height}
-                className={`lazy-image ${className} ${isLoaded ? 'lazy-image--loaded' : ''} ${isInView ? 'lazy-image--in-view' : ''} ${isFullSizeLoaded ? 'lazy-image--full' : 'lazy-image--thumb'} ${hasError ? 'lazy-image--error' : ''}`}
-                onLoad={handleLoad}
-                onError={handleError}
-                loading={priority ? 'eager' : 'lazy'}
-                fetchpriority={priority ? 'high' : 'auto'}
-                decoding="async"
-                {...props}
-            />
-        </picture>
+        <img
+            ref={setImageRef}
+            src={imageSrc}
+            srcSet={imageSrcSet}
+            sizes={sizes}
+            alt={alt}
+            width={width}
+            height={height}
+            className={`lazy-image ${className} ${isLoaded ? 'lazy-image--loaded' : ''} ${isInView ? 'lazy-image--in-view' : ''} ${isFullSizeLoaded ? 'lazy-image--full' : 'lazy-image--thumb'} ${hasError ? 'lazy-image--error' : ''}`}
+            onLoad={handleLoad}
+            onError={handleError}
+            loading={priority ? 'eager' : 'lazy'}
+            fetchpriority={priority ? 'high' : 'auto'}
+            decoding="async"
+            {...props}
+        />
     );
 };
 
