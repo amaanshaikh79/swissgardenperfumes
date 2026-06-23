@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { FiGift, FiPackage, FiArrowRight, FiMail, FiCheck } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
+import LazyImage from '../components/common/LazyImage';
 import './Gifting.css';
 
 const Gifting = () => {
@@ -68,7 +69,7 @@ const Gifting = () => {
                         >
                             <div className="gifting-prop-visual">
                                 <div className="gifting-case-image">
-                                    <img src="/Images/Swiss Flora.JPG" alt="Signature Trio Gift Case" />
+                                    <LazyImage src="/Images-compressed/Swiss Flora.webp" alt="Signature Trio Gift Case" />
                                 </div>
                             </div>
                             <div className="gifting-prop-text">
@@ -200,21 +201,21 @@ const Gifting = () => {
                             <div className="gifting-showcase-grid">
                                 <div className="gifting-showcase-item">
                                     <div className="gifting-showcase-image">
-                                        <img src="/Images/Alpine Savage.JPG" alt="Individual Attar Box" />
+                                        <LazyImage src="/Images-compressed/Alpine Savage.webp" alt="Individual Attar Box" />
                                     </div>
                                     <h4>Individual Branded Boxes</h4>
                                     <p>Each 10ml roll-on in its own protective box</p>
                                 </div>
                                 <div className="gifting-showcase-item">
                                     <div className="gifting-showcase-image">
-                                        <img src="/Images/Royal Ascent.JPG" alt="Precision Roll-On" />
+                                        <LazyImage src="/Images-compressed/Royal Ascent.webp" alt="Precision Roll-On" />
                                     </div>
                                     <h4>Precision Roll-On Format</h4>
                                     <p>Controlled application, travel-friendly design</p>
                                 </div>
                                 <div className="gifting-showcase-item">
                                     <div className="gifting-showcase-image">
-                                        <img src="/Images/Swiss Flora.JPG" alt="Emerald Gift Case" />
+                                        <LazyImage src="/Images-compressed/Swiss Flora.webp" alt="Emerald Gift Case" />
                                     </div>
                                     <h4>Emerald Gift Case</h4>
                                     <p>Deep emerald with gold foil detailing</p>

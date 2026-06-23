@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiHeart, FiGlobe, FiArrowRight, FiFeather, FiRefreshCw, FiLayers, FiTarget, FiStar, FiUsers, FiZap } from 'react-icons/fi';
+import LazyImage from '../components/common/LazyImage';
 import './About.css';
 
 const About = () => {
@@ -64,10 +65,10 @@ const About = () => {
     ];
 
     const gallery = [
-        '/Images/Alpine Savage(2).JPG',
-        '/Images/Blue Dominion(2).JPG',
-        '/Images/Glacier Splash(2).JPG',
-        '/Images/Royal Ascent(2).JPG',
+        '/Images-compressed/Alpine Savage(2).webp',
+        '/Images-compressed/Blue Dominion(2).webp',
+        '/Images-compressed/Glacier Splash(2).webp',
+        '/Images-compressed/Royal Ascent(2).webp',
     ];
 
     return (
@@ -243,7 +244,7 @@ const About = () => {
                                     viewport={{ once: true }}
                                     transition={{ delay: i * 0.1 }}
                                 >
-                                    <img src={img} alt={`Behind the scenes ${i + 1}`} loading="lazy" />
+                                    <LazyImage src={img} alt={`Behind the scenes ${i + 1}`} />
                                 </motion.div>
                             ))}
                         </div>

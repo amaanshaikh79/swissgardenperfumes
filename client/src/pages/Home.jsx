@@ -30,6 +30,15 @@ const Home = () => {
         '/Video/Glacier Splash.mp4',
     ];
 
+    const heroPosters = [
+        '/Images-compressed/Alpine Savage.webp',
+        '/Images-compressed/Royal Ascent.webp',
+        '/Images-compressed/Swiss Flora.webp',
+        '/Images-compressed/Blue Dominion.webp',
+        '/Images-compressed/Citrus Reverie.webp',
+        '/Images-compressed/Glacier Splash.webp',
+    ];
+
     useEffect(() => {
         const interval = setInterval(() => {
             setHeroSlide((prev) => (prev + 1) % heroVideos.length);
@@ -84,19 +93,19 @@ const Home = () => {
         {
             name: 'Royal Ascent',
             mood: 'Dark. Mysterious. Unforgettable.',
-            image: '/Images/Royal Ascent.JPG',
+            image: '/Images-compressed/Royal Ascent.webp',
             link: '/shop?fragranceFamily=Oriental',
         },
         {
             name: 'Swiss Flora',
             mood: 'Fresh florals meet crisp greens.',
-            image: '/Images/Swiss Flora.JPG',
+            image: '/Images-compressed/Swiss Flora.webp',
             link: '/shop?fragranceFamily=Floral',
         },
         {
             name: 'Alpine Savage',
             mood: 'Rich. Regal. Timeless.',
-            image: '/Images/Alpine Savage.JPG',
+            image: '/Images-compressed/Alpine Savage.webp',
             link: '/shop?fragranceFamily=Woody',
         },
     ];
@@ -119,6 +128,12 @@ const Home = () => {
             <Helmet>
                 <title>SwissGarden Perfumes — Luxury Crafted Fragrances | India</title>
                 <meta name="description" content="Artisan-crafted luxury fragrances inspired by iconic scents. Rare ingredients, Indian-climate tested. Discover your signature scent." />
+                <link 
+                    rel="preload" 
+                    href={heroVideos[(heroSlide + 1) % heroVideos.length]} 
+                    as="video" 
+                    type="video/mp4" 
+                />
             </Helmet>
 
             {/* ─── Banner Hero ─────────────────────────────────────── */}
@@ -139,7 +154,9 @@ const Home = () => {
                             loop
                             muted
                             playsInline
-                            preload="auto"
+                            preload="metadata"
+                            poster={heroPosters[heroSlide]}
+                            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                         />
                     </motion.div>
                 </AnimatePresence>

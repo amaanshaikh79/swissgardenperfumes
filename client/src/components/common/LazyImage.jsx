@@ -2,12 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import './LazyImage.css';
 
 /**
- * LazyImage Component - Performance optimized lazy loading with responsive images
+ * LazyImage Component - Performance optimized lazy loading with responsive images and WebP fallback
  * Features:
  * - Intersection Observer for viewport detection
- * - Responsive srcset support
- * - Blur-up placeholder effect
- * - Progressive image loading
+ * - WebP auto-resolution with JPG fallback using <picture>
+ * - CLS prevention with optional width/height attributes
+ * - fetchpriority support for critical above-the-fold images
  */
 const LazyImage = ({ 
     src, 
@@ -18,10 +18,17 @@ const LazyImage = ({
     sizes = null,
     onLoad = null,
     priority = false,
+    width,
+    height,
     ...props 
 }) => {
+    // Resolve optimized WebP path if the src points to the uncompressed Images directory
+    const isJpg = typeof src === 'string' && src.startsWith('/Images/') && /\.(jpe?g|png)$/i.test(src);
+    const webpSrc = isJpg ? src.replace('/Images/', '/Images-compressed/').replace(/\.(jpe?g|png)$/i, '.webp') : null;
+
     const [imageSrc, setImageSrc] = useState(priority ? src : placeholder);
     const [imageSrcSet, setImageSrcSet] = useState(priority && srcSet ? srcSet : null);
+    const [webpSrcSet, setWebpSrcSet] = useState(priority && webpSrc ? webpSrc : null);
     const [imageRef, setImageRef] = useState();
     const [isLoaded, setIsLoaded] = useState(false);
     const [isInView, setIsInView] = useState(false);
@@ -39,7 +46,7 @@ const LazyImage = ({
         let didCancel = false;
 
         if (imageRef && imageSrc === placeholder) {
-            if (IntersectionObserver) {
+            if (window.IntersectionObserver) {
                 observer = new IntersectionObserver(
                     entries => {
                         entries.forEach(entry => {
@@ -50,13 +57,14 @@ const LazyImage = ({
                                 setIsInView(true);
                                 setImageSrc(src);
                                 if (srcSet) setImageSrcSet(srcSet);
+                                if (webpSrc) setWebpSrcSet(webpSrc);
                                 observer.unobserve(imageRef);
                             }
                         });
                     },
                     {
                         threshold: 0.01,
-                        rootMargin: '100px', // Load images 100px before viewport
+                        rootMargin: '200px', // Load images 200px before they enter viewport
                     }
                 );
                 observer.observe(imageRef);
@@ -65,6 +73,7 @@ const LazyImage = ({
                 setIsInView(true);
                 setImageSrc(src);
                 if (srcSet) setImageSrcSet(srcSet);
+                if (webpSrc) setWebpSrcSet(webpSrc);
             }
         }
         return () => {
@@ -73,7 +82,7 @@ const LazyImage = ({
                 observer.unobserve(imageRef);
             }
         };
-    }, [src, srcSet, imageSrc, imageRef, placeholder, priority]);
+    }, [src, srcSet, webpSrc, imageSrc, imageRef, placeholder, priority]);
 
     const handleLoad = () => {
         setIsLoaded(true);
@@ -82,24 +91,43 @@ const LazyImage = ({
 
     const handleError = () => {
         setHasError(true);
-        // Fallback to placeholder on error
-        setImageSrc(placeholder);
+        // Fallback to original src or placeholder
+        if (imageSrc !== src) {
+            setImageSrc(src);
+        } else {
+            setImageSrc(placeholder);
+        }
     };
 
     return (
-        <img
-            ref={setImageRef}
-            src={imageSrc}
-            srcSet={imageSrcSet}
-            sizes={sizes}
-            alt={alt}
-            className={`lazy-image ${className} ${isLoaded ? 'lazy-image--loaded' : ''} ${isInView ? 'lazy-image--in-view' : ''} ${hasError ? 'lazy-image--error' : ''}`}
-            onLoad={handleLoad}
-            onError={handleError}
-            loading={priority ? 'eager' : 'lazy'}
-            decoding="async"
-            {...props}
-        />
+        <picture style={{ display: 'contents' }}>
+            {webpSrc && (
+                <source
+                    srcSet={webpSrcSet || placeholder}
+                    type="image/webp"
+                />
+            )}
+            {srcSet && (
+                <source
+                    srcSet={imageSrcSet || placeholder}
+                />
+            )}
+            <img
+                ref={setImageRef}
+                src={imageSrc}
+                sizes={sizes}
+                alt={alt}
+                width={width}
+                height={height}
+                className={`lazy-image ${className} ${isLoaded ? 'lazy-image--loaded' : ''} ${isInView ? 'lazy-image--in-view' : ''} ${hasError ? 'lazy-image--error' : ''}`}
+                onLoad={handleLoad}
+                onError={handleError}
+                loading={priority ? 'eager' : 'lazy'}
+                fetchpriority={priority ? 'high' : 'auto'}
+                decoding="async"
+                {...props}
+            />
+        </picture>
     );
 };
 

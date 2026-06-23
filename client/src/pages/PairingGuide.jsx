@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { FiArrowRight, FiDroplet } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
+import LazyImage from '../components/common/LazyImage';
 import './PairingGuide.css';
 
 const PairingGuide = () => {
@@ -17,8 +18,8 @@ const PairingGuide = () => {
             howToWear: 'Apply Royal Ascent at the collar and Alpine Savage on the inner wrist.',
             effect: 'A commanding, warm-spice dominant combination with aromatic elegance. Built for formal occasions, high-stakes evenings, and environments where presence matters.',
             worksFor: 'Board meetings, formal dinners, celebratory events',
-            image1: '/Images/Alpine Savage.JPG',
-            image2: '/Images/Royal Ascent.JPG',
+            image1: '/Images-compressed/Alpine Savage.webp',
+            image2: '/Images-compressed/Royal Ascent.webp',
         },
         {
             id: 2,
@@ -28,8 +29,8 @@ const PairingGuide = () => {
             howToWear: 'Apply Blue Dominion at the wrist and Alpine Savage at the collar.',
             effect: 'A bold-masculine combination that balances raw intensity with clean modern freshness. The contrast keeps both attars distinct while creating a layered presence.',
             worksFor: 'Evenings out, casual-formal settings, confident everyday wear',
-            image1: '/Images/Alpine Savage.JPG',
-            image2: '/Images/Blue Dominion.JPG',
+            image1: '/Images-compressed/Alpine Savage.webp',
+            image2: '/Images-compressed/Blue Dominion.webp',
         },
         {
             id: 3,
@@ -39,8 +40,8 @@ const PairingGuide = () => {
             howToWear: 'Apply Glacier Splash on the wrist and Blue Dominion at the collar.',
             effect: 'The most wearable everyday combination in the collection. Clean aquatic freshness at the top, woody-musky warmth underneath. Works in every setting without demanding attention.',
             worksFor: 'Office, commute, casual outings, everyday wear',
-            image1: '/Images/Blue Dominion.JPG',
-            image2: '/Images/Glacier Splash.JPG',
+            image1: '/Images-compressed/Blue Dominion.webp',
+            image2: '/Images-compressed/Glacier Splash.webp',
         },
         {
             id: 4,
@@ -50,8 +51,8 @@ const PairingGuide = () => {
             howToWear: 'Apply both at opposing wrists and allow them to develop through the day.',
             effect: 'The lightest, most energising combination in the collection. Two fresh profiles that amplify each other\'s brightness without competition. A clean, uplifting start.',
             worksFor: 'Mornings, travel, summer days, gym-to-day transitions',
-            image1: '/Images/Citrus Reverie.JPG',
-            image2: '/Images/Glacier Splash.JPG',
+            image1: '/Images-compressed/Citrus Reverie.webp',
+            image2: '/Images-compressed/Glacier Splash.webp',
         },
         {
             id: 5,
@@ -61,8 +62,8 @@ const PairingGuide = () => {
             howToWear: 'Apply Swiss Flora on the inner wrist and Citrus Reverie at the collar.',
             effect: 'A feminine, uplifting pairing — citrus brightness married to floral elegance. Light enough for daytime, refined enough for evenings. The most giftable combination.',
             worksFor: 'Daytime occasions, gifting, celebrations, brunches',
-            image1: '/Images/Citrus Reverie.JPG',
-            image2: '/Images/Swiss Flora.JPG',
+            image1: '/Images-compressed/Citrus Reverie.webp',
+            image2: '/Images-compressed/Swiss Flora.webp',
         },
         {
             id: 6,
@@ -72,8 +73,8 @@ const PairingGuide = () => {
             howToWear: 'Apply Royal Ascent at the collar and Swiss Flora on the inner wrist.',
             effect: 'Classical and composed. The structured citrus-aromatic of Royal Ascent grounds the floral elegance of Swiss Flora into a combination that is sophisticated without effort.',
             worksFor: 'Formal occasions, weddings, official events, gifting',
-            image1: '/Images/Royal Ascent.JPG',
-            image2: '/Images/Swiss Flora.JPG',
+            image1: '/Images-compressed/Royal Ascent.webp',
+            image2: '/Images-compressed/Swiss Flora.webp',
         },
     ];
 
@@ -189,11 +190,11 @@ const PairingGuide = () => {
 
                                     <div className="pairing-combo-images">
                                         <div className="pairing-combo-image">
-                                            <img src={combo.image1} alt={combo.attars[0]} />
+                                            <LazyImage src={combo.image1} alt={combo.attars[0]} />
                                         </div>
                                         <div className="pairing-combo-plus">+</div>
                                         <div className="pairing-combo-image">
-                                            <img src={combo.image2} alt={combo.attars[1]} />
+                                            <LazyImage src={combo.image2} alt={combo.attars[1]} />
                                         </div>
                                     </div>
 

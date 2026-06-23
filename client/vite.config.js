@@ -1,8 +1,17 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import viteCompression from 'vite-plugin-compression';
 
 export default defineConfig({
-    plugins: [react()],
+    plugins: [
+        react(),
+        viteCompression({
+            algorithm: 'gzip',
+            ext: '.gz',
+            threshold: 1024,
+            deleteOriginFile: false
+        })
+    ],
     server: {
         port: 5173,
         proxy: {
@@ -14,6 +23,7 @@ export default defineConfig({
     },
     build: {
         outDir: 'dist',
+        assetsInlineLimit: 4096, // Inline assets smaller than 4KB
         sourcemap: false,
         rollupOptions: {
             output: {

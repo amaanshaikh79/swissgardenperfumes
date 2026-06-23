@@ -47,6 +47,7 @@ if (!process.env.JWT_COOKIE_EXPIRE) {
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
@@ -75,6 +76,9 @@ const app = express();
 
 // Trust proxy for Render/Heroku load balancers
 app.set('trust proxy', 1);
+
+// Enable compression for all compressible responses
+app.use(compression());
 
 // ─── Security Middleware ────────────────────────────────────────
 app.use(helmet({
@@ -159,8 +163,37 @@ app.get('/api/health', (req, res) => {
 // ─── Production Static Serving ──────────────────────────────────
 
 if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../client/dist')));
+    // Serve static files with production caching headers
+    app.use(express.static(path.join(__dirname, '../client/dist'), {
+        maxAge: '1d', // default maxAge fallback
+        etag: true,
+        lastModified: true,
+        setHeaders: (res, filePath) => {
+            // Normalize path separators for Windows/Unix compatibility
+            const normalizedPath = filePath.replace(/\\/g, '/');
+            
+            if (normalizedPath.includes('/assets/')) {
+                // Vite hashed assets are immutable and can be cached forever
+                res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+            } else if (
+                normalizedPath.includes('/Images-compressed/') ||
+                normalizedPath.includes('/Video/') ||
+                /\.(webp|mp4|mov|jpg|jpeg|png|gif|svg|ico)$/i.test(normalizedPath)
+            ) {
+                // Media assets are cached for 30 days
+                res.setHeader('Cache-Control', 'public, max-age=2592000');
+            } else if (normalizedPath.endsWith('sw.js') || normalizedPath.endsWith('service-worker.js')) {
+                // Service workers must not be cached in browser storage indefinitely
+                res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+            } else {
+                // HTML files and JSON configuration should be validated on every request
+                res.setHeader('Cache-Control', 'no-cache');
+            }
+        }
+    }));
+
     app.get('*', (req, res) => {
+        res.setHeader('Cache-Control', 'no-cache');
         res.sendFile(path.resolve(__dirname, '../client/dist/index.html'));
     });
 }
