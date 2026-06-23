@@ -3,7 +3,7 @@
  * and fallback JPG/jpg images.
  */
 
-const baseCompressedPath = '/Images-compressed';
+const baseCompressedPath = '/Images';
 const baseOriginalPath = '/Images';
 
 // Map of names to their original file extensions (since some are .jpg and some are .JPG)

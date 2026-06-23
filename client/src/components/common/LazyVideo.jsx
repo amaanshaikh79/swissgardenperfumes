@@ -32,7 +32,7 @@ const LazyVideo = ({
 
     // Auto-resolve poster to WebP if it's a JPG in /Images/
     const isJpgPoster = typeof poster === 'string' && poster.startsWith('/Images/') && /\.(jpe?g|png)$/i.test(poster);
-    const optimizedPoster = isJpgPoster ? poster.replace('/Images/', '/Images-compressed/').replace(/\.(jpe?g|png)$/i, '.webp') : poster;
+    const optimizedPoster = isJpgPoster ? poster.replace(/\.(jpe?g|png)$/i, '.webp') : poster;
 
     // Detect mobile device
     useEffect(() => {

@@ -176,7 +176,6 @@ if (process.env.NODE_ENV === 'production') {
                 // Vite hashed assets are immutable and can be cached forever
                 res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
             } else if (
-                normalizedPath.includes('/Images-compressed/') ||
                 normalizedPath.includes('/Video/') ||
                 /\.(webp|mp4|mov|jpg|jpeg|png|gif|svg|ico)$/i.test(normalizedPath)
             ) {

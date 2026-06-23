@@ -24,7 +24,7 @@ const LazyImage = ({
 }) => {
     // Resolve optimized WebP path if the src points to the uncompressed Images directory
     const isJpg = typeof src === 'string' && src.startsWith('/Images/') && /\.(jpe?g|png)$/i.test(src);
-    const webpSrc = isJpg ? src.replace('/Images/', '/Images-compressed/').replace(/\.(jpe?g|png)$/i, '.webp') : null;
+    const webpSrc = isJpg ? src.replace(/\.(jpe?g|png)$/i, '.webp') : null;
 
     const [imageSrc, setImageSrc] = useState(priority ? src : placeholder);
     const [imageSrcSet, setImageSrcSet] = useState(priority && srcSet ? srcSet : null);

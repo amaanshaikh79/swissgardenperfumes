@@ -31,12 +31,12 @@ const Home = () => {
     ];
 
     const heroPosters = [
-        '/Images-compressed/Alpine Savage.webp',
-        '/Images-compressed/Royal Ascent.webp',
-        '/Images-compressed/Swiss Flora.webp',
-        '/Images-compressed/Blue Dominion.webp',
-        '/Images-compressed/Citrus Reverie.webp',
-        '/Images-compressed/Glacier Splash.webp',
+        '/Images/Alpine Savage.webp',
+        '/Images/Royal Ascent.webp',
+        '/Images/Swiss Flora.webp',
+        '/Images/Blue Dominion.webp',
+        '/Images/Citrus Reverie.webp',
+        '/Images/Glacier Splash.webp',
     ];
 
     useEffect(() => {
@@ -93,19 +93,19 @@ const Home = () => {
         {
             name: 'Royal Ascent',
             mood: 'Dark. Mysterious. Unforgettable.',
-            image: '/Images-compressed/Royal Ascent.webp',
+            image: '/Images/Royal Ascent.webp',
             link: '/shop?fragranceFamily=Oriental',
         },
         {
             name: 'Swiss Flora',
             mood: 'Fresh florals meet crisp greens.',
-            image: '/Images-compressed/Swiss Flora.webp',
+            image: '/Images/Swiss Flora.webp',
             link: '/shop?fragranceFamily=Floral',
         },
         {
             name: 'Alpine Savage',
             mood: 'Rich. Regal. Timeless.',
-            image: '/Images-compressed/Alpine Savage.webp',
+            image: '/Images/Alpine Savage.webp',
             link: '/shop?fragranceFamily=Woody',
         },
     ];
