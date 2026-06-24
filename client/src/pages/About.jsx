@@ -65,10 +65,10 @@ const About = () => {
     ];
 
     const gallery = [
-        '/Images/Alpine Savage(2).webp',
-        '/Images/Blue Dominion(2).webp',
-        '/Images/Glacier Splash(2).webp',
-        '/Images/Royal Ascent(2).webp',
+        '/Images/Alpine%20Savage(2).webp',
+        '/Images/Blue%20Dominion(2).webp',
+        '/Images/Glacier%20Splash(2).webp',
+        '/Images/Royal%20Ascent(2).webp',
     ];
 
     return (

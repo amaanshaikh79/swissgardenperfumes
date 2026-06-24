@@ -37,7 +37,7 @@ const checkImages = async () => {
             
             product.images.forEach((img, imgIndex) => {
                 totalExpected++;
-                const filename = img.url.replace('/Images/', '');
+                const filename = decodeURIComponent(img.url.replace('/Images/', ''));
                 const filePath = path.join(imagesDir, filename);
                 const exists = fs.existsSync(filePath);
                 
@@ -79,11 +79,11 @@ const checkImages = async () => {
         // Check for files not in database
         if (fs.existsSync(imagesDir)) {
             const allFiles = fs.readdirSync(imagesDir).filter(f => 
-                f.endsWith('.JPG') || f.endsWith('.jpg') || f.endsWith('.jpeg')
+                f.endsWith('.webp')
             );
             
             const dbFiles = products.flatMap(p => 
-                p.images.map(img => img.url.replace('/Images/', ''))
+                p.images.map(img => decodeURIComponent(img.url.replace('/Images/', '')))
             );
             
             const extraFiles = allFiles.filter(f => !dbFiles.includes(f));
@@ -100,18 +100,18 @@ const checkImages = async () => {
             }
         }
         
-        console.log('\n✨ IMAGE REQUIREMENTS');
+        console.log('✨ IMAGE REQUIREMENTS');
         console.log('═══════════════════════════════════════════════════════');
-        console.log('Format: JPG (JPEG)');
+        console.log('Format: WebP');
         console.log('Aspect Ratio: 4:5 (e.g., 800×1000px)');
         console.log('File Size: < 200KB (recommended)');
         console.log('Background: White or neutral');
         console.log('Content: Product bottle ONLY (no lifestyle shots)');
         console.log('');
         console.log('Naming Convention:');
-        console.log('  - "Product Name.JPG" → Default view');
-        console.log('  - "Product Name(2).JPG" → Hover view');
-        console.log('  - "Product Name(3).jpg" → Gallery view');
+        console.log('  - "Product Name.webp" → Default view');
+        console.log('  - "Product Name(2).webp" → Hover view');
+        console.log('  - "Product Name(3).webp" → Gallery view');
         console.log('');
         
         if (totalFound === totalExpected) {

@@ -23,19 +23,29 @@ const LazyImage = ({
     height,
     ...props 
 }) => {
+    // Normalize src to ensure spaces are properly URL-encoded
+    const normalizeSrc = (s) => {
+        if (!s || typeof s !== 'string') return s;
+        return s.replace(/ /g, '%20');
+    };
+
     // Generate thumbnail path: /Images/photo.webp -> /Images/thumbs/photo.webp
     const getThumbnailSrc = (originalSrc) => {
         if (!originalSrc || typeof originalSrc !== 'string') return null;
-        const lastSlashIndex = originalSrc.lastIndexOf('/');
+        const normalized = normalizeSrc(originalSrc);
+        const lastSlashIndex = normalized.lastIndexOf('/');
         if (lastSlashIndex === -1) return null;
-        const basePath = originalSrc.substring(0, lastSlashIndex);
-        const filename = originalSrc.substring(lastSlashIndex + 1);
+        const basePath = normalized.substring(0, lastSlashIndex);
+        const filename = normalized.substring(lastSlashIndex + 1);
         return `${basePath}/thumbs/${filename}`;
     };
 
+    // Normalize src to handle spaces properly
+    const normalizedSrc = normalizeSrc(src);
+
     // Determine what to show initially
-    const thumbnailSrc = useThumbnail && !priority ? getThumbnailSrc(src) : null;
-    const initialSrc = priority ? src : (thumbnailSrc || placeholder);
+    const thumbnailSrc = useThumbnail && !priority ? getThumbnailSrc(normalizedSrc) : null;
+    const initialSrc = priority ? normalizedSrc : (thumbnailSrc || placeholder);
 
     const [imageSrc, setImageSrc] = useState(initialSrc);
     const [imageSrcSet, setImageSrcSet] = useState(priority && srcSet ? srcSet : null);
@@ -65,7 +75,7 @@ const LazyImage = ({
                             if (!didCancel && (entry.intersectionRatio > 0 || entry.isIntersecting)) {
                                 setIsInView(true);
                                 // Load full-size image
-                                setImageSrc(src);
+                                setImageSrc(normalizedSrc);
                                 if (srcSet) setImageSrcSet(srcSet);
                                 setIsFullSizeLoaded(true);
                                 observer.unobserve(imageRef);
@@ -81,7 +91,7 @@ const LazyImage = ({
             } else {
                 // Old browsers fallback
                 setIsInView(true);
-                setImageSrc(src);
+                setImageSrc(normalizedSrc);
                 if (srcSet) setImageSrcSet(srcSet);
                 setIsFullSizeLoaded(true);
             }
@@ -92,7 +102,7 @@ const LazyImage = ({
                 observer.unobserve(imageRef);
             }
         };
-    }, [src, srcSet, imageRef, priority, isFullSizeLoaded]);
+    }, [normalizedSrc, srcSet, imageRef, priority, isFullSizeLoaded]);
 
     const handleLoad = () => {
         setIsLoaded(true);
@@ -102,12 +112,12 @@ const LazyImage = ({
     const handleError = () => {
         setHasError(true);
         // Fallback strategy: if thumbnail fails, load full-size immediately
-        if (useThumbnail && imageSrc === thumbnailSrc && src !== thumbnailSrc) {
-            setImageSrc(src);
+        if (useThumbnail && imageSrc === thumbnailSrc && normalizedSrc !== thumbnailSrc) {
+            setImageSrc(normalizedSrc);
             setIsFullSizeLoaded(true);
-        } else if (imageSrc !== placeholder && imageSrc !== src) {
+        } else if (imageSrc !== placeholder && imageSrc !== normalizedSrc) {
             // Try the original src
-            setImageSrc(src);
+            setImageSrc(normalizedSrc);
         } else {
             // Last resort: use placeholder
             setImageSrc(placeholder);

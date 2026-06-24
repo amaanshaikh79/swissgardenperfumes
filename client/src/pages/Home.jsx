@@ -22,29 +22,46 @@ const Home = () => {
     const heroRef = useRef(null);
 
     const heroVideos = [
-        '/Video/Alpine Savage.mp4',
-        '/Video/Royal Ascent.mp4',
-        '/Video/Swiss Flora.mp4',
-        '/Video/Blue Dominion.mp4',
-        '/Video/Citrus Reverie.mp4',
-        '/Video/Glacier Splash.mp4',
+        '/Video/Alpine%20Savage.mp4',
+        '/Video/Royal%20Ascent.mp4',
+        '/Video/Swiss%20Flora.mp4',
+        '/Video/Blue%20Dominion.mp4',
+        '/Video/Citrus%20Reverie.mp4',
+        '/Video/Glacier%20Splash.mp4',
     ];
 
     const heroPosters = [
-        '/Images/Alpine Savage.webp',
-        '/Images/Royal Ascent.webp',
-        '/Images/Swiss Flora.webp',
-        '/Images/Blue Dominion.webp',
-        '/Images/Citrus Reverie.webp',
-        '/Images/Glacier Splash.webp',
+        '/Images/Alpine%20Savage.webp',
+        '/Images/Royal%20Ascent.webp',
+        '/Images/Swiss%20Flora.webp',
+        '/Images/Blue%20Dominion.webp',
+        '/Images/Citrus%20Reverie.webp',
+        '/Images/Glacier%20Splash.webp',
     ];
 
+    const [isHeroVisible, setIsHeroVisible] = useState(true);
+
     useEffect(() => {
+        const el = heroRef.current;
+        if (!el) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsHeroVisible(entry.isIntersecting);
+            },
+            { threshold: 0.05 }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
+        if (!isHeroVisible) return;
         const interval = setInterval(() => {
             setHeroSlide((prev) => (prev + 1) % heroVideos.length);
         }, 8000); // Change video every 8 seconds
         return () => clearInterval(interval);
-    }, [heroVideos.length]);
+    }, [isHeroVisible, heroVideos.length]);
 
     const { scrollYProgress } = useScroll({
         target: heroRef,
@@ -93,19 +110,19 @@ const Home = () => {
         {
             name: 'Royal Ascent',
             mood: 'Dark. Mysterious. Unforgettable.',
-            image: '/Images/Royal Ascent.webp',
+            image: '/Images/Royal%20Ascent.webp',
             link: '/shop?fragranceFamily=Oriental',
         },
         {
             name: 'Swiss Flora',
             mood: 'Fresh florals meet crisp greens.',
-            image: '/Images/Swiss Flora.webp',
+            image: '/Images/Swiss%20Flora.webp',
             link: '/shop?fragranceFamily=Floral',
         },
         {
             name: 'Alpine Savage',
             mood: 'Rich. Regal. Timeless.',
-            image: '/Images/Alpine Savage.webp',
+            image: '/Images/Alpine%20Savage.webp',
             link: '/shop?fragranceFamily=Woody',
         },
     ];
@@ -128,12 +145,6 @@ const Home = () => {
             <Helmet>
                 <title>SwissGarden Perfumes — Luxury Crafted Fragrances | India</title>
                 <meta name="description" content="Artisan-crafted luxury fragrances inspired by iconic scents. Rare ingredients, Indian-climate tested. Discover your signature scent." />
-                <link 
-                    rel="preload" 
-                    href={heroVideos[(heroSlide + 1) % heroVideos.length]} 
-                    as="video" 
-                    type="video/mp4" 
-                />
             </Helmet>
 
             {/* ─── Banner Hero ─────────────────────────────────────── */}
@@ -150,13 +161,22 @@ const Home = () => {
                         <video
                             src={heroVideos[heroSlide]}
                             className="home-hero-video"
-                            autoPlay
+                            autoPlay={isHeroVisible}
                             loop
                             muted
                             playsInline
                             preload="metadata"
                             poster={heroPosters[heroSlide]}
                             style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                            ref={(el) => {
+                                if (el) {
+                                    if (isHeroVisible) {
+                                        el.play().catch(() => {});
+                                    } else {
+                                        el.pause();
+                                    }
+                                }
+                            }}
                         />
                     </motion.div>
                 </AnimatePresence>
@@ -368,12 +388,12 @@ const Home = () => {
                         transition={{ duration: 0.8 }}
                     >
                         {[
-                            { name: 'Alpine Savage', video: '/Video/Alpine Savage.mp4' },
-                            { name: 'Blue Dominion', video: '/Video/Blue Dominion.mp4' },
-                            { name: 'Citrus Reverie', video: '/Video/Citrus Reverie.mp4' },
-                            { name: 'Glacier Splash', video: '/Video/Glacier Splash.mp4' },
-                            { name: 'Royal Ascent', video: '/Video/Royal Ascent.mp4' },
-                            { name: 'Swiss Flora', video: '/Video/Swiss Flora.mp4' },
+                            { name: 'Alpine Savage', video: '/Video/Alpine%20Savage.mp4' },
+                            { name: 'Blue Dominion', video: '/Video/Blue%20Dominion.mp4' },
+                            { name: 'Citrus Reverie', video: '/Video/Citrus%20Reverie.mp4' },
+                            { name: 'Glacier Splash', video: '/Video/Glacier%20Splash.mp4' },
+                            { name: 'Royal Ascent', video: '/Video/Royal%20Ascent.mp4' },
+                            { name: 'Swiss Flora', video: '/Video/Swiss%20Flora.mp4' },
                         ].map((item, index) => (
                             <motion.div
                                 key={item.name}

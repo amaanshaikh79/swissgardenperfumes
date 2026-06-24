@@ -125,7 +125,7 @@ const Wishlist = () => {
                                             <Link to={`/product/${product.slug}`} className="wishlist-item-img-link">
                                                 <div className="wishlist-item-img">
                                                     {product.images?.[0] ? (
-                                                        <img src={product.images[0]} alt={product.name} loading="lazy" />
+                                                        <img src={product.images[0]?.url} alt={product.images[0]?.alt || product.name} loading="lazy" />
                                                     ) : (
                                                         <div className="wishlist-img-placeholder">
                                                             <FiHeart size={32} />

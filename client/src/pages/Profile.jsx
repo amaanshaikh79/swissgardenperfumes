@@ -299,7 +299,7 @@ const Profile = () => {
                                         <div className="profile-wishlist-mini">
                                             {(user?.wishlist || []).slice(0, 4).map((p) => (
                                                 <Link key={p._id} to={`/product/${p.slug}`} className="profile-wishlist-mini-item">
-                                                    {p.images?.[0] && <img src={p.images[0]} alt={p.name} />}
+                                                    {p.images?.[0] && <img src={p.images[0]?.url} alt={p.images[0]?.alt || p.name} />}
                                                     <div>
                                                         <span className="profile-wishlist-mini-name">{p.name}</span>
                                                         <span className="profile-wishlist-mini-price">₹{p.price?.toLocaleString('en-IN')}</span>

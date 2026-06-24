@@ -69,7 +69,7 @@ const Gifting = () => {
                         >
                             <div className="gifting-prop-visual">
                                 <div className="gifting-case-image">
-                                    <LazyImage src="/Images/Swiss Flora.webp" alt="Signature Trio Gift Case" />
+                                    <LazyImage src="/Images/Swiss%20Flora.webp" alt="Signature Trio Gift Case" />
                                 </div>
                             </div>
                             <div className="gifting-prop-text">
@@ -201,21 +201,21 @@ const Gifting = () => {
                             <div className="gifting-showcase-grid">
                                 <div className="gifting-showcase-item">
                                     <div className="gifting-showcase-image">
-                                        <LazyImage src="/Images/Alpine Savage.webp" alt="Individual Attar Box" />
+                                        <LazyImage src="/Images/Alpine%20Savage.webp" alt="Individual Attar Box" />
                                     </div>
                                     <h4>Individual Branded Boxes</h4>
                                     <p>Each 10ml roll-on in its own protective box</p>
                                 </div>
                                 <div className="gifting-showcase-item">
                                     <div className="gifting-showcase-image">
-                                        <LazyImage src="/Images/Royal Ascent.webp" alt="Precision Roll-On" />
+                                        <LazyImage src="/Images/Royal%20Ascent.webp" alt="Precision Roll-On" />
                                     </div>
                                     <h4>Precision Roll-On Format</h4>
                                     <p>Controlled application, travel-friendly design</p>
                                 </div>
                                 <div className="gifting-showcase-item">
                                     <div className="gifting-showcase-image">
-                                        <LazyImage src="/Images/Swiss Flora.webp" alt="Emerald Gift Case" />
+                                        <LazyImage src="/Images/Swiss%20Flora.webp" alt="Emerald Gift Case" />
                                     </div>
                                     <h4>Emerald Gift Case</h4>
                                     <p>Deep emerald with gold foil detailing</p>

@@ -935,61 +935,31 @@ ol {
    PERFORMANCE OPTIMIZATIONS
    ═══════════════════════════════════════════════════════════════ */
 
-/* Hardware Acceleration for Better Performance */
-.btn,
-.product-card,
-.nav-link,
+/* Hardware Acceleration for Overlays and Modals */
 .modal,
-.drawer,
-[class*="animation"],
-[class*="transition"] {
+.drawer {
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    -webkit-perspective: 1000px;
-    perspective: 1000px;
 }
 
-/* Optimize Transforms & Opacity for GPU */
+/* Optimize Transitions */
 .smooth-transform {
-    will-change: transform;
     transition: transform 0.3s ease;
 }
 
 .smooth-opacity {
-    will-change: opacity;
     transition: opacity 0.3s ease;
-}
-
-/* Remove will-change after animation completes */
-.animation-complete {
-    will-change: auto;
 }
 
 /* Mobile-Specific Performance */
 @media (max-width: 768px) {
-    /* Reduce animation complexity on mobile */
-    * {
-        animation-duration: 0.3s !important;
-        transition-duration: 0.3s !important;
-    }
-    
-    /* Simplify box shadows on mobile */
-    [class*="shadow"] {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    }
-    
     /* Optimize text rendering */
     body {
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeSpeed;
-    }
-    
-    /* Reduce blur effects */
-    [class*="blur"] {
-        filter: none !important;
     }
 }
 

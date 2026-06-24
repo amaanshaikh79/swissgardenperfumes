@@ -5,9 +5,6 @@
 .lazy-image {
     opacity: 0;
     transition: opacity 0.4s ease-in-out, filter 0.3s ease-in-out;
-    will-change: opacity, filter;
-    backface-visibility: hidden;
-    transform: translateZ(0);
 }
 
 /* Thumbnail state - slightly blurred for smooth transition */
