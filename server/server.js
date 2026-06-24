@@ -201,20 +201,22 @@ if (process.env.NODE_ENV === 'production') {
 app.use(errorHandler);
 
 // ─── Start Server ───────────────────────────────────────────────
-const PORT = process.env.PORT || 5000;
-const HOST = '0.0.0.0';
-app.listen(PORT, HOST, () => {
-    console.log(`
-  ╔═══════════════════════════════════════════╗
-  ║                                           ║
-  ║   🏆 swissgarden Perfumes API Server        ║
-  ║                                           ║
-  ║   Port:        ${PORT}                       ║
-  ║   Host:        ${HOST}                 ║
-  ║   Environment: ${process.env.NODE_ENV || 'development'}            ║
-  ║                                           ║
-  ╚═══════════════════════════════════════════╝
-  `);
-});
+if (!process.env.VERCEL) {
+    const PORT = process.env.PORT || 5000;
+    const HOST = '0.0.0.0';
+    app.listen(PORT, HOST, () => {
+        console.log(`
+      ╔═══════════════════════════════════════════╗
+      ║                                           ║
+      ║   🏆 swissgarden Perfumes API Server        ║
+      ║                                           ║
+      ║   Port:        ${PORT}                       ║
+      ║   Host:        ${HOST}                 ║
+      ║   Environment: ${process.env.NODE_ENV || 'development'}            ║
+      ║                                           ║
+      ╚═══════════════════════════════════════════╝
+      `);
+    });
+}
 
 export default app;
