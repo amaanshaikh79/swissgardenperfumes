@@ -21,6 +21,17 @@ const Home = () => {
     const [heroSlide, setHeroSlide] = useState(0);
     const heroRef = useRef(null);
 
+    const getBackendMediaUrl = (path) => {
+        if (!path) return '';
+        if (path.startsWith('http://') || path.startsWith('https://')) return path;
+        const apiUrl = import.meta.env.VITE_API_URL || '';
+        if (apiUrl && (apiUrl.startsWith('http://') || apiUrl.startsWith('https://'))) {
+            const backendBase = apiUrl.replace(/\/api\/?$/, '');
+            return `${backendBase}${path}`;
+        }
+        return path;
+    };
+
     const heroVideos = [
         '/Video/Alpine%20Savage.mp4',
         '/Video/Royal%20Ascent.mp4',
@@ -159,7 +170,7 @@ const Home = () => {
                         transition={{ duration: 1.5, ease: 'easeInOut' }}
                     >
                         <video
-                            src={heroVideos[heroSlide]}
+                            src={getBackendMediaUrl(heroVideos[heroSlide])}
                             className="home-hero-video"
                             autoPlay={isHeroVisible}
                             loop

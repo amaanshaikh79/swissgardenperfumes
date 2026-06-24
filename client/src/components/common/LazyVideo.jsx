@@ -117,10 +117,21 @@ const LazyVideo = ({
             if (onLoad) onLoad();
         };
 
+        const getBackendMediaUrl = (path) => {
+            if (!path) return '';
+            if (path.startsWith('http://') || path.startsWith('https://')) return path;
+            const apiUrl = import.meta.env.VITE_API_URL || '';
+            if (apiUrl && (apiUrl.startsWith('http://') || apiUrl.startsWith('https://'))) {
+                const backendBase = apiUrl.replace(/\/api\/?$/, '');
+                return `${backendBase}${path}`;
+            }
+            return path;
+        };
+
         videoElement.addEventListener('loadeddata', handleLoadedData);
 
         const videoSrc = isMobile && mobileSrc ? mobileSrc : src;
-        videoElement.src = videoSrc;
+        videoElement.src = getBackendMediaUrl(videoSrc);
         videoElement.load();
 
         return () => {

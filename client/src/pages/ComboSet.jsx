@@ -96,7 +96,7 @@ const ComboSet = () => {
                 <section className="combo-hero">
                     <div className="combo-hero-bg">
                         <LazyVideo
-                            src="/Video/Combo-set.mov"
+                            src="/Video/Swiss%20Flora.mp4"
                             className="combo-hero-video"
                             autoPlay
                             loop
