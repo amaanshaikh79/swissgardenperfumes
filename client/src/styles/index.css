@@ -64,6 +64,7 @@
     --bg-glass: rgba(255, 255, 255, 0.95);
     --bg-warm: #FDF8F0;
     --bg-dark-section: #111111;
+    --gradient-hero: linear-gradient(135deg, #F8F8F8 0%, #FFFFFF 50%, #FDF8F0 100%);
 
     /* Text */
     --text-primary: #111111;
