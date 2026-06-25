@@ -54,6 +54,8 @@ export const authAPI = {
     updateProfile: (data) => API.put('/auth/profile', data),
     updatePassword: (data) => API.put('/auth/password', data),
     toggleWishlist: (productId) => API.put(`/auth/wishlist/${productId}`),
+    forgotPassword: (data) => API.post('/auth/forgot-password', data),
+    resetPassword: (token, data) => API.put(`/auth/reset-password/${token}`, data),
 };
 
 // Products API

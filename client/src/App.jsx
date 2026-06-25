@@ -14,7 +14,7 @@ const AIChatbox = lazy(() => import('./components/common/AIChatbox'));
 
 // Eager load critical pages
 import Home from './pages/Home';
-import { Login, Register } from './pages/Auth';
+import { Login, Register, ForgotPassword, ResetPassword } from './pages/Auth';
 import ComboSet from './pages/ComboSet';
 
 // Lazy load other pages
@@ -80,7 +80,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 
 function App() {
     const location = useLocation();
-    const isAuthPage = ['/login', '/register', '/auth/callback'].includes(location.pathname);
+    const isAuthPage = ['/login', '/register', '/forgot-password', '/auth/callback'].includes(location.pathname) || location.pathname.startsWith('/reset-password');
     const [showSplash, setShowSplash] = useState(() => !sessionStorage.getItem('sg_splash_shown'));
 
     const handleSplashComplete = useCallback(() => {
@@ -115,6 +115,8 @@ function App() {
                         <Route path="/gifting" element={<Gifting />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/reset-password/:token" element={<ResetPassword />} />
                         <Route path="/about" element={<About />} />
                         <Route path="/fragrance-finder" element={<FragranceFinder />} />
                         <Route path="/contact" element={<Contact />} />

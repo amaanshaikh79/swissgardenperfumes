@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import './Auth.css';
+import { authAPI } from '../services/api';
 
 // Google SVG icon
 const GoogleIcon = () => (
@@ -100,6 +101,11 @@ const Login = () => {
                                 <button type="button" className="auth-toggle-password" onClick={() => setShowPassword(!showPassword)}>
                                     {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
                                 </button>
+                            </div>
+                            <div style={{ textAlign: 'right', marginTop: '0.5rem' }}>
+                                <Link to="/forgot-password" style={{ fontSize: '0.85rem', color: 'var(--accent)', fontWeight: '600' }}>
+                                    Forgot Password?
+                                </Link>
                             </div>
                         </div>
                         <button type="submit" className="btn btn-primary btn-lg auth-submit-btn" disabled={loading}>
@@ -274,4 +280,221 @@ const Register = () => {
     );
 };
 
-export { Login, Register };
+// ═══════════════════════════════════════════════════════════
+//  FORGOT PASSWORD PAGE
+// ═══════════════════════════════════════════════════════════
+const ForgotPassword = () => {
+    const [email, setEmail] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [sent, setSent] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const { data } = await authAPI.forgotPassword({ email: email.trim() });
+            toast.success(data.message);
+            setSent(true);
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to send reset email');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <>
+            <Helmet><title>Forgot Password | SwissGarden Perfumes</title></Helmet>
+            <div className="auth-page">
+                <motion.div className="auth-card" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                    <div className="auth-header">
+                        <Link to="/" className="auth-logo">
+                            <span className="logo-text">swissgarden</span>
+                            <span className="logo-sub">PERFUMES</span>
+                        </Link>
+                        <h1 className="auth-title">Forgot Password?</h1>
+                        <p className="auth-subtitle">
+                            {sent 
+                                ? 'Check your email for reset instructions'
+                                : 'Enter your email to receive a password reset link'
+                            }
+                        </p>
+                    </div>
+
+                    {!sent ? (
+                        <form className="auth-form" onSubmit={handleSubmit}>
+                            <div className="form-group">
+                                <label className="form-label" htmlFor="forgot-email">Email Address</label>
+                                <div className="auth-input-wrapper">
+                                    <FiMail size={16} className="auth-input-icon" />
+                                    <input
+                                        id="forgot-email"
+                                        type="email"
+                                        className="form-input auth-input"
+                                        placeholder="your@email.com"
+                                        required
+                                        autoComplete="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <button type="submit" className="btn btn-primary btn-lg auth-submit-btn" disabled={loading}>
+                                {loading ? 'Sending...' : 'Send Reset Link'}
+                            </button>
+                        </form>
+                    ) : (
+                        <div style={{ textAlign: 'center', padding: 'var(--space-xl) 0' }}>
+                            <div style={{ 
+                                fontSize: '3rem', 
+                                marginBottom: 'var(--space-lg)',
+                                filter: 'grayscale(100%)' 
+                            }}>
+                                ✉️
+                            </div>
+                            <p style={{ 
+                                fontSize: '0.9rem', 
+                                color: 'var(--text-secondary)', 
+                                marginBottom: 'var(--space-lg)' 
+                            }}>
+                                We've sent a password reset link to <strong>{email}</strong>
+                            </p>
+                            <p style={{ 
+                                fontSize: '0.85rem', 
+                                color: 'var(--text-muted)' 
+                            }}>
+                                Didn't receive the email? Check your spam folder or{' '}
+                                <button
+                                    type="button"
+                                    onClick={() => setSent(false)}
+                                    style={{
+                                        color: 'var(--accent)',
+                                        fontWeight: '600',
+                                        textDecoration: 'underline',
+                                        background: 'none',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        padding: 0,
+                                    }}
+                                >
+                                    try again
+                                </button>
+                            </p>
+                        </div>
+                    )}
+
+                    <div className="auth-footer">
+                        <p>Remember your password? <Link to="/login" className="auth-link">Sign In</Link></p>
+                    </div>
+                </motion.div>
+            </div>
+        </>
+    );
+};
+
+// ═══════════════════════════════════════════════════════════
+//  RESET PASSWORD PAGE
+// ═══════════════════════════════════════════════════════════
+const ResetPassword = () => {
+    const [form, setForm] = useState({ password: '', confirmPassword: '' });
+    const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const { token } = useParams();
+    const { login } = useAuth();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (form.password !== form.confirmPassword) {
+            toast.error('Passwords do not match');
+            return;
+        }
+        if (form.password.length < 6) {
+            toast.error('Password must be at least 6 characters');
+            return;
+        }
+        setLoading(true);
+        try {
+            const { data } = await authAPI.resetPassword(token, { password: form.password });
+            if (data.success) {
+                // Store the token and user from response
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                toast.success('Password reset successful! Logging you in...');
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1000);
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Invalid or expired reset token');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <>
+            <Helmet><title>Reset Password | SwissGarden Perfumes</title></Helmet>
+            <div className="auth-page">
+                <motion.div className="auth-card" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                    <div className="auth-header">
+                        <Link to="/" className="auth-logo">
+                            <span className="logo-text">swissgarden</span>
+                            <span className="logo-sub">PERFUMES</span>
+                        </Link>
+                        <h1 className="auth-title">Reset Password</h1>
+                        <p className="auth-subtitle">Enter your new password</p>
+                    </div>
+
+                    <form className="auth-form" onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label className="form-label" htmlFor="reset-password">New Password</label>
+                            <div className="auth-input-wrapper">
+                                <FiLock size={16} className="auth-input-icon" />
+                                <input
+                                    id="reset-password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    className="form-input auth-input"
+                                    placeholder="Min 6 characters"
+                                    required
+                                    minLength={6}
+                                    autoComplete="new-password"
+                                    value={form.password}
+                                    onChange={(e) => setForm({ ...form, password: e.target.value })}
+                                />
+                                <button type="button" className="auth-toggle-password" onClick={() => setShowPassword(!showPassword)}>
+                                    {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                                </button>
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label" htmlFor="reset-confirm">Confirm Password</label>
+                            <div className="auth-input-wrapper">
+                                <FiLock size={16} className="auth-input-icon" />
+                                <input
+                                    id="reset-confirm"
+                                    type="password"
+                                    className="form-input auth-input"
+                                    placeholder="Re-enter your password"
+                                    required
+                                    autoComplete="new-password"
+                                    value={form.confirmPassword}
+                                    onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+                                />
+                            </div>
+                        </div>
+                        <button type="submit" className="btn btn-primary btn-lg auth-submit-btn" disabled={loading}>
+                            {loading ? 'Resetting...' : 'Reset Password'}
+                        </button>
+                    </form>
+
+                    <div className="auth-footer">
+                        <p>Remember your password? <Link to="/login" className="auth-link">Sign In</Link></p>
+                    </div>
+                </motion.div>
+            </div>
+        </>
+    );
+};
+
+export { Login, Register, ForgotPassword, ResetPassword };

@@ -356,3 +356,170 @@ export const toggleWishlist = async (req, res, next) => {
         next(error);
     }
 };
+
+/**
+ * @desc    Forgot password - Send reset token via email
+ * @route   POST /api/auth/forgot-password
+ * @access  Public
+ */
+export const forgotPassword = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide an email address',
+            });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'No account found with this email address',
+            });
+        }
+
+        // Generate reset token
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const resetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+        // Save hashed token and expiry to user
+        user.resetPasswordToken = resetTokenHash;
+        user.resetPasswordExpire = Date.now() + 30 * 60 * 1000; // 30 minutes
+        await user.save({ validateBeforeSave: false });
+
+        // Create reset URL
+        const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
+
+        try {
+            await sendEmail({
+                email: user.email,
+                subject: 'SwissGarden Perfumes - Password Reset Request',
+                html: `
+                    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; text-align: center; padding: 40px 20px; background: #0a0a0a; color: #fff;">
+                        <h1 style="font-family: serif; color: #D4AF37; margin-bottom: 10px;">SwissGarden Perfumes</h1>
+                        <p style="color: #999; font-size: 14px; margin-bottom: 30px;">Password Reset Request</p>
+                        <div style="background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 30px; max-width: 500px; margin: 0 auto; text-align: left;">
+                            <p style="font-size: 14px; color: #ccc; margin-bottom: 20px;">Hello ${user.firstName},</p>
+                            <p style="font-size: 14px; color: #ccc; margin-bottom: 20px;">
+                                You requested to reset your password. Click the button below to create a new password:
+                            </p>
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="${resetUrl}" style="display: inline-block; background: #D4AF37; color: #000; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">
+                                    Reset Password
+                                </a>
+                            </div>
+                            <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
+                                Or copy and paste this link in your browser:
+                            </p>
+                            <p style="font-size: 12px; color: #D4AF37; word-break: break-all; background: #111; padding: 12px; border-radius: 6px; border: 1px solid #333;">
+                                ${resetUrl}
+                            </p>
+                            <p style="font-size: 12px; color: #666; margin-top: 20px;">
+                                This link will expire in 30 minutes.
+                            </p>
+                        </div>
+                        <p style="font-size: 11px; color: #444; margin-top: 30px;">
+                            If you didn't request a password reset, please ignore this email and your password will remain unchanged.
+                        </p>
+                    </div>
+                `,
+            });
+
+            res.status(200).json({
+                success: true,
+                message: 'Password reset email sent. Please check your inbox.',
+            });
+        } catch (emailError) {
+            console.error('Email send error:', emailError);
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpire = undefined;
+            await user.save({ validateBeforeSave: false });
+
+            return res.status(500).json({
+                success: false,
+                message: 'Email could not be sent. Please try again later.',
+            });
+        }
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Reset password using token
+ * @route   PUT /api/auth/reset-password/:token
+ * @access  Public
+ */
+export const resetPassword = async (req, res, next) => {
+    try {
+        const { token } = req.params;
+        const { password } = req.body;
+
+        if (!password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide a new password',
+            });
+        }
+
+        // Hash the token from URL to compare with stored hash
+        const resetTokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+        // Find user with valid token
+        const user = await User.findOne({
+            resetPasswordToken: resetTokenHash,
+            resetPasswordExpire: { $gt: Date.now() },
+        });
+
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid or expired reset token',
+            });
+        }
+
+        // Set new password
+        user.password = password;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+        await user.save();
+
+        // Send confirmation email
+        try {
+            await sendEmail({
+                email: user.email,
+                subject: 'SwissGarden Perfumes - Password Changed Successfully',
+                html: `
+                    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; text-align: center; padding: 40px 20px; background: #0a0a0a; color: #fff;">
+                        <h1 style="font-family: serif; color: #D4AF37; margin-bottom: 10px;">SwissGarden Perfumes</h1>
+                        <p style="color: #999; font-size: 14px; margin-bottom: 30px;">Password Changed</p>
+                        <div style="background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 30px; max-width: 500px; margin: 0 auto; text-align: left;">
+                            <p style="font-size: 14px; color: #ccc; margin-bottom: 20px;">Hello ${user.firstName},</p>
+                            <p style="font-size: 14px; color: #ccc; margin-bottom: 20px;">
+                                Your password has been successfully changed. You can now log in with your new password.
+                            </p>
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/login" style="display: inline-block; background: #D4AF37; color: #000; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">
+                                    Sign In
+                                </a>
+                            </div>
+                        </div>
+                        <p style="font-size: 11px; color: #444; margin-top: 30px;">
+                            If you didn't make this change, please contact us immediately.
+                        </p>
+                    </div>
+                `,
+            });
+        } catch (emailError) {
+            console.log('Confirmation email failed (password was still reset):', emailError.message);
+        }
+
+        // Auto-login by sending token
+        sendTokenResponse(user, 200, res);
+    } catch (error) {
+        next(error);
+    }
+};
