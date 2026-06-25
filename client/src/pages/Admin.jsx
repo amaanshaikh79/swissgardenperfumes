@@ -176,7 +176,8 @@ const AdminDashboard = () => {
         setShowDeliveryPartnerForm(true);
     };
 
-    const handleSaveDeliveryPartner = async () => {
+    const handleSaveDeliveryPartner = async (e) => {
+        e?.preventDefault();
         try {
             if (editingDeliveryPartner) {
                 await deliveryPartnerAPI.update(editingDeliveryPartner._id, deliveryPartnerForm);

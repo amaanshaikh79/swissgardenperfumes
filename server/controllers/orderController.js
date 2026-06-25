@@ -411,13 +411,31 @@ export const updateOrderToPaid = async (req, res, next) => {
                 const payment = await rzp.payments.fetch(razorpay_payment_id);
                 const expectedPaise = Math.round(order.totalPrice * 100);
                 if (Number(payment.amount) !== expectedPaise) {
+                    // The customer has ALREADY been charged but the captured amount
+                    // does not match the server-computed total. Never fail silently —
+                    // log a reconciliation alert so the funds can be refunded/matched
+                    // manually instead of being stranded.
+                    console.error(
+                        `🚨 PAYMENT RECONCILIATION REQUIRED — captured amount mismatch. ` +
+                        `orderId=${order._id} orderNumber=${order.orderNumber} ` +
+                        `razorpay_payment_id=${razorpay_payment_id} ` +
+                        `capturedPaise=${payment.amount} expectedPaise=${expectedPaise} ` +
+                        `user=${req.user?.email}`
+                    );
                     return res.status(400).json({
                         success: false,
-                        message: 'Payment amount does not match order total',
+                        message:
+                            'Payment amount does not match the order total. Your payment has been flagged for review and our team will reconcile it.',
                     });
                 }
             } catch (fetchErr) {
-                console.error('Razorpay payment fetch failed:', fetchErr.message);
+                // Verification could not complete. If a payment id exists, it may be
+                // captured — log it so it is never silently lost.
+                console.error(
+                    `🚨 PAYMENT RECONCILIATION — gateway verification failed. ` +
+                    `orderId=${order._id} razorpay_payment_id=${razorpay_payment_id} ` +
+                    `error=${fetchErr.message}`
+                );
                 return res.status(502).json({
                     success: false,
                     message: 'Could not verify payment with the gateway',
