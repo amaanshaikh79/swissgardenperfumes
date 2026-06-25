@@ -15,9 +15,12 @@ export const getDashboardStats = async (req, res, next) => {
         const totalOrders = await Order.countDocuments();
         const totalContacts = await Contact.countDocuments({ status: 'unread' });
 
-        // Revenue
-        const paidOrders = await Order.find({ isPaid: true });
-        const totalRevenue = paidOrders.reduce((acc, order) => acc + order.totalPrice, 0);
+        // Revenue (computed DB-side; no full-collection materialization)
+        const revenueAgg = await Order.aggregate([
+            { $match: { isPaid: true } },
+            { $group: { _id: null, totalRevenue: { $sum: '$totalPrice' } } },
+        ]);
+        const totalRevenue = revenueAgg[0]?.totalRevenue || 0;
 
         // Recent orders
         const recentOrders = await Order.find()

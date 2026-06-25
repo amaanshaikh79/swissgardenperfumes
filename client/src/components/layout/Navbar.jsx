@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiUser, FiShoppingBag, FiMenu, FiX, FiChevronDown, FiLogOut, FiGrid, FiPackage, FiHeart } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import useModalA11y from '../../hooks/useModalA11y';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -12,11 +13,20 @@ const Navbar = () => {
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
     const shopDropdownRef = useRef(null);
+    const userMenuRef = useRef(null);
+    const mobileCloseRef = useRef(null);
     const { user, isAuthenticated, isAdmin, logout } = useAuth();
     const { cartCount, setIsCartOpen } = useCart();
     const location = useLocation();
     const navigate = useNavigate();
+
+    const closeSearch = useCallback(() => setSearchOpen(false), []);
+    const closeMobile = useCallback(() => setMobileOpen(false), []);
+    // Search keeps focus on its autoFocus input, so no closeRef is passed.
+    const searchPanelRef = useModalA11y(searchOpen, closeSearch, null);
+    const mobilePanelRef = useModalA11y(mobileOpen, closeMobile, mobileCloseRef);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 30);
@@ -28,6 +38,7 @@ const Navbar = () => {
         setMobileOpen(false);
         setSearchOpen(false);
         setShopDropdownOpen(false);
+        setUserMenuOpen(false);
     }, [location]);
 
     useEffect(() => {
@@ -35,9 +46,19 @@ const Navbar = () => {
             if (shopDropdownRef.current && !shopDropdownRef.current.contains(e.target)) {
                 setShopDropdownOpen(false);
             }
+            if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+                setUserMenuOpen(false);
+            }
+        };
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') setUserMenuOpen(false);
         };
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleEscape);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleEscape);
+        };
     }, []);
 
     const handleSearch = (e) => {
@@ -170,32 +191,39 @@ const Navbar = () => {
                         </button>
 
                         {isAuthenticated ? (
-                            <div className="navbar-user-menu">
-                                <button className="navbar-action-btn user-btn">
+                            <div className="navbar-user-menu" ref={userMenuRef}>
+                                <button
+                                    type="button"
+                                    className="navbar-action-btn user-btn"
+                                    aria-label="Account menu"
+                                    aria-haspopup="menu"
+                                    aria-expanded={userMenuOpen}
+                                    onClick={() => setUserMenuOpen((o) => !o)}
+                                >
                                     <FiUser size={18} />
                                 </button>
-                                <div className="user-dropdown">
+                                <div className={`user-dropdown ${userMenuOpen ? 'open' : ''}`} role="menu">
                                     <div className="user-dropdown-header">
                                         <span className="user-dropdown-name">{user?.firstName}</span>
                                         <span className="user-dropdown-email">{user?.email}</span>
                                     </div>
                                     <div className="user-dropdown-divider" />
-                                    <Link to="/profile" className="user-dropdown-item">
+                                    <Link to="/profile" className="user-dropdown-item" role="menuitem" onClick={() => setUserMenuOpen(false)}>
                                         <FiUser size={14} /> My Profile
                                     </Link>
-                                    <Link to="/orders" className="user-dropdown-item">
+                                    <Link to="/orders" className="user-dropdown-item" role="menuitem" onClick={() => setUserMenuOpen(false)}>
                                         <FiPackage size={14} /> My Orders
                                     </Link>
-                                    <Link to="/wishlist" className="user-dropdown-item">
+                                    <Link to="/wishlist" className="user-dropdown-item" role="menuitem" onClick={() => setUserMenuOpen(false)}>
                                         <FiHeart size={14} /> Wishlist
                                     </Link>
                                     {isAdmin && (
-                                        <Link to="/admin" className="user-dropdown-item">
+                                        <Link to="/admin" className="user-dropdown-item" role="menuitem" onClick={() => setUserMenuOpen(false)}>
                                             <FiGrid size={14} /> Admin Dashboard
                                         </Link>
                                     )}
                                     <div className="user-dropdown-divider" />
-                                    <button className="user-dropdown-item" onClick={handleLogout}>
+                                    <button className="user-dropdown-item" role="menuitem" onClick={() => { setUserMenuOpen(false); handleLogout(); }}>
                                         <FiLogOut size={14} /> Logout
                                     </button>
                                 </div>
@@ -218,7 +246,11 @@ const Navbar = () => {
             <AnimatePresence>
                 {searchOpen && (
                     <motion.div
+                        ref={searchPanelRef}
                         className="search-overlay"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Search"
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
@@ -230,11 +262,12 @@ const Navbar = () => {
                                 type="text"
                                 className="search-input"
                                 placeholder="Search fragrances..."
+                                aria-label="Search fragrances"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 autoFocus
                             />
-                            <button type="button" className="search-close" onClick={() => setSearchOpen(false)}>
+                            <button type="button" className="search-close" onClick={() => setSearchOpen(false)} aria-label="Close search">
                                 <FiX size={20} />
                             </button>
                         </form>
@@ -254,7 +287,11 @@ const Navbar = () => {
                             onClick={() => setMobileOpen(false)}
                         />
                         <motion.div
+                            ref={mobilePanelRef}
                             className="mobile-menu"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-label="Menu"
                             initial={{ x: '-100%' }}
                             animate={{ x: 0 }}
                             exit={{ x: '-100%' }}
@@ -265,7 +302,7 @@ const Navbar = () => {
                                     <span className="logo-text">swissgarden</span>
                                     <span className="logo-sub">PERFUMES</span>
                                 </div>
-                                <button onClick={() => setMobileOpen(false)} className="mobile-close-btn">
+                                <button ref={mobileCloseRef} onClick={() => setMobileOpen(false)} className="mobile-close-btn" aria-label="Close menu">
                                     <FiX size={24} />
                                 </button>
                             </div>

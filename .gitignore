@@ -21,3 +21,13 @@ scripts/node_modules
 # Keep thumbnail directories in version control
 !client/public/Images/thumbs
 !client/public/Video/thumbs
+
+# Claude Code local tooling config (dev-preview launch config, etc.)
+.claude/
+
+# One-off audit/fix workflow scratch artifacts (kept locally, not shipped)
+scripts/FIX_INDEX.txt
+scripts/FIX_PLAN.json
+scripts/extract-findings.mjs
+scripts/fix-workflow.js
+scripts/review-workflow.js

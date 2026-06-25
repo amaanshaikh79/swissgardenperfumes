@@ -72,8 +72,7 @@ const couponSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Index for fast lookups
-couponSchema.index({ code: 1 });
+// Index for fast lookups (the `code` field is already indexed via unique:true)
 couponSchema.index({ expiryDate: 1 });
 
 const Coupon = mongoose.model('Coupon', couponSchema);

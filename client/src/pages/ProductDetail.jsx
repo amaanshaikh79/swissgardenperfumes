@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -15,6 +15,7 @@ const ProductDetail = () => {
     const [product, setProduct] = useState(null);
     const [related, setRelated] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [fetchError, setFetchError] = useState(false);
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
     const [imageRotation, setImageRotation] = useState(0);
@@ -49,30 +50,53 @@ const ProductDetail = () => {
     const { isAuthenticated, isInWishlist, toggleWishlist } = useAuth();
     const { addToCart } = useCart();
 
-    useEffect(() => {
-        const fetchProduct = async () => {
-            setLoading(true);
-            try {
-                const { data } = await productsAPI.getBySlug(slug);
-                setProduct(data.product);
-                setSelectedImage(0);
-                setImageRotation(0);
-                // Fetch related products
-                if (data.product.fragranceFamily) {
-                    const relData = await productsAPI.getAll({
-                        fragranceFamily: data.product.fragranceFamily,
-                        limit: 5,
-                    });
-                    setRelated(relData.data.products.filter((p) => p._id !== data.product._id).slice(0, 4));
-                }
-            } catch (error) {
-                console.error('Failed to fetch product:', error);
-            } finally {
-                setLoading(false);
+    const fetchProduct = useCallback(async () => {
+        setLoading(true);
+        setFetchError(false);
+        try {
+            const { data } = await productsAPI.getBySlug(slug);
+            setProduct(data.product);
+            setSelectedImage(0);
+            setImageRotation(0);
+        } catch (error) {
+            console.error('Failed to fetch product:', error);
+            // A 404 is a true "not found"; anything else is a transient/server error.
+            if (error.response?.status !== 404) {
+                setFetchError(true);
+                toast.error('Could not load this product. Please try again.');
             }
-        };
-        fetchProduct();
+        } finally {
+            setLoading(false);
+        }
     }, [slug]);
+
+    useEffect(() => {
+        fetchProduct();
+    }, [fetchProduct]);
+
+    // Isolated related-products fetch so a cross-sell failure neither logs a
+    // misleading "Failed to fetch product" message nor blocks the main product.
+    useEffect(() => {
+        if (!product?.fragranceFamily) {
+            setRelated([]);
+            return;
+        }
+        let cancelled = false;
+        (async () => {
+            try {
+                const relData = await productsAPI.getAll({
+                    fragranceFamily: product.fragranceFamily,
+                    limit: 5,
+                });
+                if (!cancelled) {
+                    setRelated(relData.data.products.filter((p) => p._id !== product._id).slice(0, 4));
+                }
+            } catch (e) {
+                console.error('Failed to fetch related products:', e);
+            }
+        })();
+        return () => { cancelled = true; };
+    }, [product]);
 
     const handleAddToCart = () => {
         if (product) addToCart(product, quantity);
@@ -123,6 +147,16 @@ const ProductDetail = () => {
         );
     }
 
+    if (fetchError) {
+        return (
+            <div className="page-loader" style={{ paddingTop: '100px' }}>
+                <h2>Something went wrong</h2>
+                <p>We could not load this product right now.</p>
+                <button className="btn btn-outline" onClick={fetchProduct}>Try again</button>
+            </div>
+        );
+    }
+
     if (!product) {
         return (
             <div className="page-loader" style={{ paddingTop: '100px' }}>
@@ -140,11 +174,52 @@ const ProductDetail = () => {
     // Dry-down description
     const dryDown = product.dryDown || 'As the fragrance settles, the base notes emerge slowly — warm, rich, and deeply personal. The dry-down is where this scent truly becomes yours, evolving on your skin over hours into something intimate and unforgettable.';
 
+    // ─── Product JSON-LD structured data ───────────────────────────
+    const siteUrl = import.meta.env.VITE_SITE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+    const toAbsolute = (url) => {
+        if (!url) return undefined;
+        if (url.startsWith('http://') || url.startsWith('https://')) return url;
+        return `${siteUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+    };
+    const productImages = (product.images || [])
+        .map((img) => toAbsolute(img?.url))
+        .filter(Boolean);
+    const productJsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.name,
+        ...(productImages.length > 0 && { image: productImages }),
+        description: product.shortDescription || product.description?.slice(0, 5000),
+        brand: {
+            '@type': 'Brand',
+            name: 'SwissGarden Perfumes',
+        },
+        offers: {
+            '@type': 'Offer',
+            price: product.price,
+            priceCurrency: 'INR',
+            availability: product.stock > 0
+                ? 'https://schema.org/InStock'
+                : 'https://schema.org/OutOfStock',
+            url: `${siteUrl}/product/${slug}`,
+        },
+        ...(product.numReviews > 0 && product.rating > 0 && {
+            aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: product.rating,
+                reviewCount: product.numReviews,
+            },
+        }),
+    };
+
     return (
         <>
             <Helmet>
                 <title>{product.name} | SwissGarden Perfumes</title>
                 <meta name="description" content={product.shortDescription || product.description?.slice(0, 160)} />
+                <script type="application/ld+json">
+                    {JSON.stringify(productJsonLd)}
+                </script>
             </Helmet>
 
             <div className="product-detail-page">
@@ -172,7 +247,7 @@ const ProductDetail = () => {
                             <div className="product-detail-main-image">
                                 <motion.img
                                     src={product.images?.[selectedImage]?.url || 'https://via.placeholder.com/600x800?text=Perfume'}
-                                    alt={product.name}
+                                    alt={product.images?.[selectedImage]?.alt || `${product.name} — view ${selectedImage + 1}`}
                                     style={{ rotate: imageRotation }}
                                     transition={{ type: 'spring', stiffness: 200, damping: 20 }}
                                 />
@@ -188,8 +263,9 @@ const ProductDetail = () => {
                                             key={i}
                                             className={`product-detail-thumbnail ${selectedImage === i ? 'active' : ''}`}
                                             onClick={() => { setSelectedImage(i); setImageRotation(0); }}
+                                            aria-label={`Show ${product.name} image ${i + 1}`}
                                         >
-                                            <img src={img.url} alt={img.alt || product.name} />
+                                            <img src={img.url} alt="" />
                                         </button>
                                     ))}
                                 </div>

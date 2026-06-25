@@ -1,5 +1,15 @@
 import mongoose from 'mongoose';
 
+// Atomic sequence counter used to generate collision-free order numbers.
+// Using a count-derived number is racy (duplicate orderNumbers under concurrency)
+// and not immune to deletions; an atomic $inc guarantees monotonic uniqueness.
+const counterSchema = new mongoose.Schema({
+    _id: { type: String, required: true },
+    seq: { type: Number, default: 1000 },
+});
+
+const Counter = mongoose.models.Counter || mongoose.model('Counter', counterSchema);
+
 const orderItemSchema = new mongoose.Schema({
     product: {
         type: mongoose.Schema.Types.ObjectId,
@@ -32,7 +42,11 @@ const orderSchema = new mongoose.Schema(
         paymentMethod: {
             type: String,
             required: true,
-            enum: ['stripe', 'razorpay', 'cod'],
+            enum: ['razorpay', 'cod'],
+        },
+        orderNumber: {
+            type: String,
+            unique: true,
         },
         paymentResult: {
             id: String,
@@ -99,16 +113,31 @@ const orderSchema = new mongoose.Schema(
     }
 );
 
-// Generate unique order number
+// Generate unique order number via an atomic counter (collision-free under concurrency).
 orderSchema.pre('save', async function (next) {
-    if (this.isNew) {
-        const count = await mongoose.model('Order').countDocuments();
-        this.orderNumber = `GB-${String(count + 1001).padStart(6, '0')}`;
+    if (this.isNew && !this.orderNumber) {
+        try {
+            // Seed the counter base once (idempotent). Done separately from $inc
+            // because MongoDB rejects the same field in both $inc and $setOnInsert,
+            // and an upsert-with-$inc-only would otherwise start the sequence at 1
+            // (yielding GB-000001 and risking collisions with historical numbers).
+            await Counter.updateOne(
+                { _id: 'order' },
+                { $setOnInsert: { seq: 1000 } },
+                { upsert: true }
+            );
+            const c = await Counter.findOneAndUpdate(
+                { _id: 'order' },
+                { $inc: { seq: 1 } },
+                { new: true }
+            );
+            this.orderNumber = `GB-${String(c.seq).padStart(6, '0')}`;
+        } catch (err) {
+            return next(err);
+        }
     }
     next();
 });
-
-orderSchema.add({ orderNumber: { type: String, unique: true } });
 
 const Order = mongoose.model('Order', orderSchema);
 export default Order;

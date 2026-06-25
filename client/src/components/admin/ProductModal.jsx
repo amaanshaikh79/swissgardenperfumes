@@ -61,9 +61,12 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
     };
 
     const handleImageChange = (index, field, value) => {
-        const newImages = [...formData.images];
-        newImages[index][field] = value;
-        setFormData(prev => ({ ...prev, images: newImages }));
+        setFormData(prev => ({
+            ...prev,
+            images: prev.images.map((img, i) =>
+                i === index ? { ...img, [field]: value } : img
+            )
+        }));
     };
 
     const addImageField = () => {

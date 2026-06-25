@@ -5,6 +5,7 @@
     min-height: 100vh;
     width: 100%;
     overflow-x: hidden;
+    overflow-x: clip;
 }
 
 .profile-layout {
@@ -485,27 +486,27 @@
     }
 
     .profile-nav {
-        flex-direction: row;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-
-    .profile-nav::-webkit-scrollbar {
-        display: none;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        flex-direction: unset;
     }
 
     .profile-nav-item {
-        border-bottom: none;
-        border-right: 1px solid var(--divider);
-        flex-shrink: 0;
-        white-space: nowrap;
-        min-width: fit-content;
+        border-bottom: 1px solid var(--divider);
+        border-right: none;
+        white-space: normal;
+        min-width: 0;
         padding: var(--space-md) var(--space-lg);
+        text-align: center;
+        justify-content: center;
+    }
+
+    .profile-nav-item:nth-child(odd) {
+        border-right: 1px solid var(--divider);
     }
 
     .profile-nav-item:last-child {
+        grid-column: span 2;
         border-right: none;
     }
 
@@ -521,19 +522,13 @@
 
     .profile-quick-links {
         flex-direction: row;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-
-    .profile-quick-links::-webkit-scrollbar {
-        display: none;
+        flex-wrap: wrap;
     }
 
     .profile-quick-link {
-        flex-shrink: 0;
-        white-space: nowrap;
+        flex: 1 1 calc(50% - var(--space-xs));
+        white-space: normal;
+        min-width: 0;
     }
 
     .profile-form-row {

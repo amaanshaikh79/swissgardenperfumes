@@ -63,12 +63,12 @@ const ComboSet = () => {
             _id: `combo-${Date.now()}`,
             name: 'SwissGarden Trio Combo',
             price: COMBO_PRICE,
-            images: [{ url: selectedAttars[0].images[0].url, alt: 'Trio Combo' }],
+            images: [{ url: selectedAttars[0].images?.[0]?.url || '', alt: 'Trio Combo' }],
             isCombo: true,
             comboItems: selectedAttars.map(attar => ({
                 id: attar._id,
                 name: attar.name,
-                image: attar.images[0].url
+                image: attar.images?.[0]?.url || ''
             }))
         };
 
@@ -144,7 +144,7 @@ const ComboSet = () => {
                                                     <FiX size={16} />
                                                 </button>
                                                 <img
-                                                    src={selectedAttars[slotIndex].images[0].url}
+                                                    src={selectedAttars[slotIndex].images?.[0]?.url || 'https://via.placeholder.com/400x500?text=Attar'}
                                                     alt={selectedAttars[slotIndex].name}
                                                     className="combo-selected-image"
                                                 />
@@ -200,7 +200,7 @@ const ComboSet = () => {
                                         </div>
                                     )}
                                     <div className="combo-product-image">
-                                        <img src={product.images[0].url} alt={product.name} />
+                                        <img src={product.images?.[0]?.url || 'https://via.placeholder.com/400x500?text=Attar'} alt={product.images?.[0]?.alt || product.name} />
                                     </div>
                                     <div className="combo-product-info">
                                         <h3 className="combo-product-name">{product.name}</h3>

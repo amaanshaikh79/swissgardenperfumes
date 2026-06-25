@@ -67,8 +67,8 @@ const userSchema = new mongoose.Schema(
                 ref: 'Product',
             },
         ],
-        resetPasswordToken: String,
-        resetPasswordExpire: Date,
+        resetPasswordToken: { type: String, select: false },
+        resetPasswordExpire: { type: Date, select: false },
     },
     {
         timestamps: true,
@@ -100,7 +100,19 @@ userSchema.virtual('fullName').get(function () {
     return `${this.firstName} ${this.lastName}`;
 });
 
-userSchema.set('toJSON', { virtuals: true });
+// Authoritative output guard: strip sensitive fields from any serialized user,
+// covering getMe, getUsers, updateUserRole, and any future endpoint uniformly.
+userSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc, ret) => {
+        delete ret.password;
+        delete ret.googleId;
+        delete ret.facebookId;
+        delete ret.resetPasswordToken;
+        delete ret.resetPasswordExpire;
+        return ret;
+    },
+});
 
 const User = mongoose.model('User', userSchema);
 export default User;

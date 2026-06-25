@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -11,7 +11,6 @@ const CATEGORIES = ['All', 'Eau de Parfum', 'Attar', 'Eau de Toilette', 'Parfum'
 const GENDERS = ['All', 'Gender-Free', 'Men', 'Women'];
 const FAMILIES = ['All', 'Floral', 'Oriental', 'Woody', 'Fresh', 'Citrus', 'Aquatic', 'Gourmand'];
 const OCCASIONS = ['All', 'Office', 'Party', 'Date Night', 'Daily Wear', 'Travel'];
-const INTENSITIES = ['All', 'Light', 'Moderate', 'Strong', 'Intense'];
 const SORT_OPTIONS = [
     { value: 'newest', label: 'Newest' },
     { value: 'price_asc', label: 'Price: Low to High' },
@@ -37,6 +36,7 @@ const Shop = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
     const [pages, setPages] = useState(1);
@@ -48,37 +48,39 @@ const Shop = () => {
     const gender = searchParams.get('gender') || 'All';
     const family = searchParams.get('fragranceFamily') || 'All';
     const occasion = searchParams.get('occasion') || 'All';
-    const intensity = searchParams.get('intensity') || 'All';
     const sort = searchParams.get('sort') || 'newest';
     const search = searchParams.get('search') || '';
     const minPrice = searchParams.get('minPrice') || '';
     const maxPrice = searchParams.get('maxPrice') || '';
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            setLoading(true);
-            try {
-                const params = { page, limit: 12, sort };
-                if (category !== 'All') params.category = category;
-                if (gender !== 'All') params.gender = gender === 'Gender-Free' ? 'Unisex' : gender;
-                if (family !== 'All') params.fragranceFamily = family;
-                if (occasion !== 'All') params.occasion = occasion;
-                if (search) params.search = search;
-                if (minPrice) params.minPrice = minPrice;
-                if (maxPrice) params.maxPrice = maxPrice;
+    const fetchProducts = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const params = { page, limit: 12, sort };
+            if (category !== 'All') params.category = category;
+            if (gender !== 'All') params.gender = gender === 'Gender-Free' ? 'Unisex' : gender;
+            if (family !== 'All') params.fragranceFamily = family;
+            if (occasion !== 'All') params.occasion = occasion;
+            if (search) params.search = search;
+            if (minPrice) params.minPrice = minPrice;
+            if (maxPrice) params.maxPrice = maxPrice;
 
-                const { data } = await productsAPI.getAll(params);
-                setProducts(data.products || []);
-                setTotal(data.total || 0);
-                setPages(data.pages || 1);
-            } catch (err) {
-                console.error('Failed to fetch products:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
+            const { data } = await productsAPI.getAll(params);
+            setProducts(data.products || []);
+            setTotal(data.total || 0);
+            setPages(data.pages || 1);
+        } catch (err) {
+            console.error('Failed to fetch products:', err);
+            setError('We could not load fragrances right now. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    }, [category, gender, family, occasion, sort, search, minPrice, maxPrice, page]);
+
+    useEffect(() => {
         fetchProducts();
-    }, [category, gender, family, occasion, intensity, sort, search, minPrice, maxPrice, page]);
+    }, [fetchProducts]);
 
     const updateFilter = (key, value) => {
         const newParams = new URLSearchParams(searchParams);
@@ -96,13 +98,19 @@ const Shop = () => {
         setPage(1);
     };
 
-    const hasActiveFilters = category !== 'All' || gender !== 'All' || family !== 'All' || occasion !== 'All' || intensity !== 'All' || search || minPrice || maxPrice;
+    const hasActiveFilters = category !== 'All' || gender !== 'All' || family !== 'All' || occasion !== 'All' || search || minPrice || maxPrice;
     const currentMood = collectionMoods[family] || collectionMoods.default;
+
+    const pageTitle = search
+        ? `Search: ${search} | SwissGarden Perfumes`
+        : (family !== 'All'
+            ? `${currentMood.title} – ${family} Attars | SwissGarden Perfumes`
+            : 'Shop All Attars & Luxury Perfumes | SwissGarden Perfumes');
 
     return (
         <>
             <Helmet>
-                <title>{currentMood.title} | SwissGarden Perfumes</title>
+                <title>{pageTitle}</title>
                 <meta name="description" content={`${currentMood.mood} Browse our curated collection of luxury perfumes.`} />
             </Helmet>
 
@@ -222,17 +230,6 @@ const Shop = () => {
                             </div>
 
                             <div className="filter-group">
-                                <h4 className="filter-group-title">Intensity</h4>
-                                <div className="filter-options">
-                                    {INTENSITIES.map((int) => (
-                                        <button key={int} className={`filter-chip ${intensity === int ? 'active' : ''}`} onClick={() => updateFilter('intensity', int)}>
-                                            {int}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="filter-group">
                                 <h4 className="filter-group-title">Gender-Free</h4>
                                 <div className="filter-options">
                                     {GENDERS.map((g) => (
@@ -270,6 +267,12 @@ const Shop = () => {
                         <div className="page-loader">
                             <div className="spinner" />
                             <span className="page-loader-text">Loading fragrances...</span>
+                        </div>
+                    ) : error ? (
+                        <div className="shop-empty">
+                            <h3>Something went wrong</h3>
+                            <p>{error}</p>
+                            <button className="btn btn-outline" onClick={fetchProducts}>Retry</button>
                         </div>
                     ) : products.length === 0 ? (
                         <div className="shop-empty">

@@ -5,10 +5,12 @@ import { useAuth } from './context/AuthContext';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import CartDrawer from './components/cart/CartDrawer';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
-import ExitIntentPopup from './components/common/ExitIntentPopup';
-import SplashScreen from './components/common/SplashScreen';
-import AIChatbox from './components/common/AIChatbox';
+// Non-critical UI — lazy loaded to keep them out of the main bundle
+const ExitIntentPopup = lazy(() => import('./components/common/ExitIntentPopup'));
+const SplashScreen = lazy(() => import('./components/common/SplashScreen'));
+const AIChatbox = lazy(() => import('./components/common/AIChatbox'));
 
 // Eager load critical pages
 import Home from './pages/Home';
@@ -89,14 +91,21 @@ function App() {
     return (
         <>
             <AnimatePresence>
-                {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
+                {showSplash && (
+                    <Suspense fallback={null}>
+                        <SplashScreen onComplete={handleSplashComplete} />
+                    </Suspense>
+                )}
             </AnimatePresence>
             <ScrollToTop />
-            <ExitIntentPopup />
+            <Suspense fallback={null}>
+                <ExitIntentPopup />
+            </Suspense>
             {!isAuthPage && <Navbar />}
             <CartDrawer />
             <main>
                 <Suspense fallback={<PageLoader />}>
+                    <ErrorBoundary key={location.pathname}>
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/shop" element={<Shop />} />
@@ -140,10 +149,15 @@ function App() {
                         {/* 404 */}
                         <Route path="*" element={<NotFound />} />
                     </Routes>
+                    </ErrorBoundary>
                 </Suspense>
             </main>
             {!isAuthPage && <Footer />}
-            {!isAuthPage && <AIChatbox />}
+            {!isAuthPage && (
+                <Suspense fallback={null}>
+                    <AIChatbox />
+                </Suspense>
+            )}
         </>
     );
 }

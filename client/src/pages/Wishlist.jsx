@@ -16,7 +16,7 @@ const Wishlist = () => {
     const [removing, setRemoving] = useState(null);
     const [addingToCart, setAddingToCart] = useState(null);
 
-    useEffect(() => { refreshUser(); }, [refreshUser]);
+    useEffect(() => { refreshUser().catch(() => {}); }, [refreshUser]);
 
     const wishlistItems = user?.wishlist || [];
 

@@ -123,8 +123,9 @@ const Contact = () => {
                                     <form className="contact-form-inner" onSubmit={handleSubmit}>
                                         <div className="contact-form-row">
                                             <div className="form-group">
-                                                <label className="form-label">Your Name</label>
+                                                <label className="form-label" htmlFor="contact-name">Your Name</label>
                                                 <input
+                                                    id="contact-name"
                                                     className="form-input"
                                                     placeholder="Rahul Sharma"
                                                     required
@@ -133,8 +134,9 @@ const Contact = () => {
                                                 />
                                             </div>
                                             <div className="form-group">
-                                                <label className="form-label">Email Address</label>
+                                                <label className="form-label" htmlFor="contact-email">Email Address</label>
                                                 <input
+                                                    id="contact-email"
                                                     type="email"
                                                     className="form-input"
                                                     placeholder="you@email.com"
@@ -145,8 +147,9 @@ const Contact = () => {
                                             </div>
                                         </div>
                                         <div className="form-group">
-                                            <label className="form-label">Subject</label>
+                                            <label className="form-label" htmlFor="contact-subject">Subject</label>
                                             <select
+                                                id="contact-subject"
                                                 className="form-input form-select"
                                                 value={form.subject}
                                                 onChange={(e) => setForm({ ...form, subject: e.target.value })}
@@ -161,8 +164,9 @@ const Contact = () => {
                                             </select>
                                         </div>
                                         <div className="form-group">
-                                            <label className="form-label">Message</label>
+                                            <label className="form-label" htmlFor="contact-message">Message</label>
                                             <textarea
+                                                id="contact-message"
                                                 className="form-input form-textarea"
                                                 placeholder="Tell us how we can help you..."
                                                 required

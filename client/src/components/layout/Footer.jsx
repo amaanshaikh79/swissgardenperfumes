@@ -20,8 +20,8 @@ const Footer = () => {
                             </p>
                             <div className="footer-socials">
                                 <a href="https://www.instagram.com/swissgardenperfumes.official_" target="_blank" rel="noopener noreferrer" className="footer-social-link" aria-label="Instagram"><FiInstagram size={18} /></a>
-                                <a href="www.whatsapp.com/swissgardenperfumes" className="footer-social-link" aria-label="WhatsApp"><FiMessageCircle size={18} /></a>
-                                <a href="www.gmail.com/swissgardenperfumes" className="footer-social-link" aria-label="Email"><FiMail size={18} /></a>
+                                <a href="https://wa.me/919354936369" target="_blank" rel="noopener noreferrer" className="footer-social-link" aria-label="WhatsApp"><FiMessageCircle size={18} /></a>
+                                <a href="mailto:Contact@swissgardenperfumes.com" className="footer-social-link" aria-label="Email"><FiMail size={18} /></a>
                                 <a href="https://www.facebook.com/swissgardenperfumes" className="footer-social-link" aria-label="Facebook"><FaFacebookF size={18} /></a>
                                 <a href="https://www.twitter.com/swissgardenperfumes" className="footer-social-link" aria-label="Twitter"><FaTwitter size={18} /></a>
                                 <a href="https://www.linkedin.com/swissgardenperfumes" className="footer-social-link" aria-label="LinkedIn"><FaLinkedinIn size={18} /></a>

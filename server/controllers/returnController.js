@@ -165,35 +165,3 @@ export const cancelReturn = asyncHandler(async (req, res) => {
         message: 'Return request cancelled successfully',
     });
 });
-
-// @desc    Cancel order
-// @route   PUT /api/orders/:id/cancel
-// @access  Private
-export const cancelOrder = asyncHandler(async (req, res) => {
-    const order = await Order.findById(req.params.id);
-    
-    if (!order) {
-        res.status(404);
-        throw new Error('Order not found');
-    }
-
-    if (order.user.toString() !== req.user._id.toString()) {
-        res.status(403);
-        throw new Error('Not authorized to cancel this order');
-    }
-
-    // Only allow cancellation if order is not yet shipped
-    if (['Shipped', 'Out for Delivery', 'Delivered'].includes(order.orderStatus)) {
-        res.status(400);
-        throw new Error('Order cannot be cancelled after it has been shipped');
-    }
-
-    order.orderStatus = 'Cancelled';
-    await order.save();
-
-    res.status(200).json({
-        success: true,
-        message: 'Order cancelled successfully',
-        order,
-    });
-});

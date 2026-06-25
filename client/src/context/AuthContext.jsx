@@ -34,30 +34,51 @@ export const AuthProvider = ({ children }) => {
      * Stores the token, fetches the user profile, and updates React state.
      */
     const loginWithToken = useCallback(async (token) => {
-        try {
-            localStorage.setItem('token', token);
+        localStorage.setItem('token', token);
 
-            const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/auth/me`, {
+        let response;
+        try {
+            response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/auth/me`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            const data = await response.json();
+        } catch (networkErr) {
+            // Network/CORS failure — keep the token, signal transient so the
+            // caller can retry instead of discarding a possibly-valid session.
+            console.error('Network error during loginWithToken:', networkErr);
+            const e = new Error('NETWORK'); e.transient = true; throw e;
+        }
 
-            if (data.success) {
-                localStorage.setItem('user', JSON.stringify(data.user));
-                setUser(data.user);
-                return data.user;
-            } else {
-                // Token was invalid — clean up
-                localStorage.removeItem('token');
-                return null;
-            }
-        } catch (error) {
-            console.error('Failed to login with OAuth token:', error);
+        if (response.status === 401 || response.status === 403) {
+            // Genuine invalid/expired token — clear it.
             localStorage.removeItem('token');
             return null;
         }
+
+        if (!response.ok) {
+            // 5xx / gateway error (likely an HTML body from a cold-starting
+            // backend) — keep the token and signal transient.
+            const e = new Error('SERVER'); e.transient = true; throw e;
+        }
+
+        let data;
+        try {
+            data = await response.json();
+        } catch {
+            // Unexpected non-JSON response — treat as transient.
+            const e = new Error('PARSE'); e.transient = true; throw e;
+        }
+
+        if (data.success) {
+            localStorage.setItem('user', JSON.stringify(data.user));
+            setUser(data.user);
+            return data.user;
+        }
+
+        // Authenticated request succeeded but server reports failure — invalid token.
+        localStorage.removeItem('token');
+        return null;
     }, []);
 
     const register = async (userData) => {

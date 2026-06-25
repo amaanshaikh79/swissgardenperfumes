@@ -1,7 +1,9 @@
+import { useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiMinus, FiPlus, FiTrash2, FiShoppingBag, FiTag, FiTruck, FiShield } from 'react-icons/fi';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import useModalA11y from '../../hooks/useModalA11y';
 import './CartDrawer.css';
 
 const formatINR = (amount) => {
@@ -27,6 +29,9 @@ const CartDrawer = () => {
         orderTotal,
     } = useCart();
     const navigate = useNavigate();
+    const closeRef = useRef(null);
+    const closeCart = useCallback(() => setIsCartOpen(false), [setIsCartOpen]);
+    const panelRef = useModalA11y(isCartOpen, closeCart, closeRef);
 
     const handleCheckout = () => {
         setIsCartOpen(false);
@@ -49,7 +54,11 @@ const CartDrawer = () => {
                         onClick={() => setIsCartOpen(false)}
                     />
                     <motion.div
+                        ref={panelRef}
                         className="cart-drawer"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Shopping cart"
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
@@ -60,7 +69,7 @@ const CartDrawer = () => {
                                 <FiShoppingBag size={18} />
                                 Your Bag ({cartCount})
                             </h3>
-                            <button className="cart-close" onClick={() => setIsCartOpen(false)}>
+                            <button ref={closeRef} className="cart-close" onClick={() => setIsCartOpen(false)} aria-label="Close cart">
                                 <FiX size={22} />
                             </button>
                         </div>
@@ -151,11 +160,12 @@ const CartDrawer = () => {
                                                         <button
                                                             onClick={() => updateQuantity(item._id, item.quantity - 1)}
                                                             disabled={item.quantity <= 1}
+                                                            aria-label="Decrease quantity"
                                                         >
                                                             <FiMinus size={14} />
                                                         </button>
                                                         <span>{item.quantity}</span>
-                                                        <button onClick={() => updateQuantity(item._id, item.quantity + 1)}>
+                                                        <button onClick={() => updateQuantity(item._id, item.quantity + 1)} aria-label="Increase quantity">
                                                             <FiPlus size={14} />
                                                         </button>
                                                     </div>
@@ -168,6 +178,7 @@ const CartDrawer = () => {
                                                 className="cart-item-remove"
                                                 onClick={() => removeFromCart(item._id)}
                                                 title="Remove item"
+                                                aria-label="Remove item"
                                             >
                                                 <FiTrash2 size={14} />
                                             </button>

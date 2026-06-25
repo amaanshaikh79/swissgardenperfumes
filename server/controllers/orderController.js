@@ -1,7 +1,22 @@
+import mongoose from 'mongoose';
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import Coupon from '../models/Coupon.js';
 import sendEmail, { orderConfirmationEmail } from '../utils/sendEmail.js';
+import { verifyRazorpaySignature } from '../utils/verifyRazorpay.js';
+import Razorpay from 'razorpay';
+
+// Lazy Razorpay client for server-side payment reconciliation in updateOrderToPaid.
+let _rzp = null;
+const getRzp = () => {
+    const keyId = process.env.RAZORPAY_KEY_ID?.trim();
+    const keySecret = process.env.RAZORPAY_KEY_SECRET?.trim();
+    if (!keyId || !keySecret) return null;
+    if (!_rzp) {
+        _rzp = new Razorpay({ key_id: keyId, key_secret: keySecret });
+    }
+    return _rzp;
+};
 
 /**
  * @desc    Create new order
@@ -9,6 +24,21 @@ import sendEmail, { orderConfirmationEmail } from '../utils/sendEmail.js';
  * @access  Private
  */
 export const createOrder = async (req, res, next) => {
+    // Track stock decrements so they can be rolled back on any later failure.
+    const decremented = [];
+    let couponReserved = null;
+
+    const rollbackStock = async () => {
+        await Promise.all(
+            decremented.map((d) =>
+                Product.updateOne(
+                    { _id: d.product },
+                    { $inc: { stock: d.quantity, sold: -d.quantity } }
+                )
+            )
+        );
+    };
+
     try {
         const { orderItems, shippingAddress, paymentMethod, couponCode } = req.body;
 
@@ -23,18 +53,30 @@ export const createOrder = async (req, res, next) => {
         for (const item of orderItems) {
             const product = await Product.findById(item.product);
             if (!product) {
+                await rollbackStock();
                 return res.status(404).json({
                     success: false,
                     message: `Product not found: ${item.product}`,
                 });
             }
 
-            if (product.stock < item.quantity) {
+            // Atomic, conditional stock decrement: guards stock and decrements in
+            // one operation, eliminating the read-modify-save oversell race.
+            const updated = await Product.findOneAndUpdate(
+                { _id: item.product, stock: { $gte: item.quantity } },
+                { $inc: { stock: -item.quantity, sold: item.quantity } },
+                { new: true }
+            );
+
+            if (!updated) {
+                await rollbackStock();
                 return res.status(400).json({
                     success: false,
                     message: `Insufficient stock for ${product.name}`,
                 });
             }
+
+            decremented.push({ product: item.product, quantity: item.quantity });
 
             verifiedItems.push({
                 product: product._id,
@@ -46,11 +88,6 @@ export const createOrder = async (req, res, next) => {
             });
 
             itemsPrice += product.price * item.quantity;
-
-            // Update stock and sold count
-            product.stock -= item.quantity;
-            product.sold += item.quantity;
-            await product.save();
         }
 
         // GST included in MRP — no separate tax for Indian e-commerce
@@ -74,7 +111,13 @@ export const createOrder = async (req, res, next) => {
             const coupon = await Coupon.findOne({ code: couponCode.toUpperCase().trim(), isActive: true });
             if (coupon && new Date() <= new Date(coupon.expiryDate)) {
                 const userUsage = coupon.usedBy.filter((e) => e.user.toString() === req.user.id).length;
-                if (userUsage < coupon.perUserLimit && itemsPrice >= coupon.minOrderAmount) {
+                const globalExhausted =
+                    coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit;
+                if (
+                    !globalExhausted &&
+                    userUsage < coupon.perUserLimit &&
+                    itemsPrice >= coupon.minOrderAmount
+                ) {
                     if (coupon.discountType === 'percentage') {
                         couponDiscount = Math.round((itemsPrice * coupon.discountValue) / 100);
                         if (coupon.maxDiscount && couponDiscount > coupon.maxDiscount) {
@@ -89,28 +132,91 @@ export const createOrder = async (req, res, next) => {
             }
         }
 
+        // Atomically reserve the coupon BEFORE creating the order so concurrent
+        // orders cannot exceed either the global usageLimit OR the per-user limit.
+        // Both bounds are enforced inside a single conditional findOneAndUpdate so
+        // there is no read-then-write race (the earlier checks above are only a
+        // fast UX gate; this is the authoritative enforcement).
+        if (appliedCoupon) {
+            const userObjectId = new mongoose.Types.ObjectId(req.user.id);
+            const perUserLimit =
+                appliedCoupon.perUserLimit == null
+                    ? Number.MAX_SAFE_INTEGER
+                    : appliedCoupon.perUserLimit;
+
+            couponReserved = await Coupon.findOneAndUpdate(
+                {
+                    _id: appliedCoupon._id,
+                    isActive: true,
+                    $expr: {
+                        $and: [
+                            // Global limit not yet reached (null usageLimit = unlimited)
+                            {
+                                $or: [
+                                    { $eq: ['$usageLimit', null] },
+                                    { $lt: ['$usedCount', '$usageLimit'] },
+                                ],
+                            },
+                            // This user has not yet hit their per-user limit
+                            {
+                                $lt: [
+                                    {
+                                        $size: {
+                                            $filter: {
+                                                input: '$usedBy',
+                                                as: 'u',
+                                                cond: { $eq: ['$$u.user', userObjectId] },
+                                            },
+                                        },
+                                    },
+                                    perUserLimit,
+                                ],
+                            },
+                        ],
+                    },
+                },
+                { $inc: { usedCount: 1 }, $push: { usedBy: { user: req.user.id, usedAt: new Date() } } },
+                { new: true }
+            );
+
+            if (!couponReserved) {
+                await rollbackStock();
+                return res.status(400).json({
+                    success: false,
+                    message: 'Coupon usage limit has been reached',
+                });
+            }
+        }
+
         const totalPrice = Math.max(0, itemsPrice + shippingPrice + codCharge - comboDiscount - couponDiscount);
 
-        const order = await Order.create({
-            user: req.user.id,
-            orderItems: verifiedItems,
-            shippingAddress,
-            paymentMethod,
-            itemsPrice,
-            taxPrice,
-            shippingPrice,
-            codCharge,
-            comboDiscount,
-            couponCode: appliedCoupon ? appliedCoupon.code : null,
-            couponDiscount,
-            totalPrice,
-        });
-
-        // Mark coupon as used
-        if (appliedCoupon) {
-            appliedCoupon.usedCount += 1;
-            appliedCoupon.usedBy.push({ user: req.user.id });
-            await appliedCoupon.save();
+        let order;
+        try {
+            order = await Order.create({
+                user: req.user.id,
+                orderItems: verifiedItems,
+                shippingAddress,
+                paymentMethod,
+                itemsPrice,
+                taxPrice,
+                shippingPrice,
+                codCharge,
+                comboDiscount,
+                couponCode: appliedCoupon ? appliedCoupon.code : null,
+                couponDiscount,
+                totalPrice,
+            });
+        } catch (createErr) {
+            // Compensate: release the reserved coupon usage and restore stock so a
+            // failed insert never leaves orphaned reservations.
+            if (couponReserved) {
+                await Coupon.updateOne(
+                    { _id: couponReserved._id },
+                    { $inc: { usedCount: -1 }, $pull: { usedBy: { user: req.user.id } } }
+                );
+            }
+            await rollbackStock();
+            throw createErr;
         }
 
         // Fetch populated order for email
@@ -119,7 +225,7 @@ export const createOrder = async (req, res, next) => {
         // Send confirmation email (non-blocking)
         sendEmail({
             email: req.user.email,
-            subject: `Order Confirmed - ${order.orderNumber} | swissgarden Perfumes`,
+            subject: `Order Confirmed - ${order.orderNumber} | SwissGarden Perfumes`,
             html: orderConfirmationEmail(populatedOrder, req.user),
         }).catch((err) => console.error('Email send failed:', err));
 
@@ -188,9 +294,12 @@ export const getAllOrders = async (req, res, next) => {
             .skip(skip)
             .limit(limit);
 
-        // Calculate totals
-        const allOrders = await Order.find({});
-        const totalRevenue = allOrders.reduce((acc, order) => acc + (order.isPaid ? order.totalPrice : 0), 0);
+        // Calculate paid revenue DB-side (no full-collection materialization).
+        const revenueAgg = await Order.aggregate([
+            { $match: { isPaid: true } },
+            { $group: { _id: null, totalRevenue: { $sum: '$totalPrice' } } },
+        ]);
+        const totalRevenue = revenueAgg[0]?.totalRevenue || 0;
 
         res.status(200).json({
             success: true,
@@ -213,6 +322,11 @@ export const getAllOrders = async (req, res, next) => {
  */
 export const updateOrderStatus = async (req, res, next) => {
     try {
+        const allowed = ['Processing', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'];
+        if (!allowed.includes(req.body.status)) {
+            return res.status(400).json({ success: false, message: 'Invalid or missing order status' });
+        }
+
         const order = await Order.findById(req.params.id);
 
         if (!order) {
@@ -244,19 +358,81 @@ export const updateOrderStatus = async (req, res, next) => {
  */
 export const updateOrderToPaid = async (req, res, next) => {
     try {
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing payment verification fields',
+            });
+        }
+
         const order = await Order.findById(req.params.id);
 
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
+        // Ownership: only the order owner may mark it paid.
+        if (order.user.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: 'Not authorized' });
+        }
+
+        // Idempotency: never re-flip an already-paid order (prevents replays).
+        if (order.isPaid) {
+            return res.status(400).json({ success: false, message: 'Order is already paid' });
+        }
+
+        const keySecret = process.env.RAZORPAY_KEY_SECRET?.trim();
+        if (!keySecret) {
+            return res.status(503).json({ success: false, message: 'Payment gateway is not configured' });
+        }
+
+        // Re-run the HMAC-SHA256 signature verification server-side — never trust the
+        // client to assert payment success.
+        const signatureValid = verifyRazorpaySignature({
+            razorpay_order_id,
+            razorpay_payment_id,
+            razorpay_signature,
+            keySecret,
+        });
+
+        if (!signatureValid) {
+            return res.status(400).json({
+                success: false,
+                message: 'Payment verification failed — invalid signature',
+            });
+        }
+
+        // Confirm the captured amount matches the server-computed order total.
+        const rzp = getRzp();
+        if (rzp) {
+            try {
+                const payment = await rzp.payments.fetch(razorpay_payment_id);
+                const expectedPaise = Math.round(order.totalPrice * 100);
+                if (Number(payment.amount) !== expectedPaise) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Payment amount does not match order total',
+                    });
+                }
+            } catch (fetchErr) {
+                console.error('Razorpay payment fetch failed:', fetchErr.message);
+                return res.status(502).json({
+                    success: false,
+                    message: 'Could not verify payment with the gateway',
+                });
+            }
+        }
+
         order.isPaid = true;
         order.paidAt = Date.now();
+        // Store only the verified, gateway-issued identifiers for reconciliation.
         order.paymentResult = {
-            id: req.body.id,
-            status: req.body.status,
-            updateTime: req.body.updateTime,
-            emailAddress: req.body.emailAddress,
+            id: razorpay_payment_id,
+            status: 'captured',
+            updateTime: new Date().toISOString(),
+            emailAddress: req.user.email,
         };
         order.orderStatus = 'Confirmed';
 

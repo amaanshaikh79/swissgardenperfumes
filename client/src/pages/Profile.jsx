@@ -7,7 +7,7 @@ import {
     FiPackage, FiHeart, FiShield, FiLogOut, FiCheck
 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
-import { ordersAPI } from '../services/api';
+import { ordersAPI, authAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import './Profile.css';
 
@@ -69,11 +69,14 @@ const Profile = () => {
         }
         setPwLoading(true);
         try {
-            // Call password change API if available
+            await authAPI.updatePassword({
+                currentPassword: pwForm.currentPassword,
+                newPassword: pwForm.newPassword,
+            });
             toast.success('Password changed successfully!');
             setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-        } catch {
-            toast.error('Failed to change password');
+        } catch (err) {
+            toast.error(err?.response?.data?.message || 'Failed to change password');
         } finally {
             setPwLoading(false);
         }
