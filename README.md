@@ -1,4 +1,4 @@
-# 🏆 GoldBerg Perfumes — Luxury Fragrance E-Commerce
+# 🏆 SwissGarden Perfumes — Luxury Fragrance E-Commerce
 
 <div align="center">
 
