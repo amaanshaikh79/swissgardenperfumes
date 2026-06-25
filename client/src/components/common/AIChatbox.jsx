@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMessageCircle, FiX, FiSend, FiUser } from 'react-icons/fi';
+import useModalA11y from '../../hooks/useModalA11y';
 import './AIChatbox.css';
 
 const BOT_NAME = 'SwissGarden AI';
@@ -89,6 +90,9 @@ const AIChatbox = () => {
     const [input, setInput] = useState('');
     const [typing, setTyping] = useState(false);
     const messagesEndRef = useRef(null);
+    const closeRef = useRef(null);
+    const closeChat = useCallback(() => setIsOpen(false), []);
+    const panelRef = useModalA11y(isOpen, closeChat, closeRef);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -144,7 +148,11 @@ const AIChatbox = () => {
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
+                        ref={panelRef}
                         className="chatbox-window"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="AI assistant chat"
                         initial={{ opacity: 0, y: 20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -159,13 +167,13 @@ const AIChatbox = () => {
                                     <span className="chatbox-status">Online • Powered by Claude</span>
                                 </div>
                             </div>
-                            <button className="chatbox-close" onClick={() => setIsOpen(false)}>
+                            <button ref={closeRef} className="chatbox-close" onClick={() => setIsOpen(false)} aria-label="Close chat">
                                 <FiX size={18} />
                             </button>
                         </div>
 
                         {/* Messages */}
-                        <div className="chatbox-messages">
+                        <div className="chatbox-messages" role="log" aria-live="polite" aria-atomic="false" aria-relevant="additions">
                             {messages.map((msg) => (
                                 <div key={msg.id} className={`chatbox-msg chatbox-msg-${msg.role}`}>
                                     {msg.role === 'bot' && <span className="chatbox-msg-avatar">{BOT_AVATAR}</span>}
@@ -190,11 +198,12 @@ const AIChatbox = () => {
                                 type="text"
                                 className="chatbox-input"
                                 placeholder="Ask about fragrances..."
+                                aria-label="Type your message"
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={handleKeyDown}
                             />
-                            <button className="chatbox-send" onClick={handleSend} disabled={!input.trim()}>
+                            <button className="chatbox-send" onClick={handleSend} disabled={!input.trim()} aria-label="Send message">
                                 <FiSend size={16} />
                             </button>
                         </div>
@@ -205,9 +214,13 @@ const AIChatbox = () => {
     );
 };
 
-// Simple markdown-like formatting
+// Simple markdown-like formatting. Escape HTML first so no message text can inject markup.
 function formatMessage(text) {
-    return text
+    const esc = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    return esc
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\n/g, '<br />')
         .replace(/• /g, '&bull; ');

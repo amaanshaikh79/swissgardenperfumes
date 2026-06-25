@@ -9,6 +9,7 @@ import ProductCard from '../components/product/ProductCard';
 import LazyImage from '../components/common/LazyImage';
 import LazyVideo from '../components/common/LazyVideo';
 import { productsAPI } from '../services/api';
+import { getBackendMediaUrl } from '../utils/media';
 import './Home.css';
 
 const Home = () => {
@@ -20,17 +21,6 @@ const Home = () => {
     const [carouselIndex, setCarouselIndex] = useState(0);
     const [heroSlide, setHeroSlide] = useState(0);
     const heroRef = useRef(null);
-
-    const getBackendMediaUrl = (path) => {
-        if (!path) return '';
-        if (path.startsWith('http://') || path.startsWith('https://')) return path;
-        const apiUrl = import.meta.env.VITE_API_URL || '';
-        if (apiUrl && (apiUrl.startsWith('http://') || apiUrl.startsWith('https://'))) {
-            const backendBase = apiUrl.replace(/\/api\/?$/, '');
-            return `${backendBase}${path}`;
-        }
-        return path;
-    };
 
     const heroVideos = [
         '/Video/Alpine%20Savage.mp4',
@@ -82,29 +72,21 @@ const Home = () => {
     const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
 
     useEffect(() => {
-        const fetchFeatured = async () => {
+        const fetchProducts = async () => {
             try {
-                const { data } = await productsAPI.getFeatured();
-                setFeatured(data.products || []);
+                const { data } = await productsAPI.getAll({ limit: 50 });
+                const products = data.products || [];
+                setAllProducts(products);
+                // Derive the featured/bestseller set client-side from the same
+                // response instead of firing a second round-trip.
+                setFeatured(products.filter((p) => p.featured));
             } catch (error) {
-                console.error('Failed to fetch featured products:', error);
+                console.error('Failed to fetch products:', error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchFeatured();
-    }, []);
-
-    useEffect(() => {
-        const fetchAllProducts = async () => {
-            try {
-                const { data } = await productsAPI.getAll({ limit: 50 });
-                setAllProducts(data.products || []);
-            } catch (error) {
-                console.error('Failed to fetch all products:', error);
-            }
-        };
-        fetchAllProducts();
+        fetchProducts();
     }, []);
 
     const handleEmailSubmit = (e) => {
@@ -359,15 +341,7 @@ const Home = () => {
                     {allProducts.length > 0 ? (
                         <div className="home-products-grid">
                             {allProducts.map((product, i) => (
-                                <motion.div
-                                    key={product._id}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: i * 0.05, duration: 0.4 }}
-                                >
-                                    <ProductCard product={product} />
-                                </motion.div>
+                                <ProductCard key={product._id} product={product} index={i} />
                             ))}
                         </div>
                     ) : (
@@ -399,12 +373,12 @@ const Home = () => {
                         transition={{ duration: 0.8 }}
                     >
                         {[
-                            { name: 'Alpine Savage', video: '/Video/Alpine%20Savage.mp4' },
-                            { name: 'Blue Dominion', video: '/Video/Blue%20Dominion.mp4' },
-                            { name: 'Citrus Reverie', video: '/Video/Citrus%20Reverie.mp4' },
-                            { name: 'Glacier Splash', video: '/Video/Glacier%20Splash.mp4' },
-                            { name: 'Royal Ascent', video: '/Video/Royal%20Ascent.mp4' },
-                            { name: 'Swiss Flora', video: '/Video/Swiss%20Flora.mp4' },
+                            { name: 'Alpine Savage', video: '/Video/Alpine%20Savage.mp4', poster: '/Images/Alpine Savage.webp' },
+                            { name: 'Blue Dominion', video: '/Video/Blue%20Dominion.mp4', poster: '/Images/Blue Dominion.webp' },
+                            { name: 'Citrus Reverie', video: '/Video/Citrus%20Reverie.mp4', poster: '/Images/Citrus Reverie.webp' },
+                            { name: 'Glacier Splash', video: '/Video/Glacier%20Splash.mp4', poster: '/Images/Glacier Splash.webp' },
+                            { name: 'Royal Ascent', video: '/Video/Royal%20Ascent.mp4', poster: '/Images/Royal Ascent.webp' },
+                            { name: 'Swiss Flora', video: '/Video/Swiss%20Flora.mp4', poster: '/Images/Swiss Flora.webp' },
                         ].map((item, index) => (
                             <motion.div
                                 key={item.name}
@@ -417,6 +391,7 @@ const Home = () => {
                                 <div className="home-video-wrapper">
                                     <LazyVideo
                                         src={item.video}
+                                        poster={item.poster}
                                         className="home-video-player"
                                         autoPlay
                                         loop

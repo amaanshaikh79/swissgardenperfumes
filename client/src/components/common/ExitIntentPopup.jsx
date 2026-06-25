@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiGift, FiCopy } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import useModalA11y from '../../hooks/useModalA11y';
 import LazyImage from './LazyImage';
 import './ExitIntentPopup.css';
 
@@ -10,6 +11,13 @@ const ExitIntentPopup = () => {
     const [hasBeenShown, setHasBeenShown] = useState(false);
     const [email, setEmail] = useState('');
     const [showCode, setShowCode] = useState(false);
+    const closeRef = useRef(null);
+
+    const handleClose = useCallback(() => {
+        setIsVisible(false);
+    }, []);
+
+    const panelRef = useModalA11y(isVisible, handleClose, closeRef);
 
     useEffect(() => {
         const shown = localStorage.getItem('exitIntentShown');
@@ -43,10 +51,6 @@ const ExitIntentPopup = () => {
         };
     }, [hasBeenShown, isVisible]);
 
-    const handleClose = () => {
-        setIsVisible(false);
-    };
-
     const handleSubmit = (e) => {
         e.preventDefault();
         // Here you would integrate with email marketing API
@@ -67,14 +71,20 @@ const ExitIntentPopup = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
+                    onClick={handleClose}
                 >
                     <motion.div
+                        ref={panelRef}
                         className="exit-popup-content"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Discount offer"
                         initial={{ scale: 0.9, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                        onClick={(e) => e.stopPropagation()}
                     >
-                        <button className="exit-popup-close" onClick={handleClose}>
+                        <button ref={closeRef} className="exit-popup-close" onClick={handleClose} aria-label="Close">
                             <FiX size={20} />
                         </button>
 
@@ -106,9 +116,9 @@ const ExitIntentPopup = () => {
                                 ) : (
                                     <div className="exit-code-display">
                                         <p>Your Code:</p>
-                                        <div className="code-box" onClick={copyCode}>
+                                        <button type="button" className="code-box" onClick={copyCode} aria-label="Copy discount code WELCOME10">
                                             WELCOME10 <FiCopy size={16} />
-                                        </div>
+                                        </button>
                                         <button className="btn btn-primary btn-full" onClick={handleClose}>
                                             Shop Now
                                         </button>

@@ -14,7 +14,6 @@ const SplashScreen = ({ onComplete }) => {
 
     return (
         <AnimatePresence>
-            {phase !== 'exit' ? null : null}
             <motion.div
                 className="splash-screen"
                 initial={{ opacity: 1 }}

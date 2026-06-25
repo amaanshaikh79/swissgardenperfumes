@@ -24,12 +24,11 @@
 /* ─── Tabs ─────────────────────────────────────────────────── */
 .admin-tabs {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--space-sm);
     margin-bottom: var(--space-2xl);
     border-bottom: 1px solid var(--divider);
     padding-bottom: var(--space-md);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 .admin-tab {
@@ -201,9 +200,29 @@
 
 /* ─── Tables ───────────────────────────────────────────────── */
 .admin-table-wrap {
-    overflow-x: auto;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Hide non-essential columns on mobile */
+@media (max-width: 768px) {
+    .admin-hide-sm {
+        display: none;
+    }
+    .admin-table th,
+    .admin-table td {
+        padding: var(--space-sm) var(--space-md);
+        font-size: 0.78rem;
+    }
+    .admin-stat-card {
+        gap: var(--space-md);
+        padding: var(--space-lg);
+    }
+    .stat-value {
+        font-size: 1.4rem;
+    }
 }
 
 .admin-table {

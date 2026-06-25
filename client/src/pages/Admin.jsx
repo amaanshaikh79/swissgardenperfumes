@@ -404,18 +404,18 @@ const AdminDashboard = () => {
                                             <div className="admin-table-wrap">
                                                 <table className="admin-table">
                                                     <thead>
-                                                        <tr><th>Order #</th><th>Customer</th><th>Email</th><th>Total</th><th>Status</th><th>Payment</th><th>Date</th></tr>
+                                                        <tr><th>Order #</th><th>Customer</th><th className="admin-hide-sm">Email</th><th>Total</th><th>Status</th><th>Payment</th><th className="admin-hide-sm">Date</th></tr>
                                                     </thead>
                                                     <tbody>
                                                         {stats.recentOrders.map((o) => (
                                                             <tr key={o._id}>
                                                                 <td className="admin-accent">{o.orderNumber}</td>
                                                                 <td>{o.user?.firstName} {o.user?.lastName}</td>
-                                                                <td className="admin-muted">{o.user?.email}</td>
+                                                                <td className="admin-muted admin-hide-sm">{o.user?.email}</td>
                                                                 <td className="admin-accent">{formatINR(o.totalPrice)}</td>
                                                                 <td><span className={`badge badge-${o.orderStatus === 'Delivered' ? 'success' : o.orderStatus === 'Cancelled' ? 'error' : 'gold'}`}>{o.orderStatus}</span></td>
                                                                 <td><span className={`badge ${o.isPaid ? 'badge-success' : 'badge-warning'}`}>{o.isPaid ? 'Paid' : 'Pending'}</span></td>
-                                                                <td className="admin-muted">{formatDate(o.createdAt)}</td>
+                                                                <td className="admin-muted admin-hide-sm">{formatDate(o.createdAt)}</td>
                                                             </tr>
                                                         ))}
                                                     </tbody>
@@ -584,7 +584,7 @@ const AdminDashboard = () => {
                                     <div className="admin-table-wrap">
                                         <table className="admin-table">
                                             <thead>
-                                                <tr><th>Product</th><th>Brand</th><th>Category</th><th>Price</th><th>Stock</th><th>Rating</th><th>Sold</th><th>Actions</th></tr>
+                                                <tr><th>Product</th><th className="admin-hide-sm">Brand</th><th className="admin-hide-sm">Category</th><th>Price</th><th>Stock</th><th className="admin-hide-sm">Rating</th><th>Sold</th><th>Actions</th></tr>
                                             </thead>
                                             <tbody>
                                                 {products.map((p) => (
@@ -598,15 +598,15 @@ const AdminDashboard = () => {
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td>{p.brand}</td>
-                                                        <td className="admin-muted">{p.category}</td>
+                                                        <td className="admin-hide-sm">{p.brand}</td>
+                                                        <td className="admin-muted admin-hide-sm">{p.category}</td>
                                                         <td className="admin-accent">{formatINR(p.price)}</td>
                                                         <td>
                                                             <span className={`badge badge-${p.stock > 10 ? 'success' : p.stock > 0 ? 'warning' : 'error'}`}>
                                                                 {p.stock}
                                                             </span>
                                                         </td>
-                                                        <td>{p.rating ? `⭐ ${p.rating}` : '—'}</td>
+                                                        <td className="admin-hide-sm">{p.rating ? `⭐ ${p.rating}` : '—'}</td>
                                                         <td>{p.sold || 0}</td>
                                                         <td>
                                                             <div className="admin-actions">
@@ -643,7 +643,7 @@ const AdminDashboard = () => {
                                         <div className="admin-table-wrap">
                                             <table className="admin-table">
                                                 <thead>
-                                                    <tr><th>Order #</th><th>Customer</th><th>Email</th><th>Items</th><th>Total</th><th>Status</th><th>Payment</th><th>Date</th></tr>
+                                                    <tr><th>Order #</th><th>Customer</th><th className="admin-hide-sm">Email</th><th className="admin-hide-sm">Items</th><th>Total</th><th>Status</th><th>Payment</th><th className="admin-hide-sm">Date</th></tr>
                                                 </thead>
                                                 <tbody>
                                                     {orders.map((o) => (
@@ -654,8 +654,8 @@ const AdminDashboard = () => {
                                                                     {expandedOrder === o._id ? <FiChevronUp size={14} style={{ marginLeft: '5px' }} /> : <FiChevronDown size={14} style={{ marginLeft: '5px' }} />}
                                                                 </td>
                                                                 <td>{o.user?.firstName} {o.user?.lastName}</td>
-                                                                <td className="admin-muted">{o.user?.email}</td>
-                                                                <td>{o.orderItems?.length || 0} items</td>
+                                                                <td className="admin-muted admin-hide-sm">{o.user?.email}</td>
+                                                                <td className="admin-hide-sm">{o.orderItems?.length || 0} items</td>
                                                                 <td className="admin-accent">{formatINR(o.totalPrice)}</td>
                                                                 <td onClick={(e) => e.stopPropagation()}>
                                                                     <select className="admin-status-select" value={o.orderStatus}
@@ -666,7 +666,7 @@ const AdminDashboard = () => {
                                                                     </select>
                                                                 </td>
                                                                 <td><span className={`badge ${o.isPaid ? 'badge-success' : 'badge-warning'}`}>{o.isPaid ? 'Paid' : 'Pending'}</span></td>
-                                                                <td className="admin-muted">{formatDate(o.createdAt)}</td>
+                                                                <td className="admin-muted admin-hide-sm">{formatDate(o.createdAt)}</td>
                                                             </tr>
                                                             {expandedOrder === o._id && (
                                                                 <tr>

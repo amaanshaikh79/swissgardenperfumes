@@ -123,6 +123,7 @@
 }
 
 .code-box {
+    width: 100%;
     background: var(--white);
     border: 2px dashed var(--accent);
     padding: var(--space-sm);
@@ -134,6 +135,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
     gap: var(--space-sm);
     margin-bottom: var(--space-md);
     transition: background var(--transition-fast);

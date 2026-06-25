@@ -1,8 +1,13 @@
 import axios from 'axios';
 
+const baseURL = import.meta.env.VITE_API_URL
+    ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '') + '/api'
+    : '/api';
+
 const API = axios.create({
-    baseURL: '/api',
+    baseURL,
     withCredentials: true,
+    timeout: 45000,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -24,7 +29,11 @@ API.interceptors.request.use(
 API.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
+        // Detect timeout / network failures so callers can surface a retryable
+        // error state instead of an infinite spinner (e.g. Render cold starts).
+        if (error.code === 'ECONNABORTED' || !error.response) {
+            error.isNetworkError = true;
+        } else if (error.response.status === 401) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             // Don't redirect if already on login page

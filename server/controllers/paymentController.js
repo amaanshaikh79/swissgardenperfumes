@@ -1,6 +1,7 @@
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import Order from '../models/Order.js';
+import { safeCompareHex } from '../utils/verifyRazorpay.js';
 
 // Helper to get keys lazily (only when actually needed)
 const getKeys = () => ({
@@ -141,17 +142,16 @@ export const verifyPayment = async (req, res, next) => {
             });
         }
 
-        // HMAC-SHA256 signature verification
+        // HMAC-SHA256 signature verification. safeCompareHex rejects malformed
+        // (non-hex / wrong-length) signatures with `false` instead of throwing,
+        // so a bad signature returns 400 rather than 500.
         const body = `${razorpay_order_id}|${razorpay_payment_id}`;
         const expectedSignature = crypto
             .createHmac('sha256', KEY_SECRET)
             .update(body)
             .digest('hex');
 
-        const isValid = crypto.timingSafeEqual(
-            Buffer.from(expectedSignature, 'hex'),
-            Buffer.from(razorpay_signature, 'hex')
-        );
+        const isValid = safeCompareHex(expectedSignature, razorpay_signature);
 
         if (isValid) {
             res.status(200).json({
@@ -186,24 +186,23 @@ export const webhookHandler = async (req, res, next) => {
             return res.status(400).json({ success: false, message: 'Missing webhook signature' });
         }
 
+        // Fail closed: never process an unverified webhook. If the secret is not
+        // configured we cannot validate the signature, so refuse the request.
         if (!isKeyConfigured(WEBHOOK_SECRET)) {
-            console.warn('RAZORPAY_WEBHOOK_SECRET not set — skipping signature verification');
-        } else {
-            // Verify webhook signature using raw body
-            const expectedSignature = crypto
-                .createHmac('sha256', WEBHOOK_SECRET)
-                .update(req.rawBody)
-                .digest('hex');
+            console.error('RAZORPAY_WEBHOOK_SECRET not set — refusing to process webhook');
+            return res.status(503).json({ success: false, message: 'Webhook secret not configured' });
+        }
 
-            const isValid = crypto.timingSafeEqual(
-                Buffer.from(expectedSignature, 'hex'),
-                Buffer.from(signature, 'hex')
-            );
+        // Verify webhook signature using raw body. safeCompareHex guards against
+        // malformed (non-hex / wrong-length) signatures without throwing.
+        const expectedSignature = crypto
+            .createHmac('sha256', WEBHOOK_SECRET)
+            .update(req.rawBody)
+            .digest('hex');
 
-            if (!isValid) {
-                console.warn('Webhook signature verification failed');
-                return res.status(400).json({ success: false, message: 'Invalid webhook signature' });
-            }
+        if (!safeCompareHex(expectedSignature, signature)) {
+            console.warn('Webhook signature verification failed');
+            return res.status(400).json({ success: false, message: 'Invalid webhook signature' });
         }
 
         const event = req.body;

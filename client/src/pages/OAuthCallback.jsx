@@ -13,13 +13,13 @@ const OAuthCallback = () => {
     useEffect(() => {
         const handleCallback = async () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('token');
+            const code = urlParams.get('code');
             const error = urlParams.get('error');
 
             // Clean URL params immediately to prevent re-processing
             window.history.replaceState({}, document.title, window.location.pathname);
 
-            if (error || !token) {
+            if (error || !code) {
                 setStatus('error');
                 setMessage('Sign in was cancelled or failed. Redirecting...');
                 toast.error('Social login failed. Please try again.');
@@ -28,8 +28,21 @@ const OAuthCallback = () => {
             }
 
             try {
+                // Trade the one-time code for the JWT (the raw token is never put
+                // in the redirect URL). Then sync auth state via loginWithToken.
+                const apiBase = import.meta.env.VITE_API_URL || '/api';
+                const exchangeRes = await fetch(`${apiBase}/auth/oauth/exchange`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code }),
+                });
+                const exchangeData = await exchangeRes.json().catch(() => ({}));
+                if (!exchangeRes.ok || !exchangeData.token) {
+                    throw new Error('Code exchange failed');
+                }
+
                 // Use AuthContext's loginWithToken to properly sync state
-                const user = await loginWithToken(token);
+                const user = await loginWithToken(exchangeData.token);
 
                 if (user) {
                     setStatus('success');

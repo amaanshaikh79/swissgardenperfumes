@@ -890,18 +890,12 @@
     }
 
     .product-tabs-nav {
-        gap: var(--space-md);
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-    }
-
-    .product-tabs-nav::-webkit-scrollbar {
-        display: none;
+        gap: var(--space-sm);
+        flex-wrap: wrap;
     }
 
     .product-tab {
-        white-space: nowrap;
+        white-space: normal;
         font-size: 0.72rem;
     }
 
@@ -930,9 +924,8 @@
 
     .breadcrumb {
         font-size: 0.72rem;
-        overflow-x: auto;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
+        flex-wrap: wrap;
+        white-space: normal;
     }
 
     .product-360-btn {

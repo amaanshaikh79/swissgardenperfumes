@@ -1,8 +1,18 @@
 import { defineConfig } from 'vite';
+import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
 import viteCompression from 'vite-plugin-compression';
 
 export default defineConfig({
+    resolve: {
+        alias: {
+            // react-helmet-async silently fails to commit head tags in this app;
+            // route all imports to a dependency-free drop-in with the same API.
+            'react-helmet-async': fileURLToPath(
+                new URL('./src/lib/seo-helmet.jsx', import.meta.url)
+            ),
+        },
+    },
     plugins: [
         react(),
         viteCompression({
@@ -30,7 +40,7 @@ export default defineConfig({
                 manualChunks: {
                     'react-vendor': ['react', 'react-dom', 'react-router-dom'],
                     'framer-motion': ['framer-motion'],
-                    'ui-vendor': ['react-hot-toast', 'react-helmet-async'],
+                    'ui-vendor': ['react-hot-toast'],
                 },
             },
         },

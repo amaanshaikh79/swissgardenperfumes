@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { FiPackage, FiClock, FiCheck, FiTruck, FiFileText, FiX, FiDownload, FiPrinter, FiChevronDown, FiChevronUp, FiMapPin, FiRotateCcw, FiXCircle } from 'react-icons/fi';
 import { ordersAPI, returnAPI } from '../services/api';
 import './Orders.css';
@@ -204,7 +205,7 @@ const Orders = () => {
 
     return (
         <>
-            <Helmet><title>My Orders | swissgarden Perfumes</title></Helmet>
+            <Helmet><title>My Orders | SwissGarden Perfumes</title></Helmet>
             <div className="orders-page">
                 <div className="container-sm">
                     <h1 className="page-title">My Orders</h1>
@@ -416,7 +417,7 @@ const Orders = () => {
                                     {/* Header */}
                                     <div className="invoice-header">
                                         <div>
-                                            <div className="invoice-brand">swissgarden</div>
+                                            <div className="invoice-brand">SwissGarden</div>
                                             <div className="invoice-brand-sub">PERFUMES</div>
                                         </div>
                                         <div className="invoice-title">

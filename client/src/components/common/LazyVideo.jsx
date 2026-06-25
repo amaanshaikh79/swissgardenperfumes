@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { getBackendMediaUrl } from '../../utils/media';
 
 /**
  * LazyVideo Component - Ultra-optimized with thumbnail poster
@@ -115,17 +116,6 @@ const LazyVideo = ({
         const handleLoadedData = () => {
             setVideoLoaded(true);
             if (onLoad) onLoad();
-        };
-
-        const getBackendMediaUrl = (path) => {
-            if (!path) return '';
-            if (path.startsWith('http://') || path.startsWith('https://')) return path;
-            const apiUrl = import.meta.env.VITE_API_URL || '';
-            if (apiUrl && (apiUrl.startsWith('http://') || apiUrl.startsWith('https://'))) {
-                const backendBase = apiUrl.replace(/\/api\/?$/, '');
-                return `${backendBase}${path}`;
-            }
-            return path;
         };
 
         videoElement.addEventListener('loadeddata', handleLoadedData);

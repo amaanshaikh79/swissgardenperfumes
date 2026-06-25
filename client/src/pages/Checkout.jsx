@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -119,6 +119,27 @@ const Checkout = () => {
         setStep(3);
     };
 
+    // ── Lazy-load the Razorpay checkout SDK (only on this page) ─────
+    const loadRazorpay = () => new Promise((resolve) => {
+        if (window.Razorpay) return resolve(true);
+        const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+        if (existing) {
+            existing.addEventListener('load', () => resolve(true));
+            existing.addEventListener('error', () => resolve(false));
+            return;
+        }
+        const s = document.createElement('script');
+        s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        s.onload = () => resolve(true);
+        s.onerror = () => resolve(false);
+        document.body.appendChild(s);
+    });
+
+    // Warm the SDK on mount so it is ready by the time the user pays.
+    useEffect(() => {
+        loadRazorpay();
+    }, []);
+
     // ── Launch Razorpay modal ──────────────────────────────────────
     const launchRazorpay = (keyId, razorpayOrder, prefillMethod) => {
         return new Promise((resolve, reject) => {
@@ -126,7 +147,7 @@ const Checkout = () => {
                 key: keyId,
                 amount: razorpayOrder.amount,  // already in paise from backend
                 currency: razorpayOrder.currency || 'INR',
-                name: 'swissgarden Perfumes',
+                name: 'SwissGarden Perfumes',
                 description: `Order — ${cartItems.length} item${cartItems.length > 1 ? 's' : ''}`,
                 order_id: razorpayOrder.id,
                 prefill: {
@@ -183,6 +204,10 @@ const Checkout = () => {
         setLoading(true);
         setPaymentError('');
 
+        // Tracks a verified-but-captured payment so a later failure (saving the
+        // order / marking paid) does not tell the customer to pay again.
+        let capturedPaymentId = null;
+
         const orderPayload = {
             orderItems: cartItems.map((item) => ({
                 product: item._id,
@@ -229,7 +254,11 @@ const Checkout = () => {
             });
             const razorpayOrder = paymentRes.data.order;
 
-            // Step 3: Open Razorpay modal
+            // Step 3: Ensure the checkout SDK is loaded, then open the modal
+            const sdkReady = await loadRazorpay();
+            if (!sdkReady) {
+                throw new Error('Razorpay SDK failed to load. Please refresh the page.');
+            }
             const prefillMethod = paymentMethod === 'upi' ? 'upi' : paymentMethod === 'card' ? 'card' : null;
             const razorpayResponse = await launchRazorpay(keyId, razorpayOrder, prefillMethod);
 
@@ -243,6 +272,10 @@ const Checkout = () => {
             if (!verifyRes.data.success) {
                 throw new Error('Payment verification failed. Please contact support.');
             }
+
+            // Payment is captured and verified. From here on, any failure must NOT
+            // prompt the customer to pay again.
+            capturedPaymentId = razorpayResponse.razorpay_payment_id;
 
             // Step 5: Create order in our database
             const { data: orderData } = await ordersAPI.create(orderPayload);
@@ -266,7 +299,13 @@ const Checkout = () => {
                 replace: true,
             });
         } catch (error) {
-            if (error.message === 'PAYMENT_CANCELLED') {
+            if (capturedPaymentId) {
+                // Payment already succeeded but order persistence / mark-paid failed.
+                // Tell the customer NOT to pay again and surface the payment id.
+                const supportMsg = `Your payment (ID: ${capturedPaymentId}) was received successfully, but we hit a problem saving your order. Please do NOT pay again. Contact support with this payment ID and we will confirm your order.`;
+                setPaymentError(supportMsg);
+                toast.error(supportMsg, { duration: 12000 });
+            } else if (error.message === 'PAYMENT_CANCELLED') {
                 toast('Payment cancelled', { icon: '🚫' });
             } else if (error.message?.startsWith('PAYMENT_FAILED:')) {
                 const reason = error.message.replace('PAYMENT_FAILED:', '');
@@ -296,7 +335,7 @@ const Checkout = () => {
 
     return (
         <>
-            <Helmet><title>Checkout | swissgarden Perfumes</title></Helmet>
+            <Helmet><title>Checkout | SwissGarden Perfumes</title></Helmet>
             <div className="checkout-page">
                 <div className="container-sm">
                     <h1 className="checkout-title">Checkout</h1>

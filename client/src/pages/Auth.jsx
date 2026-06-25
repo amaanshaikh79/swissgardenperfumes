@@ -26,12 +26,12 @@ const FacebookIcon = () => (
 
 // API base URL — works both locally and on Render
 const API_BASE = import.meta.env.VITE_API_URL
-    ? import.meta.env.VITE_API_URL.replace('/api', '')
+    ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '')
     : window.location.origin;
 
 const handleOAuthLogin = (provider) => {
     const backendUrl = import.meta.env.VITE_API_URL
-        ? import.meta.env.VITE_API_URL.replace('/api', '')
+        ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '')
         : '';
     window.location.href = `${backendUrl}/api/auth/${provider}`;
 };
@@ -70,7 +70,7 @@ const Login = () => {
 
     return (
         <>
-            <Helmet><title>Sign In | swissgarden Perfumes</title></Helmet>
+            <Helmet><title>Sign In | SwissGarden Perfumes</title></Helmet>
             <div className="auth-page">
                 <motion.div className="auth-card" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                     <div className="auth-header">
@@ -84,18 +84,18 @@ const Login = () => {
 
                     <motion.form className="auth-form" onSubmit={handleEmailLogin} {...fadeSlide}>
                         <div className="form-group">
-                            <label className="form-label">Email Address</label>
+                            <label className="form-label" htmlFor="login-email">Email Address</label>
                             <div className="auth-input-wrapper">
                                 <FiMail size={16} className="auth-input-icon" />
-                                <input type="email" className="form-input auth-input" placeholder="your@email.com" required autoComplete="email"
+                                <input id="login-email" type="email" className="form-input auth-input" placeholder="your@email.com" required autoComplete="email"
                                     value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
                             </div>
                         </div>
                         <div className="form-group">
-                            <label className="form-label">Password</label>
+                            <label className="form-label" htmlFor="login-password">Password</label>
                             <div className="auth-input-wrapper">
                                 <FiLock size={16} className="auth-input-icon" />
-                                <input type={showPassword ? 'text' : 'password'} className="form-input auth-input" placeholder="Enter your password" required autoComplete="current-password"
+                                <input id="login-password" type={showPassword ? 'text' : 'password'} className="form-input auth-input" placeholder="Enter your password" required autoComplete="current-password"
                                     value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
                                 <button type="button" className="auth-toggle-password" onClick={() => setShowPassword(!showPassword)}>
                                     {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
@@ -181,7 +181,7 @@ const Register = () => {
 
     return (
         <>
-            <Helmet><title>Create Account | swissgarden Perfumes</title></Helmet>
+            <Helmet><title>Create Account | SwissGarden Perfumes</title></Helmet>
             <div className="auth-page">
                 <motion.div className="auth-card" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                     <div className="auth-header">
@@ -190,40 +190,40 @@ const Register = () => {
                             <span className="logo-sub">PERFUMES</span>
                         </Link>
                         <h1 className="auth-title">Create Account</h1>
-                        <p className="auth-subtitle">Join the swissgarden experience</p>
+                        <p className="auth-subtitle">Join the SwissGarden experience</p>
                     </div>
 
                     <form className="auth-form" onSubmit={handleSubmit}>
                         {/* Name */}
                         <div className="auth-name-row">
                             <div className="form-group">
-                                <label className="form-label">First Name *</label>
-                                <input type="text" className="form-input" placeholder="First name" required autoComplete="given-name"
+                                <label className="form-label" htmlFor="reg-firstName">First Name *</label>
+                                <input id="reg-firstName" type="text" className="form-input" placeholder="First name" required autoComplete="given-name"
                                     value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} />
                             </div>
                             <div className="form-group">
-                                <label className="form-label">Last Name *</label>
-                                <input type="text" className="form-input" placeholder="Last name" required autoComplete="family-name"
+                                <label className="form-label" htmlFor="reg-lastName">Last Name *</label>
+                                <input id="reg-lastName" type="text" className="form-input" placeholder="Last name" required autoComplete="family-name"
                                     value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} />
                             </div>
                         </div>
 
                         {/* Email */}
                         <div className="form-group">
-                            <label className="form-label">Email Address *</label>
+                            <label className="form-label" htmlFor="reg-email">Email Address *</label>
                             <div className="auth-input-wrapper">
                                 <FiMail size={16} className="auth-input-icon" />
-                                <input type="email" className="form-input auth-input" placeholder="your@email.com" required autoComplete="email"
+                                <input id="reg-email" type="email" className="form-input auth-input" placeholder="your@email.com" required autoComplete="email"
                                     value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
                             </div>
                         </div>
 
                         {/* Password */}
                         <div className="form-group">
-                            <label className="form-label">Password *</label>
+                            <label className="form-label" htmlFor="reg-password">Password *</label>
                             <div className="auth-input-wrapper">
                                 <FiLock size={16} className="auth-input-icon" />
-                                <input type={showPassword ? 'text' : 'password'} className="form-input auth-input"
+                                <input id="reg-password" type={showPassword ? 'text' : 'password'} className="form-input auth-input"
                                     placeholder="Min 6 characters with a number" required minLength={6} autoComplete="new-password"
                                     value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
                                 <button type="button" className="auth-toggle-password" onClick={() => setShowPassword(!showPassword)}>
@@ -232,8 +232,8 @@ const Register = () => {
                             </div>
                         </div>
                         <div className="form-group">
-                            <label className="form-label">Confirm Password *</label>
-                            <input type="password" className="form-input" placeholder="Re-enter your password" required autoComplete="new-password"
+                            <label className="form-label" htmlFor="reg-confirmPassword">Confirm Password *</label>
+                            <input id="reg-confirmPassword" type="password" className="form-input" placeholder="Re-enter your password" required autoComplete="new-password"
                                 value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} />
                         </div>
 

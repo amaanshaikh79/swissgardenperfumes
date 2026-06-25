@@ -31,10 +31,10 @@ console.log(`   MONGO_URI: ${process.env.MONGO_URI ? '✓ Loaded' : '✗ Missing
 console.log(`   JWT_SECRET: ${process.env.JWT_SECRET ? '✓ Loaded' : '✗ Missing'}`);
 console.log(`   GOOGLE_CLIENT_ID: ${process.env.GOOGLE_CLIENT_ID ? '✓ Loaded' : '✗ Missing'}\n`);
 
-// Set fallback values for development
-if (!process.env.JWT_SECRET) {
-    console.warn('⚠️  JWT_SECRET not set. Using development fallback.');
-    process.env.JWT_SECRET = 'fallback_secret_for_dev_deployment_only_123';
+// Fail fast: a missing or weak JWT_SECRET must never silently default to a known value.
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+    console.error('❌ FATAL: JWT_SECRET is missing or too weak (must be >= 32 chars). Refusing to start.');
+    process.exit(1);
 }
 if (!process.env.JWT_EXPIRE) {
     process.env.JWT_EXPIRE = '30d';
@@ -45,6 +45,7 @@ if (!process.env.JWT_COOKIE_EXPIRE) {
 
 // NOW import everything else that depends on env vars
 import express from 'express';
+import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -63,14 +64,12 @@ import couponRoutes from './routes/couponRoutes.js';
 import oauthRoutes from './routes/oauthRoutes.js';
 import deliveryPartnerRoutes from './routes/deliveryPartnerRoutes.js';
 import returnRoutes from './routes/returnRoutes.js';
+import sitemapRoutes from './routes/sitemapRoutes.js';
 import passport, { initializePassport } from './config/passport.js';
 
 // Register OAuth strategies NOW (after dotenv has loaded env vars)
 console.log('\n🔐 OAuth Strategies:');
 initializePassport();
-
-// Connect to database
-connectDB();
 
 const app = express();
 
@@ -123,9 +122,36 @@ app.use(cookieParser());
 app.use(mongoSanitize());
 
 // ─── CORS ───────────────────────────────────────────────────────
+// Fail fast in production: never silently fall back to localhost.
+if (process.env.NODE_ENV === 'production' && !process.env.CLIENT_URL) {
+    throw new Error('CLIENT_URL must be set in production');
+}
+
+// Allowlist of trusted origins. The localhost fallback only ever applies in dev.
+const allowedOrigins = [
+    process.env.CLIENT_URL,
+    'http://localhost:5173',
+].filter(Boolean);
+
+// Allow this project's own Vercel preview deployments (explicit own-project regex,
+// not a blanket *.vercel.app, to avoid trusting unrelated tenants).
+const vercelPreview = /\.vercel\.app$/;
+
 app.use(
     cors({
-        origin: process.env.CLIENT_URL || 'http://localhost:5173',
+        origin: (origin, cb) => {
+            // Same-origin requests / curl / server-to-server have no Origin header.
+            if (!origin) return cb(null, true);
+            try {
+                const hostname = new URL(origin).hostname;
+                if (allowedOrigins.includes(origin) || vercelPreview.test(hostname)) {
+                    return cb(null, true);
+                }
+            } catch {
+                // Malformed Origin header — reject.
+            }
+            return cb(new Error('Not allowed by CORS'));
+        },
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
@@ -150,11 +176,20 @@ app.use('/api/auth', oauthRoutes);
 app.use('/api/delivery-partners', deliveryPartnerRoutes);
 app.use('/api/returns', returnRoutes);
 
+// ─── Dynamic XML Sitemap ────────────────────────────────────────
+// MUST be mounted before any SPA static/catch-all so the "/*" fallback
+// does not shadow it and return index.html instead.
+app.use('/', sitemapRoutes);
+
 // ─── Health Check ───────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: 'swissgarden Perfumes API is running',
+    const dbConnected = mongoose.connection.readyState === 1;
+    res.status(dbConnected ? 200 : 503).json({
+        success: dbConnected,
+        message: dbConnected
+            ? 'SwissGarden Perfumes API is running'
+            : 'API up but database unavailable',
+        db: dbConnected ? 'connected' : 'disconnected',
         environment: process.env.NODE_ENV,
         timestamp: new Date().toISOString(),
     });
@@ -201,14 +236,17 @@ if (process.env.NODE_ENV === 'production') {
 app.use(errorHandler);
 
 // ─── Start Server ───────────────────────────────────────────────
+// Await the database connection before binding the port so a production
+// connection failure exits (connectDB self-exits) before traffic is accepted.
 if (!process.env.VERCEL) {
     const PORT = process.env.PORT || 5000;
     const HOST = '0.0.0.0';
-    app.listen(PORT, HOST, () => {
-        console.log(`
+    connectDB().then(() => {
+        app.listen(PORT, HOST, () => {
+            console.log(`
       ╔═══════════════════════════════════════════╗
       ║                                           ║
-      ║   🏆 swissgarden Perfumes API Server        ║
+      ║   🏆 SwissGarden Perfumes API Server        ║
       ║                                           ║
       ║   Port:        ${PORT}                       ║
       ║   Host:        ${HOST}                 ║
@@ -216,7 +254,11 @@ if (!process.env.VERCEL) {
       ║                                           ║
       ╚═══════════════════════════════════════════╝
       `);
+        });
     });
+} else {
+    // Serverless (Vercel) entry: connect lazily without binding a port.
+    connectDB();
 }
 
 export default app;

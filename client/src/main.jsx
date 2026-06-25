@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 import App from './App';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { initPerformanceMonitoring } from './utils/performanceMonitor';
@@ -14,13 +15,23 @@ if (import.meta.env.DEV) {
     initPerformanceMonitoring();
 }
 
+// Global safety net for uncaught async errors and runtime errors.
+window.addEventListener('unhandledrejection', (e) => {
+    console.error('Unhandled rejection:', e.reason);
+});
+window.addEventListener('error', (e) => {
+    console.error('Global error:', e.error || e.message);
+});
+
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <HelmetProvider>
             <BrowserRouter>
                 <AuthProvider>
                     <CartProvider>
-                        <App />
+                        <ErrorBoundary>
+                            <App />
+                        </ErrorBoundary>
                         <Toaster
                             position="top-center"
                             toastOptions={{

@@ -5,6 +5,7 @@
 /* Prevent horizontal page scrolling */
 .home-page {
     overflow-x: hidden;
+    overflow-x: clip;
     width: 100%;
     max-width: 100%;
 }
@@ -748,6 +749,7 @@
     .home-all-products,
     .section {
         overflow-x: hidden;
+        overflow-x: clip;
         max-width: 100%;
     }
 
@@ -955,44 +957,21 @@
 
 .home-videos-scroll-container {
     width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent) var(--bg-secondary);
     padding: var(--space-xl) 0;
     margin-top: var(--space-2xl);
 }
 
-.home-videos-scroll-container::-webkit-scrollbar {
-    height: 8px;
-}
-
-.home-videos-scroll-container::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-full);
-}
-
-.home-videos-scroll-container::-webkit-scrollbar-thumb {
-    background: var(--accent);
-    border-radius: var(--radius-full);
-}
-
-.home-videos-scroll-container::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-hover);
-}
-
 .home-videos-track {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--space-xl);
     padding: 0 var(--space-xl);
-    width: max-content;
+    width: 100%;
 }
 
 .home-video-card {
-    flex-shrink: 0;
-    width: 320px;
-    height: 480px;
+    width: 100%;
+    aspect-ratio: 2 / 3;
     border-radius: var(--radius-xl);
     overflow: hidden;
     position: relative;
@@ -1049,15 +1028,19 @@
 }
 
 /* Responsive for videos gallery */
+@media (max-width: 1024px) {
+    .home-videos-track {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-lg);
+        padding: 0 var(--space-lg);
+    }
+}
+
 @media (max-width: 768px) {
     .home-videos-track {
+        grid-template-columns: repeat(2, 1fr);
         padding: 0 var(--space-md);
         gap: var(--space-md);
-    }
-
-    .home-video-card {
-        width: 280px;
-        height: 420px;
     }
 
     .home-video-title {
@@ -1067,17 +1050,13 @@
 
 @media (max-width: 480px) {
     .home-videos-track {
+        grid-template-columns: repeat(2, 1fr);
         padding: 0 var(--space-sm);
         gap: var(--space-sm);
     }
 
-    .home-video-card {
-        width: 240px;
-        height: 360px;
-    }
-
     .home-video-title {
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
 
     .home-video-overlay {
