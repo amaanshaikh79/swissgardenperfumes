@@ -200,18 +200,23 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// ─── Production Static Serving ──────────────────────────────────
+// ─── Static Client Serving ──────────────────────────────────────
+// Serve the built React client whenever a build exists — NOT gated on
+// NODE_ENV. This makes the deploy resilient: visiting the domain serves the
+// app even if NODE_ENV was not set to "production", instead of "Cannot GET /".
+const clientDistPath = path.join(__dirname, '../client/dist');
+const clientIndexPath = path.join(clientDistPath, 'index.html');
 
-if (process.env.NODE_ENV === 'production') {
+if (fs.existsSync(clientIndexPath)) {
     // Serve static files with production caching headers
-    app.use(express.static(path.join(__dirname, '../client/dist'), {
+    app.use(express.static(clientDistPath, {
         maxAge: '1d', // default maxAge fallback
         etag: true,
         lastModified: true,
         setHeaders: (res, filePath) => {
             // Normalize path separators for Windows/Unix compatibility
             const normalizedPath = filePath.replace(/\\/g, '/');
-            
+
             if (normalizedPath.includes('/assets/')) {
                 // Vite hashed assets are immutable and can be cached forever
                 res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
@@ -231,10 +236,18 @@ if (process.env.NODE_ENV === 'production') {
         }
     }));
 
-    app.get('*', (req, res) => {
+    // SPA fallback: serve index.html for any non-API GET route so client-side
+    // routes (and a refresh on /shop, /product/..., etc.) resolve correctly.
+    // API paths fall through to the JSON 404 / error handler below.
+    app.get('*', (req, res, next) => {
+        if (req.path.startsWith('/api/')) return next();
         res.setHeader('Cache-Control', 'no-cache');
-        res.sendFile(path.resolve(__dirname, '../client/dist/index.html'));
+        res.sendFile(clientIndexPath);
     });
+
+    console.log(`🗂️  Serving client build from ${clientDistPath}`);
+} else {
+    console.warn('⚠️  No client build found at client/dist — frontend will not be served. Run "npm run build".');
 }
 
 // ─── Error Handler ──────────────────────────────────────────────
