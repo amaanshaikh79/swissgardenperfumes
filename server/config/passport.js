@@ -2,6 +2,7 @@ import passport from 'passport';
 import User from '../models/User.js';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
+import { getOAuthCallbackUrl } from './urls.js';
 
 /**
  * Initialize Passport strategies.
@@ -18,7 +19,7 @@ export function initializePassport() {
                 {
                     clientID: process.env.GOOGLE_CLIENT_ID,
                     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-                    callbackURL: process.env.GOOGLE_CALLBACK_URL || '/api/auth/google/callback',
+                    callbackURL: process.env.GOOGLE_CALLBACK_URL || getOAuthCallbackUrl('google'),
                 },
                 async (accessToken, refreshToken, profile, done) => {
                     try {
@@ -62,7 +63,7 @@ export function initializePassport() {
                 {
                     clientID: process.env.FACEBOOK_APP_ID,
                     clientSecret: process.env.FACEBOOK_APP_SECRET,
-                    callbackURL: process.env.FACEBOOK_CALLBACK_URL || '/api/auth/facebook/callback',
+                    callbackURL: process.env.FACEBOOK_CALLBACK_URL || getOAuthCallbackUrl('facebook'),
                     profileFields: ['id', 'displayName', 'emails', 'photos'],
                 },
                 async (accessToken, refreshToken, profile, done) => {

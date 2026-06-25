@@ -1,15 +1,25 @@
 services:
   - type: web
-    name: goldberg-perfumes
+    name: swissgardenperfumes
     env: node
     plan: free
-    buildCommand: npm install --prefix server
+    # Installs server + client deps (client incl. dev deps for Vite), builds the
+    # client bundle, then `npm start` runs the Express server which also serves
+    # the built client. Commands live in the root package.json (single source).
+    buildCommand: npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: NODE_VERSION
         value: 20
+
+      # ── URLs are auto-detected ───────────────────────────────────
+      # The app derives client/server/OAuth-callback URLs from Render's
+      # built-in RENDER_EXTERNAL_URL, so the default *.onrender.com URL works
+      # with NO manual URL config. Only set CLIENT_URL (and register the OAuth
+      # callback in Google) if you attach a custom domain.
+
       - key: MONGO_URI
         sync: false
       - key: JWT_SECRET
@@ -18,14 +28,14 @@ services:
         value: 30d
       - key: JWT_COOKIE_EXPIRE
         value: 30
-      - key: CLIENT_URL
-        value: https://swissgardenperfumes.vercel.app
+
       - key: RAZORPAY_KEY_ID
         sync: false
       - key: RAZORPAY_KEY_SECRET
         sync: false
       - key: RAZORPAY_WEBHOOK_SECRET
         sync: false
+
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
@@ -34,13 +44,17 @@ services:
         sync: false
       - key: FACEBOOK_APP_SECRET
         sync: false
-      - key: EMAIL_HOST
+
+      # Email — code reads SMTP_*/FROM_* (the old EMAIL_* names were dead).
+      - key: SMTP_HOST
         sync: false
-      - key: EMAIL_PORT
+      - key: SMTP_PORT
         sync: false
-      - key: EMAIL_USER
+      - key: SMTP_EMAIL
         sync: false
-      - key: EMAIL_PASS
+      - key: SMTP_PASSWORD
         sync: false
-      - key: EMAIL_FROM
+      - key: FROM_NAME
+        value: SwissGarden Perfumes
+      - key: FROM_EMAIL
         sync: false

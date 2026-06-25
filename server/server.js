@@ -53,6 +53,7 @@ import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import connectDB from './config/db.js';
+import { getAllowedOrigins } from './config/urls.js';
 import errorHandler from './middleware/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
@@ -122,16 +123,20 @@ app.use(cookieParser());
 app.use(mongoSanitize());
 
 // ─── CORS ───────────────────────────────────────────────────────
-// Fail fast in production: never silently fall back to localhost.
-if (process.env.NODE_ENV === 'production' && !process.env.CLIENT_URL) {
-    throw new Error('CLIENT_URL must be set in production');
+// Fail fast in production unless we can resolve a public origin. Render injects
+// RENDER_EXTERNAL_URL automatically, so an explicit CLIENT_URL is optional there.
+if (
+    process.env.NODE_ENV === 'production' &&
+    !process.env.CLIENT_URL &&
+    !process.env.RENDER_EXTERNAL_URL
+) {
+    throw new Error(
+        'Set CLIENT_URL in production (or deploy on Render, which auto-provides RENDER_EXTERNAL_URL)'
+    );
 }
 
-// Allowlist of trusted origins. The localhost fallback only ever applies in dev.
-const allowedOrigins = [
-    process.env.CLIENT_URL,
-    'http://localhost:5173',
-].filter(Boolean);
+// Allowlist of trusted origins (CLIENT_URL + Render default URL + dev localhost).
+const allowedOrigins = getAllowedOrigins();
 
 // Allow this project's own Vercel preview deployments (explicit own-project regex,
 // not a blanket *.vercel.app, to avoid trusting unrelated tenants).

@@ -1,10 +1,11 @@
 import express from 'express';
 import crypto from 'crypto';
 import passport from '../config/passport.js';
+import { getClientUrl } from '../config/urls.js';
 
 const router = express.Router();
 
-const CLIENT_URL = () => process.env.CLIENT_URL || 'http://localhost:5173';
+const CLIENT_URL = () => getClientUrl();
 
 // ─── One-time OAuth exchange codes ─────────────────────────────────
 // The raw 30-day JWT must never appear in a redirect URL (URLs leak via
