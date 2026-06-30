@@ -3,31 +3,30 @@ import Order from '../models/Order.js';
 import { getClientUrl } from '../config/urls.js';
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const MAX_RETRIES = 3;
-const BASE_BACKOFF_MS = 500;
 const MAX_HISTORY_TURNS = 10;
 const MAX_MESSAGE_LENGTH = 2000;
 const FALLBACK_REPLY =
     "I'm having trouble right now — please try again shortly, or reach us at support@swissgardenperfumes.com.";
 
+// Default free model list — verified against OpenRouter /api/v1/models June 2026.
+// On 429/404 we skip immediately to the next model (no wait), spreading load
+// across providers so a single-provider outage doesn't kill the chatbot.
+const DEFAULT_MODELS = [
+    'meta-llama/llama-3.3-70b-instruct:free',      // LLaMA — best instruction following
+    'google/gemma-4-31b-it:free',                   // Gemma 4 — different provider
+    'openai/gpt-oss-20b:free',                      // GPT OSS — OpenAI lineage
+    'qwen/qwen3-next-80b-a3b-instruct:free',        // Qwen3 — strong reasoning
+    'nvidia/nemotron-3-super-120b-a12b:free',       // Nemotron — large fallback
+    'meta-llama/llama-3.2-3b-instruct:free',        // LLaMA 3B — smallest, most available
+];
+
 async function sleep(ms) {
     return new Promise((r) => setTimeout(r, ms));
 }
 
-async function callOpenRouter(messages, attempt = 0) {
-    const key = process.env.OPENROUTER_API_KEY;
-    if (!key) throw new Error('OPENROUTER_API_KEY not configured');
-
-    const primaryModel =
-        process.env.OPENROUTER_MODEL || 'meta-llama/llama-3.3-70b-instruct:free';
-    const fallbackModels = (
-        process.env.OPENROUTER_FALLBACK_MODELS ||
-        'deepseek/deepseek-chat-v3-0324:free,google/gemini-2.0-flash-exp:free,qwen/qwen-2.5-72b-instruct:free'
-    ).split(',').map((m) => m.trim()).filter(Boolean);
-
+async function tryModel(model, messages, key) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30_000);
-
     try {
         const res = await fetch(OPENROUTER_URL, {
             method: 'POST',
@@ -39,30 +38,53 @@ async function callOpenRouter(messages, attempt = 0) {
                 'X-Title': 'SwissGarden Perfumes',
             },
             body: JSON.stringify({
-                model: primaryModel,
-                models: fallbackModels,
+                model,
                 messages,
                 temperature: 0.4,
                 max_tokens: 600,
             }),
         });
-
         if (!res.ok) {
-            const status = res.status;
-            if ((status === 429 || status >= 500) && attempt < MAX_RETRIES - 1) {
-                await sleep(BASE_BACKOFF_MS * Math.pow(2, attempt));
-                return callOpenRouter(messages, attempt + 1);
-            }
-            throw new Error(`OpenRouter responded with ${status}`);
+            const body = await res.text().catch(() => '');
+            return { ok: false, status: res.status, body };
         }
-
         const data = await res.json();
         const content = data?.choices?.[0]?.message?.content;
-        if (!content) throw new Error('Empty response from OpenRouter');
-        return content;
+        if (!content) return { ok: false, status: 200, body: 'empty response' };
+        return { ok: true, content };
     } finally {
         clearTimeout(timeoutId);
     }
+}
+
+async function callOpenRouter(messages) {
+    const key = process.env.OPENROUTER_API_KEY;
+    if (!key) throw new Error('OPENROUTER_API_KEY not configured');
+
+    const primaryModel =
+        process.env.OPENROUTER_MODEL || DEFAULT_MODELS[0];
+    const envFallbacks = process.env.OPENROUTER_FALLBACK_MODELS
+        ? process.env.OPENROUTER_FALLBACK_MODELS.split(',').map((m) => m.trim()).filter(Boolean)
+        : DEFAULT_MODELS.slice(1);
+
+    const modelList = [primaryModel, ...envFallbacks];
+
+    for (let i = 0; i < modelList.length; i++) {
+        const model = modelList[i];
+        const result = await tryModel(model, messages, key);
+        if (result.ok) {
+            if (i > 0) console.log(`[chat] Succeeded with fallback model: ${model}`);
+            return result.content;
+        }
+        // 429 = rate limited — skip immediately to next model
+        // 5xx = provider error — skip immediately to next model
+        // Other errors (400, 401) — likely config issue, skip to next
+        console.warn(`[chat] Model ${model} failed (${result.status}), trying next...`);
+        // Brief pause between models to avoid hammering the API
+        if (i < modelList.length - 1) await sleep(300);
+    }
+
+    throw new Error('All models exhausted');
 }
 
 function buildSystemPrompt(user, orders, products) {

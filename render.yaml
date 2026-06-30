@@ -66,6 +66,6 @@ services:
       - key: OPENROUTER_MODEL
         value: meta-llama/llama-3.3-70b-instruct:free
       - key: OPENROUTER_FALLBACK_MODELS
-        value: deepseek/deepseek-chat-v3-0324:free,google/gemini-2.0-flash-exp:free,qwen/qwen-2.5-72b-instruct:free
+        value: google/gemma-4-31b-it:free,openai/gpt-oss-20b:free,qwen/qwen3-next-80b-a3b-instruct:free,nvidia/nemotron-3-super-120b-a12b:free,meta-llama/llama-3.2-3b-instruct:free
       - key: CHAT_INCLUDE_PII
         value: "true"
