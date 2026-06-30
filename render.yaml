@@ -58,3 +58,14 @@ services:
         value: SwissGarden Perfumes
       - key: FROM_EMAIL
         sync: false
+
+      # ── AI Chatbot (OpenRouter) ──────────────────────────────────
+      # Rotate the key at https://openrouter.ai/keys after first deploy
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_MODEL
+        value: meta-llama/llama-3.3-70b-instruct:free
+      - key: OPENROUTER_FALLBACK_MODELS
+        value: deepseek/deepseek-chat-v3-0324:free,google/gemini-2.0-flash-exp:free,qwen/qwen-2.5-72b-instruct:free
+      - key: CHAT_INCLUDE_PII
+        value: "true"

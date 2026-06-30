@@ -29,7 +29,11 @@ console.log(`   RAZORPAY_KEY_ID: ${process.env.RAZORPAY_KEY_ID ? '✓ Loaded' : 
 console.log(`   RAZORPAY_KEY_SECRET: ${process.env.RAZORPAY_KEY_SECRET ? '✓ Loaded' : '✗ Missing'}`);
 console.log(`   MONGO_URI: ${process.env.MONGO_URI ? '✓ Loaded' : '✗ Missing'}`);
 console.log(`   JWT_SECRET: ${process.env.JWT_SECRET ? '✓ Loaded' : '✗ Missing'}`);
-console.log(`   GOOGLE_CLIENT_ID: ${process.env.GOOGLE_CLIENT_ID ? '✓ Loaded' : '✗ Missing'}\n`);
+console.log(`   GOOGLE_CLIENT_ID: ${process.env.GOOGLE_CLIENT_ID ? '✓ Loaded' : '✗ Missing'}`);
+console.log(`   OPENROUTER_API_KEY: ${process.env.OPENROUTER_API_KEY ? '✓ Loaded' : '✗ Missing (chatbot will return fallback)'}\n`);
+if (!process.env.OPENROUTER_API_KEY) {
+    console.warn('⚠️  OPENROUTER_API_KEY not set — AI chatbot will return a friendly fallback to users');
+}
 
 // Fail fast: a missing or weak JWT_SECRET must never silently default to a known value.
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
@@ -66,6 +70,7 @@ import oauthRoutes from './routes/oauthRoutes.js';
 import deliveryPartnerRoutes from './routes/deliveryPartnerRoutes.js';
 import returnRoutes from './routes/returnRoutes.js';
 import sitemapRoutes from './routes/sitemapRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
 import passport, { initializePassport } from './config/passport.js';
 
 // Register OAuth strategies NOW (after dotenv has loaded env vars)
@@ -101,6 +106,14 @@ const authLimiter = rateLimit({
 });
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
+
+// Chat rate limiting — cost control for OpenRouter calls
+const chatLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 20,
+    message: { success: false, reply: 'Too many chat requests — please wait a moment and try again.' },
+});
+app.use('/api/chat', chatLimiter);
 
 // ─── Body & Cookie Parsing ─────────────────────────────────────
 // Webhook route needs raw body for Razorpay HMAC signature verification
@@ -180,6 +193,7 @@ app.use('/api/coupons', couponRoutes);
 app.use('/api/auth', oauthRoutes);
 app.use('/api/delivery-partners', deliveryPartnerRoutes);
 app.use('/api/returns', returnRoutes);
+app.use('/api/chat', chatRoutes);
 
 // ─── Dynamic XML Sitemap ────────────────────────────────────────
 // MUST be mounted before any SPA static/catch-all so the "/*" fallback

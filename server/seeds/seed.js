@@ -281,7 +281,7 @@ const products = [
 const adminUser = {
     firstName: 'Admin',
     lastName: 'swissgarden',
-    email: 'adnanshaikh07@gmail.com',
+    email: 'adnanshaikh20@gmail.com',
     password: 'Admin@123',
     role: 'admin',
 };

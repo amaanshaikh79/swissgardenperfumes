@@ -43,7 +43,7 @@ const makeAdmin = async (email) => {
 const email = process.argv[2];
 if (!email) {
     console.log('Usage: node makeAdmin.js <email>');
-    console.log('Example: node makeAdmin.js adnanshaikh07@gmail.com');
+    console.log('Example: node makeAdmin.js adnanshaikh20@gmail.com');
     process.exit(1);
 }
 

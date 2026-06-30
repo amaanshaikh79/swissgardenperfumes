@@ -393,6 +393,29 @@ export const forgotPassword = async (req, res, next) => {
         // Create reset URL
         const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
 
+        // Check if SMTP is configured
+        const smtpConfigured = process.env.SMTP_HOST && process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD && 
+                              process.env.SMTP_EMAIL !== 'your-email@gmail.com';
+
+        if (!smtpConfigured) {
+            // Development mode - log the reset link to console
+            console.log('\n' + '═'.repeat(70));
+            console.log('🔐 PASSWORD RESET REQUEST (DEVELOPMENT MODE)');
+            console.log('═'.repeat(70));
+            console.log(`📧 Email: ${user.email}`);
+            console.log(`👤 User: ${user.firstName} ${user.lastName}`);
+            console.log(`🔗 Reset Link: ${resetUrl}`);
+            console.log(`⏰ Expires: ${new Date(user.resetPasswordExpire).toLocaleString()}`);
+            console.log('═'.repeat(70) + '\n');
+
+            return res.status(200).json({
+                success: true,
+                message: 'Password reset link generated. Check server console for the link (SMTP not configured).',
+                // In development, include the link in response
+                ...(process.env.NODE_ENV === 'development' && { resetUrl }),
+            });
+        }
+
         try {
             await sendEmail({
                 email: user.email,

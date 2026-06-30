@@ -126,6 +126,11 @@ export const returnAPI = {
     cancel: (id) => API.delete(`/returns/${id}`),
 };
 
+// Chat API
+export const chatAPI = {
+    sendMessage: (messages) => API.post('/chat', { messages }),
+};
+
 // Admin API
 export const adminAPI = {
     getStats: () => API.get('/admin/stats'),

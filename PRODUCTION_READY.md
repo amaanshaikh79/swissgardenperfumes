@@ -299,7 +299,7 @@
 - Address: C-589 DDA Flat, Pocket 11, Jasola, New Delhi 110025
 
 ### Admin Credentials
-- Email: adnanshaikh07@gmail.com
+- Email: adnanshaikh20@gmail.com
 - Password: Admin@123
 
 ---

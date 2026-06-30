@@ -295,6 +295,27 @@ const ForgotPassword = () => {
             const { data } = await authAPI.forgotPassword({ email: email.trim() });
             toast.success(data.message);
             setSent(true);
+            
+            // In development, show the reset link
+            if (data.resetUrl) {
+                console.log('🔗 Password Reset Link:', data.resetUrl);
+                toast((t) => (
+                    <div>
+                        <p style={{ marginBottom: '8px' }}>Reset link generated!</p>
+                        <a 
+                            href={data.resetUrl} 
+                            style={{ 
+                                color: 'var(--accent)', 
+                                textDecoration: 'underline',
+                                fontSize: '0.85rem'
+                            }}
+                            onClick={() => toast.dismiss(t.id)}
+                        >
+                            Click here to reset password
+                        </a>
+                    </div>
+                ), { duration: 10000 });
+            }
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to send reset email');
         } finally {
