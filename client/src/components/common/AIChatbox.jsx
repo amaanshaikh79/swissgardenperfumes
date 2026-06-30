@@ -53,8 +53,14 @@ const AIChatbox = () => {
             const res = await chatAPI.sendMessage(history);
             const reply = res.data?.reply || ERROR_REPLY;
             setMessages((prev) => [...prev, { id: Date.now() + 1, role: 'bot', text: reply }]);
-        } catch {
-            setMessages((prev) => [...prev, { id: Date.now() + 1, role: 'bot', text: ERROR_REPLY }]);
+        } catch (err) {
+            // Use the server's reply if it returned one (e.g. rate-limit message),
+            // otherwise fall back to the generic error string.
+            const serverReply = err?.response?.data?.reply;
+            setMessages((prev) => [
+                ...prev,
+                { id: Date.now() + 1, role: 'bot', text: serverReply || ERROR_REPLY },
+            ]);
         } finally {
             setTyping(false);
         }
