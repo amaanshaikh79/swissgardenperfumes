@@ -70,7 +70,7 @@ const products = [
         ],
         video: '/Video/Blue%20Dominion.mp4',
         category: 'Attar',
-        gender: 'Men',
+        gender: 'Women',
         size: '10ml',
         fragranceNotes: {
             top: ['Woody', 'Citrus', 'Aromatic'],
@@ -160,7 +160,7 @@ const products = [
         ],
         video: '/Video/Royal%20Ascent.mp4',
         category: 'Attar',
-        gender: 'Unisex',
+        gender: 'Men',
         size: '10ml',
         fragranceNotes: {
             top: ['Leather', 'Fruity', 'Sweet'],
@@ -250,7 +250,7 @@ const products = [
         ],
         video: '/Video/Glacier%20Splash.mp4',
         category: 'Attar',
-        gender: 'Unisex',
+        gender: 'Men',
         size: '10ml',
         fragranceNotes: {
             top: ['Aromatic', 'Green'],

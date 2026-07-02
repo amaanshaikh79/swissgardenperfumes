@@ -848,7 +848,7 @@ ol {
 
     .grid-products {
         grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-md);
+        gap: 12px;
     }
 
     .btn-lg {
@@ -871,12 +871,12 @@ ol {
     .container,
     .container-sm,
     .container-narrow {
-        padding: 0 var(--space-sm);
+        padding: 0 12px;
     }
 
     .grid-products {
         grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-sm);
+        gap: 10px;
     }
 
     .section-label {

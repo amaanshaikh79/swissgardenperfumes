@@ -83,10 +83,10 @@ const Contact = () => {
                     <div className="container-sm">
                         <div className="contact-info-cards">
                             {[
-                                { icon: <FiPhone size={22} />, title: 'Call Us', detail: '+91 98765 43210', sub: 'Mon–Sat, 9AM–7PM' },
+                                { icon: <FiPhone size={22} />, title: 'Call Us', detail: '+91 9354936369', sub: 'Mon–Sat, 9AM–7PM' },
                                 { icon: <FiMail size={22} />, title: 'Email Us', detail: 'contact@swissgardenperfumes.com', sub: 'Reply within 24 hours' },
-                                { icon: <FiMapPin size={22} />, title: 'Visit Us', detail: 'Aerocity, New Delhi', sub: 'Worldmark 1, Suite 502' },
-                                { icon: <FiInstagram size={22} />, title: 'WhatsApp', detail: '+91 98765 43210', sub: 'Quick support & orders' },
+                                { icon: <FiMapPin size={22} />, title: 'Visit Us', detail: 'C-589 DDA Flat, Pocket 11', sub: 'Jasola, New Delhi 110025' },
+                                { icon: <FiInstagram size={22} />, title: 'WhatsApp', detail: '+91 9354936369', sub: 'Quick support & orders' },
                             ].map((card, i) => (
                                 <motion.div
                                     key={card.title}
@@ -215,7 +215,7 @@ const Contact = () => {
 
                                 {/* WhatsApp CTA */}
                                 <a
-                                    href="https://wa.me/919876543210?text=Hello%20SwissGarden%2C%20I%20have%20a%20question"
+                                    href="https://wa.me/919354936369?text=Hello%20SwissGarden%2C%20I%20have%20a%20question"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="contact-whatsapp-btn"

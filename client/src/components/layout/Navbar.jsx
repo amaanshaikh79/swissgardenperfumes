@@ -327,6 +327,10 @@ const Navbar = () => {
                                         <span className="mobile-menu-icon">👗</span>
                                         <span>For Her</span>
                                     </Link>
+                                    <Link to="/shop?gender=Unisex" className="mobile-menu-link">
+                                        <span className="mobile-menu-icon">⚡</span>
+                                        <span>Unisex</span>
+                                    </Link>
                                 </div>
 
                                 <div className="mobile-menu-divider" />

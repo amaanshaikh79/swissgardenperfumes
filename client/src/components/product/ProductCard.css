@@ -254,45 +254,122 @@
 
     .product-card-wishlist {
         opacity: 1;
+        width: 32px;
+        height: 32px;
     }
 
     .product-card-body {
         padding: var(--space-sm) var(--space-sm) var(--space-md);
+        gap: 4px;
     }
 
     .product-card-name {
-        font-size: 0.82rem;
+        font-size: 0.85rem;
+        -webkit-line-clamp: 2;
     }
 
     .product-card-price {
-        font-size: 1rem;
+        font-size: 1.05rem;
+    }
+
+    .product-card-compare {
+        font-size: 0.75rem;
     }
 
     .product-card-inspired {
-        font-size: 0.65rem;
+        font-size: 0.68rem;
     }
 
     .product-card-add-btn {
-        padding: 8px;
-        font-size: 0.7rem;
+        padding: 9px;
+        font-size: 0.72rem;
+    }
+
+    .product-card-rating {
+        gap: 4px;
+    }
+
+    .product-card-rating-text {
+        font-size: 0.68rem;
     }
 }
 
 @media (max-width: 480px) {
+    .product-card {
+        border-radius: var(--radius-md);
+    }
+
+    .product-card-image {
+        aspect-ratio: 3/4;
+    }
+
     .product-card-badge {
         font-size: 0.55rem;
-        padding: 3px 8px;
+        padding: 3px 7px;
         top: 8px;
         left: 8px;
     }
 
     .product-card-wishlist {
-        width: 28px;
-        height: 28px;
-        min-width: 44px;   /* guarantee tap target independent of global rule */
-        min-height: 44px;
+        width: 30px;
+        height: 30px;
         top: 8px;
         right: 8px;
+    }
+
+    .product-card-body {
+        padding: 10px 10px 12px;
+        gap: 3px;
+    }
+
+    .product-card-inspired {
+        font-size: 0.62rem;
+        margin-bottom: 2px;
+    }
+
+    .product-card-name {
+        font-size: 0.8rem;
+        line-height: 1.25;
+        margin-bottom: 4px;
+    }
+
+    .product-card-rating {
+        gap: 3px;
+        margin-bottom: 4px;
+    }
+
+    .product-card-stars svg {
+        width: 11px;
+        height: 11px;
+    }
+
+    .product-card-rating-text {
+        font-size: 0.65rem;
+    }
+
+    .product-card-price-row {
+        gap: 6px;
+        margin-bottom: 6px;
+    }
+
+    .product-card-price {
+        font-size: 0.95rem;
+    }
+
+    .product-card-compare {
+        font-size: 0.7rem;
+    }
+
+    .product-card-add-btn {
+        padding: 8px;
+        font-size: 0.68rem;
+        gap: 4px;
+        min-height: 36px;
+    }
+
+    .product-card-add-btn svg {
+        width: 13px;
+        height: 13px;
     }
 }
 

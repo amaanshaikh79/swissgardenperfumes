@@ -6,9 +6,8 @@ dotenv.config();
 
 /**
  * Migration script to update product genders
- * For Him: Alpine Savage, Blue Dominion
- * For Her: Swiss Flora, Citrus Reverie
- * Unisex: Royal Ascent, Glacier Splash
+ * For Him: Glacier Splash, Royal Ascent, Alpine Savage
+ * For Her: Blue Dominion, Citrus Reverie, Swiss Flora
  */
 const updateGenders = async () => {
     try {
@@ -17,16 +16,14 @@ const updateGenders = async () => {
 
         const updates = [
             // Men's fragrances
+            { name: 'Glacier Splash', gender: 'Men' },
+            { name: 'Royal Ascent', gender: 'Men' },
             { name: 'Alpine Savage', gender: 'Men' },
-            { name: 'Blue Dominion', gender: 'Men' },
             
             // Women's fragrances
-            { name: 'Swiss Flora', gender: 'Women' },
+            { name: 'Blue Dominion', gender: 'Women' },
             { name: 'Citrus Reverie', gender: 'Women' },
-            
-            // Unisex fragrances
-            { name: 'Royal Ascent', gender: 'Unisex' },
-            { name: 'Glacier Splash', gender: 'Unisex' },
+            { name: 'Swiss Flora', gender: 'Women' },
         ];
 
         let updatedCount = 0;
