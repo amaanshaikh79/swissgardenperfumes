@@ -27,10 +27,6 @@ const FAQS = [
         q: 'Are your perfumes safe for sensitive skin?',
         a: 'Our formulas are crafted with skin-safe ingredients. We recommend doing a patch test before application. If you have specific allergies, contact us before ordering.'
     },
-    {
-        q: 'Do you offer gift wrapping?',
-        a: 'Yes! Gift wrapping is available for all orders. Simply select the gift wrap option at checkout. We can also include a personalized message card.'
-    },
 ];
 
 const Contact = () => {
@@ -83,7 +79,7 @@ const Contact = () => {
                     <div className="container-sm">
                         <div className="contact-info-cards">
                             {[
-                                { icon: <FiPhone size={22} />, title: 'Call Us', detail: '+91 9354936369', sub: 'Mon–Sat, 9AM–7PM' },
+                                { icon: <FiPhone size={22} />, title: 'Call Us', detail: '+91 9354936369', sub: 'Mon–Sun, 10AM–7PM' },
                                 { icon: <FiMail size={22} />, title: 'Email Us', detail: 'contact@swissgardenperfumes.com', sub: 'Reply within 24 hours' },
                                 { icon: <FiMapPin size={22} />, title: 'Visit Us', detail: 'C-589 DDA Flat, Pocket 11', sub: 'Jasola, New Delhi 110025' },
                                 { icon: <FiInstagram size={22} />, title: 'WhatsApp', detail: '+91 9354936369', sub: 'Quick support & orders' },
@@ -201,9 +197,9 @@ const Contact = () => {
                                     </div>
                                     <div className="contact-hours-list">
                                         {[
-                                            { day: 'Monday – Friday', hours: '9:00 AM – 7:00 PM' },
-                                            { day: 'Saturday', hours: '10:00 AM – 5:00 PM' },
-                                            { day: 'Sunday', hours: 'Closed' },
+                                            { day: 'Monday – Friday', hours: '10:00 AM – 7:00 PM' },
+                                            { day: 'Saturday', hours: '10:00 AM – 7:00 PM' },
+                                            { day: 'Sunday', hours: '10:00 AM – 7:00 PM' },
                                         ].map((item) => (
                                             <div key={item.day} className="contact-hours-row">
                                                 <span className="contact-hours-day">{item.day}</span>
