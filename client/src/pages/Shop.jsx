@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -7,10 +7,10 @@ import ProductCard from '../components/product/ProductCard';
 import { productsAPI } from '../services/api';
 import './Shop.css';
 
-const CATEGORIES = ['All', 'Eau de Parfum', 'Attar', 'Eau de Toilette', 'Parfum', 'Body Mist', 'Gift Set'];
-const GENDERS = ['All', 'Gender-Free', 'Men', 'Women'];
-const FAMILIES = ['All', 'Floral', 'Oriental', 'Woody', 'Fresh', 'Citrus', 'Aquatic', 'Gourmand'];
-const OCCASIONS = ['All', 'Office', 'Party', 'Date Night', 'Daily Wear', 'Travel'];
+const CATEGORIES = ['All', 'Attar'];
+const GENDERS = ['All', 'Unisex', 'Men', 'Women'];
+const FAMILIES = ['All', 'Floral', 'Oriental', 'Woody', 'Citrus', 'Aquatic'];
+const OCCASIONS = ['All', 'Office', 'Date Night', 'Travel'];
 const SORT_OPTIONS = [
     { value: 'newest', label: 'Newest' },
     { value: 'price_asc', label: 'Price: Low to High' },
@@ -53,18 +53,45 @@ const Shop = () => {
     const minPrice = searchParams.get('minPrice') || '';
     const maxPrice = searchParams.get('maxPrice') || '';
 
-    const fetchProducts = useCallback(async () => {
+    const fetchProducts = async () => {
         setLoading(true);
         setError(null);
         try {
-            const params = { page, limit: 12, sort };
-            if (category !== 'All') params.category = category;
-            if (gender !== 'All') params.gender = gender === 'Gender-Free' ? 'Unisex' : gender;
-            if (family !== 'All') params.fragranceFamily = family;
-            if (occasion !== 'All') params.occasion = occasion;
-            if (search) params.search = search;
-            if (minPrice) params.minPrice = minPrice;
-            if (maxPrice) params.maxPrice = maxPrice;
+            const currentPage = parseInt(searchParams.get('page')) || 1;
+            const params = { page: currentPage, limit: 12, sort };
+            
+            // Category filter
+            if (category && category !== 'All') {
+                params.category = category;
+            }
+            
+            // Gender filter - when "Unisex" or "All" is selected, show all products
+            if (gender && gender !== 'All' && gender !== 'Unisex' && gender !== 'Gender-Free') {
+                params.gender = gender;
+            }
+            
+            // Fragrance family filter
+            if (family && family !== 'All') {
+                params.fragranceFamily = family;
+            }
+            
+            // Occasion filter
+            if (occasion && occasion !== 'All') {
+                params.occasion = occasion;
+            }
+            
+            // Search filter
+            if (search && search.trim()) {
+                params.search = search.trim();
+            }
+            
+            // Price filters
+            if (minPrice && !isNaN(minPrice) && minPrice > 0) {
+                params.minPrice = minPrice;
+            }
+            if (maxPrice && !isNaN(maxPrice) && maxPrice > 0) {
+                params.maxPrice = maxPrice;
+            }
 
             const { data } = await productsAPI.getAll(params);
             setProducts(data.products || []);
@@ -76,26 +103,45 @@ const Shop = () => {
         } finally {
             setLoading(false);
         }
-    }, [category, gender, family, occasion, sort, search, minPrice, maxPrice, page]);
+    };
 
     useEffect(() => {
+        const urlPage = parseInt(searchParams.get('page')) || 1;
+        setPage(urlPage);
         fetchProducts();
-    }, [fetchProducts]);
+    }, [searchParams, sort]);
 
     const updateFilter = (key, value) => {
         const newParams = new URLSearchParams(searchParams);
-        if (value === 'All' || value === '') {
+        
+        // Remove filter if value is "All" or empty
+        if (value === 'All' || value === '' || value === null || value === undefined) {
             newParams.delete(key);
         } else {
+            // Set the new filter value
             newParams.set(key, value);
         }
+        
+        // Reset to page 1 when filters change
+        newParams.delete('page');
+        
         setSearchParams(newParams);
         setPage(1);
+        
+        // Close filters panel on mobile after selection
+        if (window.innerWidth < 768) {
+            setFiltersOpen(false);
+        }
     };
 
     const clearFilters = () => {
+        // Clear all search params
         setSearchParams({});
         setPage(1);
+        setFiltersOpen(false);
+        
+        // Scroll to top smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const hasActiveFilters = category !== 'All' || gender !== 'All' || family !== 'All' || occasion !== 'All' || search || minPrice || maxPrice;
@@ -139,40 +185,6 @@ const Shop = () => {
                 </div>
 
                 {/* ─── Collection Overview Strips ──────────────── */}
-                <section className="shop-overview">
-                    <div className="container">
-                        <div className="shop-overview-grid">
-                            <motion.div
-                                className="shop-overview-block"
-                                initial={{ opacity: 0, y: 25 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.6 }}
-                            >
-                                <h3 className="shop-overview-title">Collection Grid</h3>
-                                <p className="shop-overview-text">
-                                    Below each product you will find its mood profile, its note structure, and the occasions it is engineered for. Every attar in the collection pairs with at least two others. The Scent Pairing Guide on this site shows you every recommended combination.
-                                </p>
-                            </motion.div>
-                            <motion.div
-                                className="shop-overview-block"
-                                initial={{ opacity: 0, y: 25 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.6, delay: 0.12 }}
-                            >
-                                <h3 className="shop-overview-title">Format & Formula</h3>
-                                <ul className="shop-overview-specs">
-                                    <li><strong>Format:</strong> 10ml precision roll-on attar</li>
-                                    <li><strong>Base:</strong> Non-alcoholic carrier oil</li>
-                                    <li><strong>Concentration:</strong> Long-lasting attar concentration</li>
-                                    <li><strong>Application:</strong> Roll directly onto pulse points — inner wrist, base of throat, behind ear, inner elbow</li>
-                                    <li><strong>Wear:</strong> Full-day progression from top note through base</li>
-                                </ul>
-                            </motion.div>
-                        </div>
-                    </div>
-                </section>
 
                 <div className="container shop-container">
                     {/* ─── Filter Bar ─────────────────────────── */}
@@ -230,7 +242,7 @@ const Shop = () => {
                             </div>
 
                             <div className="filter-group">
-                                <h4 className="filter-group-title">Gender-Free</h4>
+                                <h4 className="filter-group-title">Gender</h4>
                                 <div className="filter-options">
                                     {GENDERS.map((g) => (
                                         <button key={g} className={`filter-chip ${gender === g ? 'active' : ''}`} onClick={() => updateFilter('gender', g)}>
@@ -255,7 +267,7 @@ const Shop = () => {
                                 <h4 className="filter-group-title">Price Range</h4>
                                 <div className="filter-price-range">
                                     <input type="number" className="form-input" placeholder="Min" value={minPrice} onChange={(e) => updateFilter('minPrice', e.target.value)} />
-                                    <span>\u2014</span>
+                                    <span>–</span>
                                     <input type="number" className="form-input" placeholder="Max" value={maxPrice} onChange={(e) => updateFilter('maxPrice', e.target.value)} />
                                 </div>
                             </div>
@@ -326,18 +338,24 @@ const Shop = () => {
                             {/* Pagination */}
                             {pages > 1 && (
                                 <div className="shop-pagination">
-                                    {[...Array(pages)].map((_, i) => (
-                                        <button
-                                            key={i}
-                                            className={`pagination-btn ${page === i + 1 ? 'active' : ''}`}
-                                            onClick={() => {
-                                                setPage(i + 1);
-                                                window.scrollTo({ top: 0, behavior: 'smooth' });
-                                            }}
-                                        >
-                                            {i + 1}
-                                        </button>
-                                    ))}
+                                    {[...Array(pages)].map((_, i) => {
+                                        const pageNum = i + 1;
+                                        return (
+                                            <button
+                                                key={pageNum}
+                                                className={`pagination-btn ${page === pageNum ? 'active' : ''}`}
+                                                onClick={() => {
+                                                    const newParams = new URLSearchParams(searchParams);
+                                                    newParams.set('page', pageNum.toString());
+                                                    setSearchParams(newParams);
+                                                    setPage(pageNum);
+                                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                }}
+                                            >
+                                                {pageNum}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             )}
                         </>
@@ -361,8 +379,8 @@ const Shop = () => {
                                 an emotion, a memory, a moment. Whether you're looking for confidence before a meeting, warmth
                                 on a winter evening, or something that makes strangers turn around — we've built a scent for that.
                             </p>
-                            <Link to="/fragrance-finder" className="btn btn-outline btn-lg">
-                                Find Your Perfect Match <FiArrowRight size={16} />
+                            <Link to="/combo-set" className="btn btn-outline btn-lg">
+                                Build Your Signature Trio <FiArrowRight size={16} />
                             </Link>
                         </motion.div>
                     </div>

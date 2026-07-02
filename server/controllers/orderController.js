@@ -96,8 +96,8 @@ export const createOrder = async (req, res, next) => {
         // Free shipping above ₹799, else ₹49 flat
         const shippingPrice = itemsPrice >= 799 ? 0 : 49;
 
-        // COD extra charge ₹50
-        const codCharge = paymentMethod === 'cod' ? 50 : 0;
+        // COD extra charge (currently free)
+        const codCharge = paymentMethod === 'cod' ? 0 : 0;
 
         // Combo discount: 3+ items = ₹400, 2 items = ₹200
         const totalQty = verifiedItems.reduce((sum, item) => sum + item.quantity, 0);

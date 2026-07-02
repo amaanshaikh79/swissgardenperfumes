@@ -9,7 +9,6 @@ const STATIC_ROUTES = [
     '/shop',
     '/combo-set',
     '/gifting',
-    '/fragrance-finder',
     '/pairing-guide',
     '/about',
     '/contact',

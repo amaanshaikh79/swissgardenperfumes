@@ -88,8 +88,8 @@ export const CartProvider = ({ children }) => {
 
     const comboDiscount = getComboDiscount();
 
-    // COD extra charge ₹50
-    const codCharge = 50;
+    // COD extra charge (currently free)
+    const codCharge = 0;
 
     const orderTotal = Math.max(0, cartTotal + shippingAmount - comboDiscount);
 

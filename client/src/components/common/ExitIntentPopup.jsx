@@ -90,7 +90,7 @@ const ExitIntentPopup = () => {
 
                         <div className="exit-popup-grid">
                             <div className="exit-popup-image">
-                                <LazyImage src="/Images/Swiss%20Flora.webp" alt="SwissGarden Perfume" />
+                                <LazyImage src="/Images/Combo%20Set.png" alt="SwissGarden Perfume" priority={true} useThumbnail={false} />
                             </div>
                             <div className="exit-popup-details">
                                 <div className="exit-icon-wrap">

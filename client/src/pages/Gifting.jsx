@@ -69,7 +69,12 @@ const Gifting = () => {
                         >
                             <div className="gifting-prop-visual">
                                 <div className="gifting-case-image">
-                                    <LazyImage src="/Images/Swiss%20Flora.webp" alt="Signature Trio Gift Case" />
+                                    <LazyImage 
+                                        src="/Images/Combo%20Set.png" 
+                                        alt="Signature Trio Gift Case"
+                                        priority={true}
+                                        useThumbnail={false}
+                                    />
                                 </div>
                             </div>
                             <div className="gifting-prop-text">
@@ -215,7 +220,12 @@ const Gifting = () => {
                                 </div>
                                 <div className="gifting-showcase-item">
                                     <div className="gifting-showcase-image">
-                                        <LazyImage src="/Images/Swiss%20Flora.webp" alt="Emerald Gift Case" />
+                                        <LazyImage 
+                                            src="/Images/Combo%20Set.png" 
+                                            alt="Emerald Gift Case"
+                                            priority={true}
+                                            useThumbnail={false}
+                                        />
                                     </div>
                                     <h4>Emerald Gift Case</h4>
                                     <p>Deep emerald with gold foil detailing</p>

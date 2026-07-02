@@ -13,14 +13,9 @@ const About = () => {
             desc: 'Six precision roll-on fragrances. Non-alcoholic. Concentrated. The vocabulary of a larger language we are building.',
         },
         {
-            icon: <FiGlobe size={24} />,
-            title: 'Eau de Parfum Line',
-            desc: 'Full-spectrum spray fragrances for the moments that demand more presence.',
-        },
-        {
             icon: <FiLayers size={24} />,
             title: 'The Layering Matrix',
-            desc: 'A system of six fragrances engineered to create over 100 distinct combinations. Your own personal perfume laboratory.',
+            desc: 'A system of six fragrances engineered to create distinct combination with our first roll-on collection.',
         },
     ];
 
@@ -54,7 +49,7 @@ const About = () => {
             icon: <FiZap size={26} />,
             number: '04',
             title: 'Innovation as Identity',
-            desc: 'The Layering Matrix. The Eau de Parfum line. Every phase of Swiss Garden Perfumes pushes what Indian fragrance can be. We are not following the market. We are building it.',
+            desc: 'The Layering Matrix. Every phase of Swiss Garden Perfumes pushes what Indian fragrance can be. We are not following the market. We are building it.',
         },
     ];
 
@@ -182,7 +177,7 @@ const About = () => {
                             <motion.div className="about-pillar-card" initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.3 }}>
                                 <span className="about-pillar-num">04</span>
                                 <h3 className="about-pillar-title">Accessibility</h3>
-                                <p className="about-pillar-desc">Precision does not require a premium import price. Swiss Garden Perfumes sits at the affordable luxury tier — ₹499 per attar, ₹1,499 for the Signature Trio — because we believe quality of formulation should not be gated by margin structures.</p>
+                                <p className="about-pillar-desc">Precision does not require a premium import price. Swiss Garden Perfumes sits at the affordable luxury tier — ₹799 per attar, ₹2,397 for the Signature Trio — because we believe quality of formulation should not be gated by margin structures.</p>
                             </motion.div>
                         </div>
 
@@ -221,30 +216,6 @@ const About = () => {
                                     <div className="about-sustain-icon">{chapter.icon}</div>
                                     <h3>{chapter.title}</h3>
                                     <p>{chapter.desc}</p>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* ─── Behind the Scenes Gallery ──────────────── */}
-                <section className="about-gallery section section-gray">
-                    <div className="container">
-                        <div className="section-header">
-                            <span className="section-label">Behind the Scenes</span>
-                            <h2 className="section-title">Where the Magic Happens</h2>
-                        </div>
-                        <div className="about-gallery-grid">
-                            {gallery.map((img, i) => (
-                                <motion.div
-                                    key={i}
-                                    className="about-gallery-item"
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    whileInView={{ opacity: 1, scale: 1 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: i * 0.1 }}
-                                >
-                                    <LazyImage src={img} alt={`Behind the scenes ${i + 1}`} />
                                 </motion.div>
                             ))}
                         </div>
@@ -397,8 +368,8 @@ const About = () => {
                                 <Link to="/shop" className="btn btn-white btn-lg">
                                     Shop the Collection <FiArrowRight size={16} />
                                 </Link>
-                                <Link to="/fragrance-finder" className="btn btn-outline-light btn-lg">
-                                    Find Your Scent <FiArrowRight size={16} />
+                                <Link to="/combo-set" className="btn btn-outline-light btn-lg">
+                                    Build Your Trio <FiArrowRight size={16} />
                                 </Link>
                             </div>
                         </motion.div>

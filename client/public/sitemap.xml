@@ -8,7 +8,6 @@
     <url><loc>https://swissgardenperfumes.vercel.app/shop</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
     <url><loc>https://swissgardenperfumes.vercel.app/combo-set</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
     <url><loc>https://swissgardenperfumes.vercel.app/gifting</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-    <url><loc>https://swissgardenperfumes.vercel.app/fragrance-finder</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
     <url><loc>https://swissgardenperfumes.vercel.app/pairing-guide</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
     <url><loc>https://swissgardenperfumes.vercel.app/about</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
     <url><loc>https://swissgardenperfumes.vercel.app/contact</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>

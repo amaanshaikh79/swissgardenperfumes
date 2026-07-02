@@ -118,7 +118,7 @@ function App() {
                         <Route path="/forgot-password" element={<ForgotPassword />} />
                         <Route path="/reset-password/:token" element={<ResetPassword />} />
                         <Route path="/about" element={<About />} />
-                        <Route path="/fragrance-finder" element={<FragranceFinder />} />
+                        {/* <Route path="/fragrance-finder" element={<FragranceFinder />} /> */}
                         <Route path="/contact" element={<Contact />} />
                         <Route path="/shipping-policy" element={<ShippingPolicy />} />
                         <Route path="/return-policy" element={<ReturnPolicy />} />

@@ -128,7 +128,9 @@ const Home = () => {
         { name: 'Sneha R.', location: 'Hyderabad', rating: 4, text: 'The scent profile is incredibly close to the inspirations. Reordered within a week.', tag: 'Verified Purchase' },
     ];
 
-    const bestsellers = featured.length > 0 ? featured : [];
+    const bestsellers = allProducts.filter(p => 
+        p.name === 'Citrus Reverie' || p.name === 'Royal Ascent'
+    );
     const carouselMax = Math.max(0, bestsellers.length - 4);
     const nextSlide = () => setCarouselIndex((prev) => Math.min(prev + 1, carouselMax));
     const prevSlide = () => setCarouselIndex((prev) => Math.max(prev - 1, 0));
@@ -209,7 +211,6 @@ const Home = () => {
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.8, delay: 1.2 }}
                     >
-                        SCROLL TO DISCOVER
                         <div className="scroll-line"></div>
                     </motion.div>
 
@@ -222,8 +223,8 @@ const Home = () => {
                         <Link to="/shop" className="btn btn-light btn-lg">
                             EXPLORE COLLECTION
                         </Link>
-                        <Link to="/fragrance-finder" className="btn btn-outline-light btn-lg">
-                            FIND YOUR SCENT
+                        <Link to="/combo-set" className="btn btn-outline-light btn-lg">
+                            BUILD YOUR TRIO
                         </Link>
                     </motion.div>
                 </motion.div>
@@ -260,6 +261,38 @@ const Home = () => {
                     >
                         This is not a shelf fragrance. This is yours.
                     </motion.p>
+                </div>
+            </section>
+
+            {/* ─── Combo Set Video Section ──────────────────────────── */}
+            <section className="home-combo-video-section">
+                <div className="home-combo-video-bg">
+                    <LazyVideo
+                        src="/Video/Combo%20Set.mov"
+                        className="home-combo-video"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                    />
+                    <div className="home-combo-video-overlay"></div>
+                </div>
+                <div className="container">
+                    <motion.div
+                        className="home-combo-video-content"
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: '-100px' }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <h2 className="home-combo-video-title">Build Your Signature Trio</h2>
+                        <p className="home-combo-video-text">
+                            Choose any three attars from The Mood Collection. Layer them, wear them individually, or create your own unique combination. Presented in our signature emerald gift case.
+                        </p>
+                        <Link to="/combo-set" className="btn btn-light btn-lg">
+                            Explore Combo Sets <FiArrowRight size={16} />
+                        </Link>
+                    </motion.div>
                 </div>
             </section>
 
@@ -304,27 +337,6 @@ const Home = () => {
                             </p>
                         </motion.div>
                     </div>
-                </div>
-            </section>
-
-            {/* ─── Collection Preview Banner ───────────────────────── */}
-            <section className="home-collection-banner section">
-                <div className="container-sm">
-                    <motion.div
-                        className="home-collection-banner-inner"
-                        initial={{ opacity: 0, y: 40 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: '-80px' }}
-                        transition={{ duration: 0.8 }}
-                    >
-                        <h2 className="home-collection-banner-title">Six Attars. Every Mood.</h2>
-                        <p className="home-collection-banner-text">
-                            From the cool clarity of Glacier Splash to the commanding warmth of Royal Ascent — each fragrance in The Mood Collection is a complete expression. Wear one. Layer two. Make the combination yours.
-                        </p>
-                        <Link to="/shop" className="btn btn-accent btn-lg home-collection-banner-cta">
-                            Explore The Collection <FiArrowRight size={16} />
-                        </Link>
-                    </motion.div>
                 </div>
             </section>
 
@@ -408,7 +420,7 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* ─── Trio / Gifting Teaser ───────────────────────────── */}
+            {/* ─── Combo Sets / Layering Section ───────────────────────────── */}
             <section className="home-trio-teaser section">
                 <div className="container-sm">
                     <motion.div
@@ -418,13 +430,22 @@ const Home = () => {
                         viewport={{ once: true, margin: '-80px' }}
                         transition={{ duration: 0.8 }}
                     >
-                        <h2 className="home-trio-teaser-title">Choose Three. Call It Yours.</h2>
+                        <h2 className="home-trio-teaser-title">Build Your Signature Trio</h2>
                         <p className="home-trio-teaser-text">
-                            The Signature Trio lets you build a personal fragrance wardrobe from any three attars in the collection. Gift it. Keep it. Own it completely.
+                            The Signature Trio is a personal fragrance system — three precision attars, selected by you, engineered to work individually and in concert. Wear one for a clean presence. Layer two for depth. Use all three for a scent that is entirely yours.
                         </p>
-                        <Link to="/fragrance-finder" className="btn btn-outline btn-lg home-trio-teaser-cta">
-                            Build Your Trio <FiArrowRight size={16} />
-                        </Link>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', marginTop: '2rem' }}>
+                            <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                                <span>ANY 3 ATTARS</span>
+                                <span>·</span>
+                                <span>₹2,397</span>
+                                <span>·</span>
+                                <span>EMERALD GIFT CASE</span>
+                            </div>
+                            <Link to="/combo-set" className="btn btn-accent btn-lg home-trio-teaser-cta">
+                                Explore Combo Sets <FiArrowRight size={16} />
+                            </Link>
+                        </div>
                     </motion.div>
                 </div>
             </section>
@@ -437,22 +458,25 @@ const Home = () => {
                         <h2 className="section-title">Curated for Every Mood</h2>
                     </div>
                     <div className="home-spotlight-grid">
-                        {spotlightCollections.map((col, i) => (
+                        {allProducts.map((product, i) => (
                             <motion.div
-                                key={col.name}
+                                key={product._id}
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: i * 0.15, duration: 0.6 }}
+                                transition={{ delay: i * 0.1, duration: 0.6 }}
                             >
-                                <Link to={col.link} className="home-spotlight-card">
+                                <Link to={`/product/${product.slug}`} className="home-spotlight-card">
                                     <div className="home-spotlight-image">
-                                        <LazyImage src={col.image} alt={col.name} />
+                                        <LazyImage 
+                                            src={product.images?.[0]?.url || '/Images/placeholder.webp'} 
+                                            alt={product.name} 
+                                        />
                                         <div className="home-spotlight-overlay" />
                                     </div>
                                     <div className="home-spotlight-info">
-                                        <h3>{col.name}</h3>
-                                        <p>{col.mood}</p>
+                                        <h3>{product.name}</h3>
+                                        <p>{product.shortDescription?.split('.')[0]}.</p>
                                         <span className="home-spotlight-link">
                                             Explore <FiArrowRight size={14} />
                                         </span>
@@ -508,69 +532,6 @@ const Home = () => {
                         <Link to="/shop" className="btn btn-outline btn-lg">
                             View All Fragrances <FiArrowRight size={16} />
                         </Link>
-                    </div>
-                </div>
-            </section>
-
-            {/* ─── Newsletter + Fragrance Quiz Teaser ────────────── */}
-            <section className="home-newsletter section">
-                <div className="container-sm">
-                    <div className="home-newsletter-grid">
-                        <motion.div
-                            className="home-newsletter-content"
-                            initial={{ opacity: 0, x: -30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6 }}
-                        >
-                            <span className="section-label">Stay Close</span>
-                            <h2 className="home-newsletter-title">
-                                Get <span className="home-newsletter-highlight">10% OFF</span> Your First Order
-                            </h2>
-                            <p className="home-newsletter-desc">
-                                Join 15,000+ fragrance lovers. Receive exclusive launches, behind-the-scenes stories, and early access.
-                            </p>
-                            {emailSubmitted ? (
-                                <div className="email-capture-success">
-                                    <FiCheck size={20} />
-                                    <span>Welcome! Check your email for your discount code.</span>
-                                </div>
-                            ) : (
-                                <form className="home-newsletter-form" onSubmit={handleEmailSubmit}>
-                                    <input
-                                        type="email"
-                                        className="form-input"
-                                        placeholder="Your email address"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        required
-                                    />
-                                    <button type="submit" className="btn btn-primary">
-                                        Subscribe <FiSend size={14} />
-                                    </button>
-                                </form>
-                            )}
-                            <p className="home-newsletter-privacy">No spam. Unsubscribe anytime.</p>
-                        </motion.div>
-
-                        <motion.div
-                            className="home-quiz-teaser"
-                            initial={{ opacity: 0, x: 30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: 0.15 }}
-                        >
-                            <div className="home-quiz-card">
-                                <span className="home-quiz-emoji">&#x1F9ED;</span>
-                                <h3 className="home-quiz-title">Not sure where to start?</h3>
-                                <p className="home-quiz-desc">
-                                    Take our 2-minute Fragrance Finder quiz and discover the scents made for your personality.
-                                </p>
-                                <Link to="/fragrance-finder" className="btn btn-accent btn-lg btn-block">
-                                    Take the Quiz <FiArrowRight size={16} />
-                                </Link>
-                            </div>
-                        </motion.div>
                     </div>
                 </div>
             </section>

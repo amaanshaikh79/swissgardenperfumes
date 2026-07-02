@@ -24,7 +24,7 @@ const PAYMENT_METHODS = [
         id: 'cod',
         label: 'Cash on Delivery',
         icon: <FiTruck size={22} />,
-        desc: 'Pay when delivered (+₹50 COD charge)',
+        desc: 'Pay when delivered (No extra charges)',
     },
     {
         id: 'razorpay',

@@ -427,6 +427,12 @@
 .about-sustain-card {
     text-align: center;
     padding: var(--space-2xl) var(--space-lg);
+    position: relative;
+}
+
+/* Remove any potential special styling for middle card */
+.about-sustain-card:nth-child(2) {
+    /* Ensure no special styling */
 }
 
 .about-sustain-icon {

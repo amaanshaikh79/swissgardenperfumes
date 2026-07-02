@@ -43,7 +43,7 @@ const Footer = () => {
 
                         {/* Policies */}
                         <div className="footer-section">
-                            <h4 className="footer-heading">Customer Care</h4>
+                            <h4 className="footer-heading">Information</h4>
                             <Link to="/shipping-policy" className="footer-link">Shipping Policy</Link>
                             <Link to="/return-policy" className="footer-link">Return Policy</Link>
                             <Link to="/privacy-policy" className="footer-link">Privacy Policy</Link>

@@ -142,8 +142,8 @@ ${catalog}
 
 STORE POLICIES:
 - Products: 10 ml roll-on attars, non-alcoholic, 8–12 hr longevity
-- Combo deal: any 3 for ₹1,499 (~₹1,000 savings)
-- Fragrance Finder quiz: /fragrance-finder
+- Combo deal: any 3 for ₹2,397 (save ₹200), presented in emerald gift case
+- Build Your Trio: /combo-set
 - Shipping: free on prepaid ₹200+; COD under ₹200 = ₹15 extra; processing 1–2 days; delivery 3–10 days
 - Returns: 7-day return for damaged/wrong items (unused & sealed); contact support with order ID + photos
 - Payment: Razorpay (cards, UPI, net banking) or Cash on Delivery

@@ -14,8 +14,8 @@ const ComboSet = () => {
     const [loading, setLoading] = useState(true);
     const { addToCart } = useCart();
 
-    const COMBO_PRICE = 1499;
-    const SINGLE_PRICE = 499;
+    const COMBO_PRICE = 2397;
+    const SINGLE_PRICE = 799;
     const SAVINGS = (SINGLE_PRICE * 3) - COMBO_PRICE;
 
     useEffect(() => {
@@ -88,7 +88,7 @@ const ComboSet = () => {
         <>
             <Helmet>
                 <title>Build Your Signature Trio | SwissGarden Perfumes</title>
-                <meta name="description" content="Create your personal fragrance system. Choose any 3 precision attars for ₹1,499. Presented in The Mood Collection emerald gift case with gold foil detailing." />
+                <meta name="description" content="Create your personal fragrance system. Choose any 3 precision attars for ₹2,397. Presented in The Mood Collection emerald gift case with gold foil detailing." />
             </Helmet>
 
             <div className="combo-page">
@@ -96,7 +96,7 @@ const ComboSet = () => {
                 <section className="combo-hero">
                     <div className="combo-hero-bg">
                         <LazyVideo
-                            src="/Video/Swiss%20Flora.mp4"
+                            src="/Video/Combo%20Set.mov"
                             className="combo-hero-video"
                             autoPlay
                             loop
@@ -165,7 +165,7 @@ const ComboSet = () => {
                         <div className="combo-add-section">
                             <div className="combo-price-info">
                                 <div className="combo-price-main">₹{COMBO_PRICE.toLocaleString('en-IN')}</div>
-                                <div className="combo-price-detail">₹499 × 3</div>
+                                <div className="combo-price-detail">₹{SINGLE_PRICE} × 3</div>
                             </div>
                             <button
                                 className={`btn btn-primary btn-lg combo-add-btn ${!canAddToCart ? 'disabled' : ''}`}
@@ -290,7 +290,7 @@ const ComboSet = () => {
                                 <div className="combo-feature">EMERALD GIFT CASE</div>
                                 <div className="combo-feature">INDIVIDUAL BOXES</div>
                                 <div className="combo-feature">GOLD FOIL DETAILS</div>
-                                <div className="combo-feature">₹1,499 · ₹499 × 3</div>
+                                <div className="combo-feature">₹2,397 · ₹799 × 3</div>
                             </div>
                         </motion.div>
                     </div>

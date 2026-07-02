@@ -9,7 +9,9 @@
         "dev": "nodemon -r dotenv/config server.js",
         "seed": "node seeds/seed.js",
         "make-admin": "node scripts/makeAdmin.js",
-        "clean-api-images": "node scripts/cleanApiImages.js"
+        "clean-api-images": "node scripts/cleanApiImages.js",
+        "update-prices": "node scripts/updatePrices.js",
+        "update-genders": "node scripts/updateGenders.js"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",

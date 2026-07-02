@@ -13,11 +13,11 @@ const products = [
         brand: 'Swiss Garden Perfumes',
         description:
             "For the one who doesn't need to announce himself. There is a kind of confidence that doesn't speak. It simply stands in the room and lets the room adjust. Alpine Savage was built for that person. Above the treeline, where the air loses its softness and becomes something honest — cold, mineral, alive — that is where this fragrance begins. It opens with the sharpness of frozen alpine air and dark wood, the kind of wood that has survived decades of mountain winters and grown stronger for it. As it settles into your skin, something deeper emerges. A warmth underneath the cold. A quiet intensity that refuses to fade. This is not a fragrance that tries to please everyone. It was never meant to. It was built for the person who has stopped trying to please everyone — and found, in that decision, a particular kind of freedom.",
-        shortDescription: 'Bold woody masculine roll-on attar. Commands attention effortlessly. 10ml · Non-Alcoholic · Long Lasting · ₹499.',
-        metaDescription: 'Alpine Savage by Swiss Garden Perfumes — luxury non-alcoholic roll-on attar for men. Woody, dark, long-lasting. 10ml. ₹499.',
+        shortDescription: 'Bold woody masculine roll-on attar. Commands attention effortlessly. 10ml · Non-Alcoholic · Long Lasting · ₹799.',
+        metaDescription: 'Alpine Savage by Swiss Garden Perfumes — luxury non-alcoholic roll-on attar for men. Woody, dark, long-lasting. 10ml. ₹799.',
         wearFor: 'Evening. The first impression that becomes a lasting one. Every moment you walk into a room and need it to know you were there.',
         layeringStory: 'Alpine Savage is the foundation. The anchor. Layer it beneath Glacier Splash for a cold-water sharpness. Pair it with Royal Ascent for something deep beyond naming.',
-        price: 499,
+        price: 799,
         images: [
             { url: '/Images/Alpine%20Savage.webp', alt: 'Alpine Savage - Main View' },
             { url: '/Images/Alpine%20Savage(2).webp', alt: 'Alpine Savage - Hover View' },
@@ -28,9 +28,9 @@ const products = [
         gender: 'Men',
         size: '10ml',
         fragranceNotes: {
-            top: ['Frozen Alpine Air', 'Dark Wood', 'Cold Mineral'],
-            middle: ['Aged Wood', 'Mountain Accord', 'Dark Resin'],
-            base: ['Warm Amber', 'Deep Musk', 'Earthy Vetiver'],
+            top: ['Fresh Spicy', 'Amber', 'Citrus'],
+            middle: ['Aromatic', 'Musky', 'Woody'],
+            base: ['Lavender', 'Herbal', 'Warm Spicy'],
         },
         fragranceFamily: 'Woody',
         stock: 100,
@@ -49,7 +49,7 @@ const products = [
             { name: 'Royal Ascent', slug: 'royal-ascent', description: 'Layer at the collar for a commanding formal presence' },
             { name: 'Blue Dominion', slug: 'blue-dominion', description: 'Apply on the wrist for a bold-fresh contrast' },
         ],
-        format: '10ml · Non-Alcoholic · Roll-On Attar · ₹499',
+        format: '10ml · Non-Alcoholic · Roll-On Attar · ₹799',
     },
 
     // ── 02 BLUE DOMINION ─────────────────────────────────────────────────────
@@ -58,11 +58,11 @@ const products = [
         brand: 'Swiss Garden Perfumes',
         description:
             "The quiet kind of confidence. The kind that doesn't explain itself.\n\nBlue Dominion opens with a fresh-spice and amber accord — modern, versatile, effortless. It is the fragrance for those who do not dress for the occasion so much as they make the occasion theirs. The opening is confident without being aggressive.\n\nA woody-musky core gives Blue Dominion its staying power and its depth. This is the fragrance that someone describes as \"clean but interesting\" — because the heart delivers both.\n\nWarm spice settles the composition — not demanding, but present. Blue Dominion closes with the quiet authority of someone who knows they have already made their impression.",
-        shortDescription: 'Confident, fresh, modern luxury roll-on attar. Makes every occasion yours. 10ml · Non-Alcoholic · Long Lasting · ₹499.',
-        metaDescription: 'Blue Dominion by Swiss Garden Perfumes — modern fresh-woody non-alcoholic roll-on attar. Confident, versatile, long-lasting. 10ml. ₹499.',
+        shortDescription: 'Confident, fresh, modern luxury roll-on attar. Makes every occasion yours. 10ml · Non-Alcoholic · Long Lasting · ₹799.',
+        metaDescription: 'Blue Dominion by Swiss Garden Perfumes — modern fresh-woody non-alcoholic roll-on attar. Confident, versatile, long-lasting. 10ml. ₹799.',
         wearFor: 'Everyday wear, office, casual outings, dates. Modern confidence that doesn\'t explain itself.',
         layeringStory: 'Layer with Alpine Savage at the collar for a bold-masculine statement, or with Glacier Splash on the wrist for a modern fresh-woody everyday pairing.',
-        price: 499,
+        price: 799,
         images: [
             { url: '/Images/Blue%20Dominion.webp', alt: 'Blue Dominion - Main View' },
             { url: '/Images/Blue%20Dominion(2).webp', alt: 'Blue Dominion - Hover View' },
@@ -73,9 +73,9 @@ const products = [
         gender: 'Men',
         size: '10ml',
         fragranceNotes: {
-            top: ['Fresh Spice', 'Amber', 'Aromatic Accord'],
-            middle: ['Woody', 'Musky', 'Herbal'],
-            base: ['Warm Spice', 'Deep Amber', 'Clean Musk'],
+            top: ['Woody', 'Citrus', 'Aromatic'],
+            middle: ['Amber', 'Fresh Spicy', 'Powdery'],
+            base: ['Warm Spicy', 'Green', 'Lavender'],
         },
         fragranceFamily: 'Woody',
         stock: 100,
@@ -94,7 +94,7 @@ const products = [
             { name: 'Alpine Savage', slug: 'alpine-savage', description: 'Layer at the collar for a bold-masculine statement' },
             { name: 'Glacier Splash', slug: 'glacier-splash', description: 'Apply on the wrist for a modern fresh-woody everyday pairing' },
         ],
-        format: '10ml · Non-Alcoholic · Roll-On Attar · ₹499',
+        format: '10ml · Non-Alcoholic · Roll-On Attar · ₹799',
     },
 
     // ── 03 CITRUS REVERIE ────────────────────────────────────────────────────
@@ -104,10 +104,10 @@ const products = [
         description:
             "Citrus Reverie opens the way the best mornings do — bright, clean, effortlessly optimistic. The citrus top note is vivid without being sharp, fresh without the synthetic edge that lesser formulas cannot avoid. It is the opening that makes someone in the same room ask what you are wearing. The heart drifts into herbal and musky warmth — the brightness becomes something more grounded, more considered. The base is warm and approachable — not demanding, not loud. The kind of scent that makes the end of a long day feel like the right place to be.",
         shortDescription: '"The scent of a morning that already has the answer."',
-        metaDescription: 'Citrus Reverie by Swiss Garden Perfumes — fresh unisex non-alcoholic roll-on attar. Bright citrus, warm base, long-lasting. 10ml. ₹499.',
+        metaDescription: 'Citrus Reverie by Swiss Garden Perfumes — fresh unisex non-alcoholic roll-on attar. Bright citrus, warm base, long-lasting. 10ml. ₹799.',
         wearFor: 'Mornings, casual days, travel, gifting',
         layeringStory: 'Pair with Glacier Splash on opposing pulse points for a fresh-bright daytime combination, or layer Swiss Flora at the wrist for a floral-citrus lift.',
-        price: 499,
+        price: 799,
         images: [
             { url: '/Images/Citrus%20Reverie.webp', alt: 'Citrus Reverie - Main View' },
             { url: '/Images/Citrus%20Reverie(2).webp', alt: 'Citrus Reverie - Hover View' },
@@ -115,12 +115,12 @@ const products = [
         ],
         video: '/Video/Citrus%20Reverie.mp4',
         category: 'Attar',
-        gender: 'Unisex',
+        gender: 'Women',
         size: '10ml',
         fragranceNotes: {
-            top: ['Vivid Citrus', 'Fresh Accord', 'Aromatic Lift'],
-            middle: ['Herbal', 'Musky', 'Light Woody'],
-            base: ['Warm Spice', 'Soft Amber'],
+            top: ['Citrus', 'Fresh'],
+            middle: ['Fresh Spicy', 'Green'],
+            base: ['Amber'],
         },
         fragranceFamily: 'Citrus',
         stock: 100,
@@ -139,7 +139,7 @@ const products = [
             { name: 'Glacier Splash', slug: 'glacier-splash', description: 'Pair on opposing pulse points for a fresh-bright daytime combination' },
             { name: 'Swiss Flora', slug: 'swiss-flora', description: 'Layer at the wrist for a floral-citrus lift' },
         ],
-        format: '10ml · Non-Alcoholic · Roll-On Attar · ₹499',
+        format: '10ml · Non-Alcoholic · Roll-On Attar · ₹799',
     },
 
     // ── 04 ROYAL ASCENT ──────────────────────────────────────────────────────
@@ -149,10 +149,10 @@ const products = [
         description:
             "Royal Ascent opens with the measured confidence of someone who does not need to raise their voice. A citrus-aromatic accord — precise, structured, instantly recognisable as deliberate — announces a scent that knows exactly what it is. The heart is where the timelessness lives: lavender and herbal notes with a classical refinement that does not age. Warm spice anchors the composition — grounding the elegance, ensuring the scent closes with the same authority with which it opened.",
         shortDescription: '"Worn by those who have already arrived."',
-        metaDescription: 'Royal Ascent by Swiss Garden Perfumes — premium classic aromatic non-alcoholic roll-on attar. Refined, commanding, timeless. 10ml. ₹499.',
+        metaDescription: 'Royal Ascent by Swiss Garden Perfumes — premium classic aromatic non-alcoholic roll-on attar. Refined, commanding, timeless. 10ml. ₹799.',
         wearFor: 'Office, formal occasions, board meetings, celebrations',
         layeringStory: 'Layer with Alpine Savage for formal evening occasions requiring maximum presence, or with Swiss Flora for a refined day-to-evening transition.',
-        price: 499,
+        price: 799,
         images: [
             { url: '/Images/Royal%20Ascent.webp', alt: 'Royal Ascent - Main View' },
             { url: '/Images/Royal%20Ascent(2).webp', alt: 'Royal Ascent - Hover View' },
@@ -163,9 +163,9 @@ const products = [
         gender: 'Unisex',
         size: '10ml',
         fragranceNotes: {
-            top: ['Citrus', 'Aromatic Accord', 'Fresh Spice'],
-            middle: ['Lavender', 'Herbal', 'Musky'],
-            base: ['Warm Spice', 'Amber', 'Woody Depth'],
+            top: ['Leather', 'Fruity', 'Sweet'],
+            middle: ['Woody', 'Citrus', 'Smoky'],
+            base: ['Musky', 'Fresh', 'Tropical'],
         },
         fragranceFamily: 'Oriental',
         stock: 100,
@@ -184,7 +184,7 @@ const products = [
             { name: 'Alpine Savage', slug: 'alpine-savage', description: 'Layer for formal evening occasions requiring maximum presence' },
             { name: 'Swiss Flora', slug: 'swiss-flora', description: 'Pair for a refined day-to-evening transition' },
         ],
-        format: '10ml · Non-Alcoholic · Roll-On Attar · ₹499',
+        format: '10ml · Non-Alcoholic · Roll-On Attar · ₹799',
     },
 
     // ── 05 SWISS FLORA ───────────────────────────────────────────────────────
@@ -193,11 +193,11 @@ const products = [
         brand: 'Swiss Garden Perfumes',
         description:
             "Elegance does not announce itself. It is simply present.\n\nSwiss Flora opens with aromatic clarity — a citrus-herbal accord that is immediately refined, immediately feminine without being delicate. There is structure here from the first note.\n\nThe heart is where Swiss Flora earns its name: lavender and herbal florals in a composition that is not overwhelming, not shy, but precise. Each note occupies its space without competing. This is what formulated elegance smells like.\n\nA soft warm-spice base — the florals settle, the fragrance becomes quieter, closer to the skin. Swiss Flora in its base note is a secret shared between the wearer and whoever stands close enough to notice.",
-        shortDescription: 'Elegant, floral, serene luxury roll-on attar. Refined without being delicate. 10ml · Non-Alcoholic · Long Lasting · ₹499.',
-        metaDescription: 'Swiss Flora by Swiss Garden Perfumes — premium floral non-alcoholic roll-on attar for women. Warm, romantic, long-lasting. 10ml. ₹499. Perfect gift.',
+        shortDescription: 'Elegant, floral, serene luxury roll-on attar. Refined without being delicate. 10ml · Non-Alcoholic · Long Lasting · ₹799.',
+        metaDescription: 'Swiss Flora by Swiss Garden Perfumes — premium floral non-alcoholic roll-on attar for women. Warm, romantic, long-lasting. 10ml. ₹799. Perfect gift.',
         wearFor: 'Formal gifting, celebrations, evenings, special occasions. Elegant presence without announcement.',
         layeringStory: 'Layer with Royal Ascent for Garden Royale — floral-dark contrast that is romantic and authoritative simultaneously. Pair with Citrus Reverie for warmth and brightness like a garden in peak summer.',
-        price: 499,
+        price: 799,
         images: [
             { url: '/Images/Swiss%20Flora.webp', alt: 'Swiss Flora - Main View' },
             { url: '/Images/Swiss%20Flora(2).webp', alt: 'Swiss Flora - Hover View' },
@@ -205,12 +205,12 @@ const products = [
         ],
         video: '/Video/Swiss%20Flora.mp4',
         category: 'Attar',
-        gender: 'Unisex',
+        gender: 'Women',
         size: '10ml',
         fragranceNotes: {
-            top: ['Aromatic Citrus', 'Fresh Herbal', 'Light Spice'],
-            middle: ['Lavender', 'Floral Accord', 'Herbal Depth'],
-            base: ['Warm Spice', 'Soft Amber', 'Light Musk'],
+            top: ['Flora', 'Citrus', 'Fresh'],
+            middle: ['Rose', 'Fruity', 'Woody'],
+            base: ['Patchouli', 'Warm Spicy'],
         },
         fragranceFamily: 'Floral',
         stock: 100,
@@ -229,7 +229,7 @@ const products = [
             { name: 'Royal Ascent', slug: 'royal-ascent', description: 'Layer for Garden Royale — floral-dark contrast that is both romantic and authoritative' },
             { name: 'Citrus Reverie', slug: 'citrus-reverie', description: 'Pair for warmth and brightness like a garden in peak summer' },
         ],
-        format: '10ml · Non-Alcoholic · Roll-On Attar · ₹499',
+        format: '10ml · Non-Alcoholic · Roll-On Attar · ₹799',
     },
 
     // ── 06 GLACIER SPLASH ────────────────────────────────────────────────────
@@ -239,10 +239,10 @@ const products = [
         description:
             "Glacier Splash opens with the kind of freshness that feels like a decision. Marine and minty top notes — clean, cool, immediate — not a soft suggestion but a definitive start. It is the fragrance of someone who already knows what the day requires. The heart softens into lavender-floral notes — the aquatic edge remains, but there is now warmth underneath it. Clean musk and amber close a composition that never loses its clarity.",
         shortDescription: '"Clarity, without compromise."',
-        metaDescription: 'Glacier Splash by Swiss Garden Perfumes — premium aquatic fresh non-alcoholic roll-on attar. Cool, revitalising, long-lasting. 10ml. ₹499.',
+        metaDescription: 'Glacier Splash by Swiss Garden Perfumes — premium aquatic fresh non-alcoholic roll-on attar. Cool, revitalising, long-lasting. 10ml. ₹799.',
         wearFor: 'Summer, morning routines, gym, travel, outdoor',
         layeringStory: 'Pair with Citrus Reverie for the lightest, brightest daytime pairing in the collection, or with Blue Dominion for a fresh-woody contrast that carries through the evening.',
-        price: 499,
+        price: 799,
         images: [
             { url: '/Images/Glacier%20Splash.webp', alt: 'Glacier Splash - Main View' },
             { url: '/Images/Glacier%20Splash(2).webp', alt: 'Glacier Splash - Hover View' },
@@ -253,9 +253,9 @@ const products = [
         gender: 'Unisex',
         size: '10ml',
         fragranceNotes: {
-            top: ['Marine Accord', 'Mint', 'Fresh Citrus'],
-            middle: ['Lavender', 'Floral', 'Light Aquatic'],
-            base: ['Clean Musk', 'Amber', 'Soft Wood'],
+            top: ['Aromatic', 'Green'],
+            middle: ['Marine', 'Fresh Spicy'],
+            base: ['Lavender', 'Woody', 'Salty'],
         },
         fragranceFamily: 'Aquatic',
         stock: 100,
@@ -274,7 +274,7 @@ const products = [
             { name: 'Citrus Reverie', slug: 'citrus-reverie', description: 'Pair for the lightest, brightest daytime pairing in the collection' },
             { name: 'Blue Dominion', slug: 'blue-dominion', description: 'Layer for a fresh-woody contrast that carries through the evening' },
         ],
-        format: '10ml · Non-Alcoholic · Roll-On Attar · ₹499',
+        format: '10ml · Non-Alcoholic · Roll-On Attar · ₹799',
     },
 ];
 

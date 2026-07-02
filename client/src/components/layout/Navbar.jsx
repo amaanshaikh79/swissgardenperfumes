@@ -104,9 +104,9 @@ const Navbar = () => {
             { label: 'Daily Wear', to: '/shop?occasion=Day' },
         ],
         'By Price': [
-            { label: 'Under ₹499', to: '/shop?maxPrice=499' },
-            { label: '₹500 – ₹999', to: '/shop?minPrice=500&maxPrice=999' },
-            { label: '₹1,000+', to: '/shop?minPrice=1000' },
+            { label: 'Under ₹799', to: '/shop?maxPrice=799' },
+            { label: '₹800 – ₹1,999', to: '/shop?minPrice=800&maxPrice=1999' },
+            { label: '₹2,000+', to: '/shop?minPrice=2000' },
         ],
     };
 

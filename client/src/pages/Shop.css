@@ -366,6 +366,14 @@
         min-height: 240px;
     }
 
+    .shop-hero-title {
+        font-size: 1.8rem;
+    }
+
+    .shop-hero-mood {
+        font-size: 0.9rem;
+    }
+
     .shop-overview-grid {
         grid-template-columns: 1fr;
         gap: var(--space-lg);
@@ -374,12 +382,40 @@
     .shop-filter-bar {
         flex-direction: row;
         justify-content: space-between;
+        gap: var(--space-sm);
+    }
+
+    .shop-sort {
+        flex-direction: row;
+        align-items: center;
     }
 
     .shop-sort-select {
         min-width: 130px;
+        font-size: 0.8rem;
     }
 
+    .shop-filters {
+        padding: var(--space-lg);
+    }
+
+    .filter-group {
+        gap: var(--space-sm);
+    }
+
+    .filter-chip {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .filter-price-range {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    .filter-price-range .form-input {
+        width: 100%;
+    }
 
     .shop-hover-notes {
         display: none;
@@ -388,11 +424,60 @@
     .shop-story {
         padding: var(--space-3xl) 0;
     }
+
+    .shop-story-title {
+        font-size: 1.5rem;
+    }
+
+    .shop-story-text {
+        font-size: 0.95rem;
+    }
+
+    .grid-products {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: var(--space-md);
+    }
 }
 
 @media (max-width: 480px) {
+    .shop-hero {
+        padding: var(--space-2xl) 0 var(--space-xl);
+        min-height: 200px;
+    }
+
+    .shop-hero-title {
+        font-size: 1.5rem;
+        line-height: 1.2;
+    }
+
+    .shop-hero-mood {
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+
+    .shop-filter-bar {
+        flex-wrap: wrap;
+        gap: var(--space-xs);
+    }
+
+    .shop-filter-bar-left {
+        flex: 1;
+    }
+
+    .shop-sort {
+        width: 100%;
+        margin-top: var(--space-sm);
+        justify-content: flex-end;
+    }
+
     .shop-sort label {
         display: none;
+    }
+
+    .shop-sort-select {
+        min-width: 100px;
+        font-size: 0.75rem;
+        padding: 0.4rem 1.5rem 0.4rem 0.6rem;
     }
 
     .shop-header .section-title {
@@ -410,11 +495,36 @@
         font-size: 0.78rem;
     }
 
+    .shop-pagination {
+        gap: var(--space-xs);
+    }
+
     .shop-filters {
         padding: var(--space-md);
     }
 
     .shop-container {
         padding-top: var(--space-md);
+    }
+
+    .shop-story-title {
+        font-size: 1.3rem;
+    }
+
+    .shop-story-text {
+        font-size: 0.9rem;
+    }
+
+    .grid-products {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: var(--space-sm);
+    }
+
+    .shop-empty {
+        padding: var(--space-2xl) var(--space-md);
+    }
+
+    .shop-empty h3 {
+        font-size: 1.1rem;
     }
 }
