@@ -70,7 +70,6 @@ const products = [
             { url: '/Images/Blue%20Dominion(3).webp', alt: 'Blue Dominion - Alternate View' },
             { url: '/Images/Blue%20Dominion(4).png', alt: 'Blue Dominion - Gallery View' },
         ],
-        ],
         video: '/Video/Blue%20Dominion.mp4',
         category: 'Attar',
         gender: 'Women',
