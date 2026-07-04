@@ -110,19 +110,19 @@ const faqSchema = () => ({
 // ─── Static route metadata ───────────────────────────────────────
 const STATIC_ROUTES = {
     '/': {
-        title: 'SwissGarden Perfumes — Luxury Inspired Scents at Smart Prices',
+        title: 'SwissGarden Perfumes — Premium Attars at Smart Prices',
         description:
-            'SwissGarden Perfumes — luxury-inspired, non-alcoholic roll-on attars crafted for everyday wear in India. Long-lasting fragrances starting at ₹799, Cash on Delivery available.',
+            'SwissGarden Perfumes — premium non-alcoholic roll-on attars crafted for everyday wear in India. Long-lasting fragrances starting at ₹799, Cash on Delivery available.',
     },
     '/shop': {
         title: 'Shop All Attars & Perfumes | SwissGarden Perfumes',
         description:
-            'Browse the full SwissGarden collection of non-alcoholic roll-on attars. Long-lasting, luxury-inspired fragrances for him, her, and unisex — from ₹799 with free prepaid shipping.',
+            'Browse the full SwissGarden collection of non-alcoholic roll-on attars. Long-lasting premium fragrances for him, her, and unisex — from ₹799 with free prepaid shipping.',
     },
     '/combo-set': {
-        title: 'Build Your Trio — Any 3 Attars for ₹1,499 | SwissGarden Perfumes',
+        title: 'Build Your Trio — Any 3 Attars for ₹2,397 | SwissGarden Perfumes',
         description:
-            'Create your own combo: pick any three SwissGarden attars for ₹1,499 and save. Mix moods and gift-ready roll-on fragrances crafted for the Indian climate.',
+            'Create your own combo: pick any three SwissGarden attars for ₹2,397 and save ₹200. Mix moods and gift-ready roll-on fragrances crafted for the Indian climate.',
     },
     '/gifting': {
         title: 'Perfume Gifting & Gift Sets | SwissGarden Perfumes',
@@ -332,7 +332,7 @@ export async function injectSeo(template, rawPath) {
     } else if (isNoindex(path)) {
         tags = buildTags({
             title: `SwissGarden Perfumes`,
-            description: 'SwissGarden Perfumes — luxury-inspired non-alcoholic attars crafted in India.',
+            description: 'SwissGarden Perfumes — premium non-alcoholic attars crafted in India.',
             canonical: `${SITE_URL}${path}`,
             robots: NOINDEX_ROBOTS,
         });

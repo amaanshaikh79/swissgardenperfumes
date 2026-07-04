@@ -139,7 +139,7 @@ const Home = () => {
         <>
             <Helmet>
                 <title>SwissGarden Perfumes — Luxury Crafted Fragrances | India</title>
-                <meta name="description" content="Artisan-crafted luxury fragrances inspired by iconic scents. Rare ingredients, Indian-climate tested. Discover your signature scent." />
+                <meta name="description" content="Artisan-crafted luxury fragrances. Premium ingredients, Indian-climate tested. Discover your signature scent." />
                 <link rel="canonical" href="https://swissgardenperfumes.com/" />
             </Helmet>
 
