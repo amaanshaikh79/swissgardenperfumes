@@ -94,6 +94,7 @@ const PairingGuide = () => {
             <Helmet>
                 <title>Scent Pairing Guide | SwissGarden Perfumes</title>
                 <meta name="description" content="Learn how to layer our attars. Six recommended combinations, layering techniques, and a complete pairing matrix for creating your signature scent." />
+                <link rel="canonical" href="https://swissgardenperfumes.com/pairing-guide" />
             </Helmet>
 
             <div className="pairing-guide-page">

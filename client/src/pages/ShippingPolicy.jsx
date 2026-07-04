@@ -11,6 +11,7 @@ const ShippingPolicy = () => (
         <Helmet>
             <title>Shipping Policy | SwissGarden Perfumes</title>
             <meta name="description" content="Learn about shipping timelines, charges, delivery zones, and tracking for SwissGarden Perfumes orders across India." />
+            <link rel="canonical" href="https://swissgardenperfumes.com/shipping-policy" />
         </Helmet>
         <div className="policy-page">
             {/* Hero */}

@@ -11,48 +11,60 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="format-detection" content="telephone=no" />
-    <meta name="description"
-        content="SwissGarden Perfumes — Luxury inspired fragrances at smart prices. Premium scents crafted for everyday wear in India. Starting at ₹799. COD available." />
-    <meta name="keywords"
-        content="perfumes india, affordable luxury perfumes, inspired fragrances, oud, attar, men perfume, women perfume, combo deals, COD perfume" />
     <meta name="author" content="SwissGarden Perfumes" />
 
+    <!-- ─── Per-route SEO block (server-injected in production; homepage defaults below) ───
+         The Express server replaces everything between the SEO markers with route-specific
+         tags before sending index.html, so crawlers and social scrapers receive correct
+         per-page title/description/canonical/OG/JSON-LD without executing JavaScript. -->
+    <!--SEO-->
+    <title>SwissGarden Perfumes — Luxury Inspired Scents at Smart Prices</title>
+    <meta name="description"
+        content="SwissGarden Perfumes — luxury-inspired, non-alcoholic roll-on attars crafted for everyday wear in India. Long-lasting fragrances starting at ₹799, Cash on Delivery available." />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href="https://swissgardenperfumes.com/" />
+    <link rel="alternate" hreflang="en-in" href="https://swissgardenperfumes.com/" />
+    <link rel="alternate" hreflang="x-default" href="https://swissgardenperfumes.com/" />
+
     <!-- Open Graph -->
-    <!-- TODO: replace with production domain -->
     <meta property="og:title" content="SwissGarden Perfumes — Luxury Inspired Scents. Smart Prices." />
     <meta property="og:description"
-        content="Premium fragrance profiles inspired by iconic scents — crafted for everyday wear in India. Starting at ₹799." />
+        content="Premium non-alcoholic attars inspired by iconic scents — crafted for everyday wear in India. Starting at ₹799." />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="SwissGarden Perfumes" />
-    <meta property="og:url" content="https://swissgardenperfumes.vercel.app/" />
-    <meta property="og:image" content="https://swissgardenperfumes.vercel.app/og-default.jpg" />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:url" content="https://swissgardenperfumes.com/" />
+    <meta property="og:image" content="https://swissgardenperfumes.com/og-default.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="SwissGarden Perfumes" />
 
     <!-- Twitter Card -->
-    <!-- TODO: replace with production domain -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="SwissGarden Perfumes — Luxury Inspired Scents. Smart Prices." />
     <meta name="twitter:description"
-        content="Premium fragrance profiles inspired by iconic scents — crafted for everyday wear in India. Starting at ₹799." />
-    <meta name="twitter:image" content="https://swissgardenperfumes.vercel.app/og-default.jpg" />
-
-    <!-- Canonical (per-route canonicals are emitted at runtime via Helmet) -->
-    <!-- TODO: replace with production domain -->
-    <link rel="canonical" href="https://swissgardenperfumes.vercel.app/" />
+        content="Premium non-alcoholic attars inspired by iconic scents — crafted for everyday wear in India. Starting at ₹799." />
+    <meta name="twitter:image" content="https://swissgardenperfumes.com/og-default.jpg" />
+    <!--/SEO-->
 
     <!-- Preconnect to external resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://checkout.razorpay.com" />
-    
-    <!-- Font loading with display swap for better performance -->
-    <link
+
+    <!-- Fonts: loaded non-render-blocking (media-swap) with display=swap -->
+    <link rel="preload" as="style"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" />
+    <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet" />
+        media="print" onload="this.media='all'" />
+    <noscript>
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" />
+    </noscript>
 
     <!-- Preload LCP hero poster so the preload scanner fetches it before JS executes -->
-    <link rel="preload" as="image" href="/Images/Alpine%20Savage.webp" fetchpriority="high" />
-
-    <title>SwissGarden Perfumes — Luxury Inspired Scents at Smart Prices</title>
+    <link rel="preload" as="image" type="image/webp" href="/Images/Alpine%20Savage.webp" fetchpriority="high" />
 </head>
 
 <body>

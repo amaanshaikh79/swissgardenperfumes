@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
@@ -66,6 +67,11 @@ const OAuthCallback = () => {
 
     return (
         <div className="oauth-callback-page">
+            <Helmet>
+                <title>Signing In | SwissGarden Perfumes</title>
+                <meta name="robots" content="noindex,nofollow" />
+            </Helmet>
+            <h1 style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', border: 0 }}>Completing sign in</h1>
             <motion.div
                 className="oauth-callback-card"
                 initial={{ opacity: 0, scale: 0.9 }}

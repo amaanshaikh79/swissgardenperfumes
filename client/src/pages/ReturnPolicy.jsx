@@ -11,6 +11,7 @@ const ReturnPolicy = () => (
         <Helmet>
             <title>Return & Refund Policy | SwissGarden Perfumes</title>
             <meta name="description" content="SwissGarden Perfumes return, exchange, and refund policy. Learn how to request returns within 7 days of delivery." />
+            <link rel="canonical" href="https://swissgardenperfumes.com/return-policy" />
         </Helmet>
         <div className="policy-page">
             {/* Hero */}

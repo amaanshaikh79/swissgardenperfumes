@@ -5,13 +5,17 @@ const router = express.Router();
 
 // Static, indexable routes (auth-gated/transactional routes are intentionally excluded).
 const STATIC_ROUTES = [
-    '/',
-    '/shop',
-    '/combo-set',
-    '/gifting',
-    '/pairing-guide',
-    '/about',
-    '/contact',
+    { route: '/', changefreq: 'weekly', priority: '1.0' },
+    { route: '/shop', changefreq: 'weekly', priority: '0.9' },
+    { route: '/combo-set', changefreq: 'monthly', priority: '0.8' },
+    { route: '/gifting', changefreq: 'monthly', priority: '0.7' },
+    { route: '/pairing-guide', changefreq: 'monthly', priority: '0.6' },
+    { route: '/about', changefreq: 'yearly', priority: '0.5' },
+    { route: '/contact', changefreq: 'yearly', priority: '0.5' },
+    { route: '/shipping-policy', changefreq: 'yearly', priority: '0.3' },
+    { route: '/return-policy', changefreq: 'yearly', priority: '0.3' },
+    { route: '/privacy-policy', changefreq: 'yearly', priority: '0.3' },
+    { route: '/terms', changefreq: 'yearly', priority: '0.3' },
 ];
 
 const escapeXml = (value) =>
@@ -47,12 +51,18 @@ router.get('/sitemap.xml', async (req, res, next) => {
         }
 
         const urls = [
-            ...STATIC_ROUTES.map((route) => ({ loc: `${origin}${route}` })),
+            ...STATIC_ROUTES.map((r) => ({
+                loc: `${origin}${r.route}`,
+                changefreq: r.changefreq,
+                priority: r.priority,
+            })),
             ...products
                 .filter((p) => p.slug)
                 .map((p) => ({
                     loc: `${origin}/product/${encodeURIComponent(p.slug)}`,
                     lastmod: p.updatedAt ? new Date(p.updatedAt).toISOString() : undefined,
+                    changefreq: 'weekly',
+                    priority: '0.8',
                 })),
         ];
 
@@ -63,6 +73,8 @@ ${urls
         (u) =>
             `  <url>\n    <loc>${escapeXml(u.loc)}</loc>${
                 u.lastmod ? `\n    <lastmod>${escapeXml(u.lastmod)}</lastmod>` : ''
+            }${u.changefreq ? `\n    <changefreq>${u.changefreq}</changefreq>` : ''}${
+                u.priority ? `\n    <priority>${u.priority}</priority>` : ''
             }\n  </url>`
     )
     .join('\n')}

@@ -71,7 +71,11 @@ const Login = () => {
 
     return (
         <>
-            <Helmet><title>Sign In | SwissGarden Perfumes</title></Helmet>
+            <Helmet>
+                <title>Sign In | SwissGarden Perfumes</title>
+                <meta name="robots" content="noindex,follow" />
+                <link rel="canonical" href="https://swissgardenperfumes.com/login" />
+            </Helmet>
             <div className="auth-page">
                 <motion.div className="auth-card" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                     <div className="auth-header">
@@ -187,7 +191,11 @@ const Register = () => {
 
     return (
         <>
-            <Helmet><title>Create Account | SwissGarden Perfumes</title></Helmet>
+            <Helmet>
+                <title>Create Account | SwissGarden Perfumes</title>
+                <meta name="robots" content="noindex,follow" />
+                <link rel="canonical" href="https://swissgardenperfumes.com/register" />
+            </Helmet>
             <div className="auth-page">
                 <motion.div className="auth-card" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                     <div className="auth-header">
@@ -325,7 +333,11 @@ const ForgotPassword = () => {
 
     return (
         <>
-            <Helmet><title>Forgot Password | SwissGarden Perfumes</title></Helmet>
+            <Helmet>
+                <title>Forgot Password | SwissGarden Perfumes</title>
+                <meta name="robots" content="noindex,follow" />
+                <link rel="canonical" href="https://swissgardenperfumes.com/forgot-password" />
+            </Helmet>
             <div className="auth-page">
                 <motion.div className="auth-card" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                     <div className="auth-header">
@@ -455,7 +467,11 @@ const ResetPassword = () => {
 
     return (
         <>
-            <Helmet><title>Reset Password | SwissGarden Perfumes</title></Helmet>
+            <Helmet>
+                <title>Reset Password | SwissGarden Perfumes</title>
+                <meta name="robots" content="noindex,nofollow" />
+                <link rel="canonical" href="https://swissgardenperfumes.com/forgot-password" />
+            </Helmet>
             <div className="auth-page">
                 <motion.div className="auth-card" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                     <div className="auth-header">

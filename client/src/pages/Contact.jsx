@@ -53,6 +53,7 @@ const Contact = () => {
             <Helmet>
                 <title>Contact Us | SwissGarden Perfumes</title>
                 <meta name="description" content="Get in touch with SwissGarden Perfumes. We reply within 24 hours — email, phone, or WhatsApp." />
+                <link rel="canonical" href="https://swissgardenperfumes.com/contact" />
             </Helmet>
             <div className="contact-page-new">
                 {/* ── Header ── */}

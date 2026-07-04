@@ -49,6 +49,8 @@ const Wishlist = () => {
             <Helmet>
                 <title>My Wishlist | SwissGarden Perfumes</title>
                 <meta name="description" content="Your saved fragrances — shop your wishlist anytime." />
+                <meta name="robots" content="noindex,nofollow" />
+                <link rel="canonical" href="https://swissgardenperfumes.com/wishlist" />
             </Helmet>
             <div className="wishlist-page">
                 <div className="container-sm">

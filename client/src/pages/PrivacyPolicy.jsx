@@ -11,6 +11,7 @@ const PrivacyPolicy = () => (
         <Helmet>
             <title>Privacy Policy | SwissGarden Perfumes</title>
             <meta name="description" content="SwissGarden Perfumes privacy policy. Learn how we collect, use, store, and protect your personal information." />
+            <link rel="canonical" href="https://swissgardenperfumes.com/privacy-policy" />
         </Helmet>
         <div className="policy-page">
             {/* Hero */}

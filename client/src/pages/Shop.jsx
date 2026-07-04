@@ -158,6 +158,7 @@ const Shop = () => {
             <Helmet>
                 <title>{pageTitle}</title>
                 <meta name="description" content={`${currentMood.mood} Browse our curated collection of luxury perfumes.`} />
+                <link rel="canonical" href="https://swissgardenperfumes.com/shop" />
             </Helmet>
 
             <div className="shop-page">

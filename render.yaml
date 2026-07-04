@@ -14,6 +14,12 @@ services:
       - key: NODE_VERSION
         value: 20
 
+      # Canonical public origin — drives sitemap <loc>, server-injected canonicals,
+      # og:url, and JSON-LD URLs. Set to the custom domain so these never emit the
+      # default *.onrender.com host.
+      - key: SITE_URL
+        value: https://swissgardenperfumes.com
+
       # ── URLs are auto-detected ───────────────────────────────────
       # The app derives client/server/OAuth-callback URLs from Render's
       # built-in RENDER_EXTERNAL_URL, so the default *.onrender.com URL works

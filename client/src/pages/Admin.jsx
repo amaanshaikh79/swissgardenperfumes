@@ -318,7 +318,10 @@ const AdminDashboard = () => {
 
     return (
         <>
-            <Helmet><title>Admin Dashboard | swissgarden Perfumes</title></Helmet>
+            <Helmet>
+                <title>Admin Dashboard | SwissGarden Perfumes</title>
+                <meta name="robots" content="noindex,nofollow" />
+            </Helmet>
             <div className="admin-page">
                 <div className="container">
                     <div className="admin-header">

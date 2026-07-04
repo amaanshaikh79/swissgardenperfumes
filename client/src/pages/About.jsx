@@ -2,7 +2,6 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiHeart, FiGlobe, FiArrowRight, FiFeather, FiRefreshCw, FiLayers, FiTarget, FiStar, FiUsers, FiZap } from 'react-icons/fi';
-import LazyImage from '../components/common/LazyImage';
 import './About.css';
 
 const About = () => {
@@ -59,18 +58,12 @@ const About = () => {
         'Swiss Garden Perfumes is not a product. It is a world you join.',
     ];
 
-    const gallery = [
-        '/Images/Alpine%20Savage(2).webp',
-        '/Images/Blue%20Dominion(2).webp',
-        '/Images/Glacier%20Splash(2).webp',
-        '/Images/Royal%20Ascent(2).webp',
-    ];
-
     return (
         <>
             <Helmet>
-                <title>About Us | Swiss Garden Perfumes</title>
+                <title>About Us | SwissGarden Perfumes</title>
                 <meta name="description" content="The story behind Swiss Garden Perfumes — a fragrance house built for Modern India. Precision-crafted. Identity-driven. Swiss precision meets Indian soul." />
+                <link rel="canonical" href="https://swissgardenperfumes.com/about" />
             </Helmet>
 
             <div className="about-page">

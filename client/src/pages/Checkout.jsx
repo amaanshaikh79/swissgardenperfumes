@@ -335,7 +335,11 @@ const Checkout = () => {
 
     return (
         <>
-            <Helmet><title>Checkout | SwissGarden Perfumes</title></Helmet>
+            <Helmet>
+                <title>Checkout | SwissGarden Perfumes</title>
+                <meta name="robots" content="noindex,nofollow" />
+                <link rel="canonical" href="https://swissgardenperfumes.com/checkout" />
+            </Helmet>
             <div className="checkout-page">
                 <div className="container-sm">
                     <h1 className="checkout-title">Checkout</h1>

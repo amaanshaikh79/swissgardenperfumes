@@ -26,7 +26,10 @@ const OrderSuccess = () => {
 
     return (
         <>
-            <Helmet><title>Order Confirmed | swissgarden Perfumes</title></Helmet>
+            <Helmet>
+                <title>Order Confirmed | SwissGarden Perfumes</title>
+                <meta name="robots" content="noindex,nofollow" />
+            </Helmet>
             <div className="success-page">
 
                 {/* ── Animated Tick ─────────────────────────────── */}

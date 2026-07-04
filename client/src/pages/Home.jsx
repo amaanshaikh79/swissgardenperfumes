@@ -140,6 +140,7 @@ const Home = () => {
             <Helmet>
                 <title>SwissGarden Perfumes — Luxury Crafted Fragrances | India</title>
                 <meta name="description" content="Artisan-crafted luxury fragrances inspired by iconic scents. Rare ingredients, Indian-climate tested. Discover your signature scent." />
+                <link rel="canonical" href="https://swissgardenperfumes.com/" />
             </Helmet>
 
             {/* ─── Banner Hero ─────────────────────────────────────── */}
@@ -250,7 +251,7 @@ const Home = () => {
                         viewport={{ once: true, margin: '-100px' }}
                         transition={{ duration: 0.8, delay: 0.15 }}
                     >
-                        Swiss Garden Perfumes was built on a single conviction — that fragrance at any price point can be precise, intentional, and deeply personal. The Mood Collection translates that conviction into six attars: each one a distinct mood, engineered to last, formulated without alcohol, and delivered in a roll-on that puts the scent exactly where you intend it.
+                        Swiss Garden Perfumes was built on a single conviction — that fragrance at any price point can be precise, intentional, and deeply personal. The Mood Collection translates that conviction into six attars: each one a distinct mood, engineered to last, formulated without alcohol, and delivered a roll-on that puts the scent exactly where you intend it.
                     </motion.p>
                     <motion.p
                         className="home-philosophy-closing"
@@ -385,12 +386,12 @@ const Home = () => {
                         transition={{ duration: 0.8 }}
                     >
                         {[
-                            { name: 'Alpine Savage', video: '/Video/Alpine%20Savage.mp4', poster: '/Images/Alpine Savage.webp' },
-                            { name: 'Blue Dominion', video: '/Video/Blue%20Dominion.mp4', poster: '/Images/Blue Dominion.webp' },
-                            { name: 'Citrus Reverie', video: '/Video/Citrus%20Reverie.mp4', poster: '/Images/Citrus Reverie.webp' },
-                            { name: 'Glacier Splash', video: '/Video/Glacier%20Splash.mp4', poster: '/Images/Glacier Splash.webp' },
-                            { name: 'Royal Ascent', video: '/Video/Royal%20Ascent.mp4', poster: '/Images/Royal Ascent.webp' },
-                            { name: 'Swiss Flora', video: '/Video/Swiss%20Flora.mp4', poster: '/Images/Swiss Flora.webp' },
+                            { name: 'Alpine Savage', video: '/Video/Alpine%20Savage.mp4', poster: '/Images/Alpine%20Savage.webp' },
+                            { name: 'Blue Dominion', video: '/Video/Blue%20Dominion.mp4', poster: '/Images/Blue%20Dominion.webp' },
+                            { name: 'Citrus Reverie', video: '/Video/Citrus%20Reverie.mp4', poster: '/Images/Citrus%20Reverie.webp' },
+                            { name: 'Glacier Splash', video: '/Video/Glacier%20Splash.mp4', poster: '/Images/Glacier%20Splash.webp' },
+                            { name: 'Royal Ascent', video: '/Video/Royal%20Ascent.mp4', poster: '/Images/Royal%20Ascent.webp' },
+                            { name: 'Swiss Flora', video: '/Video/Swiss%20Flora.mp4', poster: '/Images/Swiss%20Flora.webp' },
                         ].map((item, index) => (
                             <motion.div
                                 key={item.name}
@@ -468,9 +469,11 @@ const Home = () => {
                             >
                                 <Link to={`/product/${product.slug}`} className="home-spotlight-card">
                                     <div className="home-spotlight-image">
-                                        <LazyImage 
-                                            src={product.images?.[0]?.url || '/Images/placeholder.webp'} 
-                                            alt={product.name} 
+                                        <LazyImage
+                                            src={product.images?.[0]?.url || '/Images/placeholder.webp'}
+                                            alt={product.name}
+                                            width={400}
+                                            height={500}
                                         />
                                         <div className="home-spotlight-overlay" />
                                     </div>

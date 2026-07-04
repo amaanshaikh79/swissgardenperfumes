@@ -90,9 +90,12 @@ const Profile = () => {
             <Helmet>
                 <title>My Account | SwissGarden Perfumes</title>
                 <meta name="description" content="Manage your SwissGarden account — profile, orders, wishlist and security settings." />
+                <meta name="robots" content="noindex,nofollow" />
+                <link rel="canonical" href="https://swissgardenperfumes.com/profile" />
             </Helmet>
             <div className="profile-page">
                 <div className="container-sm">
+                    <h1 className="page-title">My Account</h1>
                     <div className="profile-layout">
                         {/* Sidebar */}
                         <motion.aside

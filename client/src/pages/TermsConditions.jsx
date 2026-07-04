@@ -11,6 +11,7 @@ const TermsConditions = () => (
         <Helmet>
             <title>Terms & Conditions | SwissGarden Perfumes</title>
             <meta name="description" content="Read the terms and conditions governing the use of SwissGarden Perfumes website and purchase of our products." />
+            <link rel="canonical" href="https://swissgardenperfumes.com/terms" />
         </Helmet>
         <div className="policy-page">
             {/* Hero */}

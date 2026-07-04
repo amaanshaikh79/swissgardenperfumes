@@ -58,6 +58,7 @@ import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import connectDB from './config/db.js';
 import { getAllowedOrigins } from './config/urls.js';
+import { injectSeo } from './utils/seoMeta.js';
 import errorHandler from './middleware/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
@@ -222,8 +223,16 @@ const clientDistPath = path.join(__dirname, '../client/dist');
 const clientIndexPath = path.join(clientDistPath, 'index.html');
 
 if (fs.existsSync(clientIndexPath)) {
-    // Serve static files with production caching headers
+    // Read the built index.html once; the SPA catch-all injects per-route SEO
+    // tags into it before sending so crawlers get correct head tags without JS.
+    const indexTemplate = fs.readFileSync(clientIndexPath, 'utf8');
+
+    // Serve static files with production caching headers.
+    // index:false so "/" is NOT auto-served the raw index.html here — it must
+    // fall through to the SPA catch-all below so the homepage gets its
+    // server-injected SEO tags (Organization/WebSite JSON-LD, canonical, etc.).
     app.use(express.static(clientDistPath, {
+        index: false,
         maxAge: '1d', // default maxAge fallback
         etag: true,
         lastModified: true,
@@ -252,11 +261,19 @@ if (fs.existsSync(clientIndexPath)) {
 
     // SPA fallback: serve index.html for any non-API GET route so client-side
     // routes (and a refresh on /shop, /product/..., etc.) resolve correctly.
+    // Per-route SEO tags (title, description, canonical, OG, JSON-LD) are injected
+    // server-side so crawlers/social scrapers see correct head tags without JS.
     // API paths fall through to the JSON 404 / error handler below.
-    app.get('*', (req, res, next) => {
+    app.get('*', async (req, res, next) => {
         if (req.path.startsWith('/api/')) return next();
         res.setHeader('Cache-Control', 'no-cache');
-        res.sendFile(clientIndexPath);
+        try {
+            const html = await injectSeo(indexTemplate, req.path);
+            res.type('html').send(html);
+        } catch (err) {
+            console.error('SEO injection failed, serving base index.html:', err.message);
+            res.sendFile(clientIndexPath);
+        }
     });
 
     console.log(`🗂️  Serving client build from ${clientDistPath}`);

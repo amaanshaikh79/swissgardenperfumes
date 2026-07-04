@@ -184,12 +184,18 @@ const ProductDetail = () => {
     const productImages = (product.images || [])
         .map((img) => toAbsolute(img?.url))
         .filter(Boolean);
+    const productUrl = `${siteUrl}/product/${slug}`;
+    const nextYear = new Date().getFullYear() + 1;
     const productJsonLd = {
         '@context': 'https://schema.org',
         '@type': 'Product',
+        '@id': `${productUrl}#product`,
+        url: productUrl,
         name: product.name,
         ...(productImages.length > 0 && { image: productImages }),
         description: product.shortDescription || product.description?.slice(0, 5000),
+        sku: String(product._id || slug),
+        ...(product.category && { category: product.category }),
         brand: {
             '@type': 'Brand',
             name: 'SwissGarden Perfumes',
@@ -201,15 +207,29 @@ const ProductDetail = () => {
             availability: product.stock > 0
                 ? 'https://schema.org/InStock'
                 : 'https://schema.org/OutOfStock',
-            url: `${siteUrl}/product/${slug}`,
+            itemCondition: 'https://schema.org/NewCondition',
+            priceValidUntil: `${nextYear}-12-31`,
+            url: productUrl,
         },
         ...(product.numReviews > 0 && product.rating > 0 && {
             aggregateRating: {
                 '@type': 'AggregateRating',
                 ratingValue: product.rating,
                 reviewCount: product.numReviews,
+                bestRating: 5,
+                worstRating: 1,
             },
         }),
+    };
+
+    const breadcrumbJsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}/` },
+            { '@type': 'ListItem', position: 2, name: 'Shop', item: `${siteUrl}/shop` },
+            { '@type': 'ListItem', position: 3, name: product.name },
+        ],
     };
 
     return (
@@ -217,8 +237,12 @@ const ProductDetail = () => {
             <Helmet>
                 <title>{product.name} | SwissGarden Perfumes</title>
                 <meta name="description" content={product.shortDescription || product.description?.slice(0, 160)} />
+                <link rel="canonical" href={productUrl} />
                 <script type="application/ld+json">
                     {JSON.stringify(productJsonLd)}
+                </script>
+                <script type="application/ld+json">
+                    {JSON.stringify(breadcrumbJsonLd)}
                 </script>
             </Helmet>
 
@@ -248,6 +272,10 @@ const ProductDetail = () => {
                                 <motion.img
                                     src={product.images?.[selectedImage]?.url || 'https://via.placeholder.com/600x800?text=Perfume'}
                                     alt={product.images?.[selectedImage]?.alt || `${product.name} — view ${selectedImage + 1}`}
+                                    width="600"
+                                    height="800"
+                                    fetchpriority="high"
+                                    decoding="async"
                                     style={{ rotate: imageRotation }}
                                     transition={{ type: 'spring', stiffness: 200, damping: 20 }}
                                 />
@@ -265,7 +293,7 @@ const ProductDetail = () => {
                                             onClick={() => { setSelectedImage(i); setImageRotation(0); }}
                                             aria-label={`Show ${product.name} image ${i + 1}`}
                                         >
-                                            <img src={img.url} alt="" />
+                                            <img src={img.url} alt="" width="80" height="100" loading="lazy" decoding="async" />
                                         </button>
                                     ))}
                                 </div>

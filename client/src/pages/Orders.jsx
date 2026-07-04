@@ -205,7 +205,11 @@ const Orders = () => {
 
     return (
         <>
-            <Helmet><title>My Orders | SwissGarden Perfumes</title></Helmet>
+            <Helmet>
+                <title>My Orders | SwissGarden Perfumes</title>
+                <meta name="robots" content="noindex,nofollow" />
+                <link rel="canonical" href="https://swissgardenperfumes.com/orders" />
+            </Helmet>
             <div className="orders-page">
                 <div className="container-sm">
                     <h1 className="page-title">My Orders</h1>

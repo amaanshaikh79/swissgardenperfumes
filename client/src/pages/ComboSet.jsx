@@ -89,6 +89,7 @@ const ComboSet = () => {
             <Helmet>
                 <title>Build Your Signature Trio | SwissGarden Perfumes</title>
                 <meta name="description" content="Create your personal fragrance system. Choose any 3 precision attars for ₹2,397. Presented in The Mood Collection emerald gift case with gold foil detailing." />
+                <link rel="canonical" href="https://swissgardenperfumes.com/combo-set" />
             </Helmet>
 
             <div className="combo-page">
@@ -147,6 +148,8 @@ const ComboSet = () => {
                                                     src={selectedAttars[slotIndex].images?.[0]?.url || 'https://via.placeholder.com/400x500?text=Attar'}
                                                     alt={selectedAttars[slotIndex].name}
                                                     className="combo-selected-image"
+                                                    width="400"
+                                                    height="500"
                                                 />
                                                 <h4 className="combo-selected-name">{selectedAttars[slotIndex].name}</h4>
                                             </div>
@@ -200,7 +203,7 @@ const ComboSet = () => {
                                         </div>
                                     )}
                                     <div className="combo-product-image">
-                                        <img src={product.images?.[0]?.url || 'https://via.placeholder.com/400x500?text=Attar'} alt={product.images?.[0]?.alt || product.name} />
+                                        <img src={product.images?.[0]?.url || 'https://via.placeholder.com/400x500?text=Attar'} alt={product.images?.[0]?.alt || product.name} loading="lazy" decoding="async" width="400" height="500" />
                                     </div>
                                     <div className="combo-product-info">
                                         <h3 className="combo-product-name">{product.name}</h3>

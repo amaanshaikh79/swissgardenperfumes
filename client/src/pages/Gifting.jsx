@@ -38,6 +38,7 @@ const Gifting = () => {
             <Helmet>
                 <title>Gifting | SwissGarden Perfumes</title>
                 <meta name="description" content="The gift that knows their taste. The Signature Trio in emerald gift case. Perfect for birthdays, anniversaries, corporate gifting, and celebrations." />
+                <link rel="canonical" href="https://swissgardenperfumes.com/gifting" />
             </Helmet>
 
             <div className="gifting-page">
@@ -69,11 +70,13 @@ const Gifting = () => {
                         >
                             <div className="gifting-prop-visual">
                                 <div className="gifting-case-image">
-                                    <LazyImage 
-                                        src="/Images/Combo%20Set.png" 
+                                    <LazyImage
+                                        src="/Images/Combo%20Set.png"
                                         alt="Signature Trio Gift Case"
                                         priority={true}
                                         useThumbnail={false}
+                                        width={400}
+                                        height={500}
                                     />
                                 </div>
                             </div>
@@ -206,25 +209,27 @@ const Gifting = () => {
                             <div className="gifting-showcase-grid">
                                 <div className="gifting-showcase-item">
                                     <div className="gifting-showcase-image">
-                                        <LazyImage src="/Images/Alpine%20Savage.webp" alt="Individual Attar Box" />
+                                        <LazyImage src="/Images/Alpine%20Savage.webp" alt="Alpine Savage attar in its individual branded box" width={400} height={500} />
                                     </div>
                                     <h4>Individual Branded Boxes</h4>
                                     <p>Each 10ml roll-on in its own protective box</p>
                                 </div>
                                 <div className="gifting-showcase-item">
                                     <div className="gifting-showcase-image">
-                                        <LazyImage src="/Images/Royal%20Ascent.webp" alt="Precision Roll-On" />
+                                        <LazyImage src="/Images/Royal%20Ascent.webp" alt="Royal Ascent precision roll-on attar" width={400} height={500} />
                                     </div>
                                     <h4>Precision Roll-On Format</h4>
                                     <p>Controlled application, travel-friendly design</p>
                                 </div>
                                 <div className="gifting-showcase-item">
                                     <div className="gifting-showcase-image">
-                                        <LazyImage 
-                                            src="/Images/Combo%20Set.png" 
+                                        <LazyImage
+                                            src="/Images/Combo%20Set.png"
                                             alt="Emerald Gift Case"
                                             priority={true}
                                             useThumbnail={false}
+                                            width={400}
+                                            height={500}
                                         />
                                     </div>
                                     <h4>Emerald Gift Case</h4>
