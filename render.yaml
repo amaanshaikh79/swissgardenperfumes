@@ -68,6 +68,12 @@ services:
       - key: ADMIN_EMAIL
         value: support@swissgardenperfumes.com
 
+      # Brevo HTTPS email API — REQUIRED on Render: GoDaddy SMTP is unreachable
+      # from cloud IPs on all ports (verified July 2026). Create the key at
+      # brevo.com (free 300/day) and set it in the dashboard.
+      - key: BREVO_API_KEY
+        sync: false
+
       # ── AI Chatbot (OpenRouter) ──────────────────────────────────
       # Rotate the key at https://openrouter.ai/keys after first deploy
       - key: OPENROUTER_API_KEY

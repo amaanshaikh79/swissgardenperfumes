@@ -69,8 +69,15 @@ const promoteTransporter = (port) => {
  * provider is reachable from THIS network. Never throws.
  */
 export const verifySmtpTransport = async () => {
+    if (process.env.BREVO_API_KEY) {
+        console.log('📧 Brevo API key set — HTTPS email provider active (SMTP is fallback)');
+    }
     if (!smtpConfigured()) {
-        console.log('📧 SMTP not configured — emails disabled');
+        console.log(
+            process.env.BREVO_API_KEY
+                ? '📧 SMTP not configured — Brevo API is the sole email provider'
+                : '📧 SMTP not configured — emails disabled'
+        );
         return { ok: false, reason: 'not_configured' };
     }
     for (const port of candidatePorts()) {
@@ -106,22 +113,91 @@ export const escapeHTML = (str) => {
         .replace(/'/g, '&#039;');
 };
 
+// ─── Brevo HTTPS provider ─────────────────────────────────────────
+// Cloud hosts (Render/AWS) frequently cannot reach GoDaddy SMTP at all — the
+// connections are silently dropped on every port. Brevo's REST API sends over
+// HTTPS :443, which is never blocked. When BREVO_API_KEY is set it is the
+// primary provider; SMTP remains the fallback (and works fine locally).
+const sendViaBrevo = async (mailOptions) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15_000);
+    try {
+        const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST',
+            signal: controller.signal,
+            headers: {
+                'api-key': process.env.BREVO_API_KEY,
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+            body: JSON.stringify({
+                sender: { name: mailOptions.fromName, email: mailOptions.fromEmail },
+                to: [{ email: mailOptions.to }],
+                subject: mailOptions.subject,
+                htmlContent: mailOptions.html,
+            }),
+        });
+        if (!res.ok) {
+            const body = await res.text().catch(() => '');
+            throw new Error(`Brevo ${res.status}: ${body.slice(0, 200)}`);
+        }
+        const data = await res.json();
+        return { messageId: data.messageId || 'brevo' };
+    } finally {
+        clearTimeout(timeoutId);
+    }
+};
+
+// When every SMTP port has failed, skip SMTP entirely for a cooldown window so
+// email-touching requests fail fast instead of re-walking 3 × 8s timeouts.
+let _smtpDeadUntil = 0;
+const SMTP_COOLDOWN_MS = 5 * 60 * 1000;
+
 /**
- * Send email utility. On network-level failures it retries once per alternate
- * SMTP port (465/587/3535) and promotes the first working port. Never throws —
- * email failure must not break the calling flow.
+ * Send email utility. Provider order:
+ *   1. Brevo HTTPS API (if BREVO_API_KEY is set) — works from any cloud host
+ *   2. SMTP with port fallback 465 → 587 → 3535 (promotes the working port)
+ * Never throws — returns the send info, or null when every provider failed.
+ * Callers that must surface failure to the user (e.g. forgot-password) should
+ * check for a null return.
  */
 const sendEmail = async (options) => {
+    const fromName = process.env.FROM_NAME || 'SwissGarden Perfumes';
+    const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_EMAIL;
+
+    // Provider 1: Brevo over HTTPS
+    if (process.env.BREVO_API_KEY) {
+        try {
+            const info = await sendViaBrevo({
+                fromName,
+                fromEmail,
+                to: options.email,
+                subject: options.subject,
+                html: options.html,
+            });
+            console.log('📧 Email sent (Brevo API):', info.messageId);
+            return info;
+        } catch (error) {
+            console.error('❌ Brevo send failed, falling back to SMTP:', error.message);
+        }
+    }
+
+    // Provider 2: SMTP
     if (!getTransporter()) {
         console.log('📧 Email skipped (SMTP not configured)');
         console.log('📧 To: ', options.email);
         console.log('📧 Subject: ', options.subject);
-        console.log('📧 To enable emails, configure SMTP_HOST, SMTP_EMAIL, and SMTP_PASSWORD in .env');
+        console.log('📧 To enable emails, set BREVO_API_KEY or configure SMTP_HOST/SMTP_EMAIL/SMTP_PASSWORD');
+        return null;
+    }
+
+    if (Date.now() < _smtpDeadUntil) {
+        console.error('❌ Email skipped — SMTP marked unreachable (cooldown active)');
         return null;
     }
 
     const mailOptions = {
-        from: `"${process.env.FROM_NAME || 'SwissGarden Perfumes'}" <${process.env.FROM_EMAIL || process.env.SMTP_EMAIL}>`,
+        from: `"${fromName}" <${fromEmail}>`,
         to: options.email,
         subject: options.subject,
         html: options.html,
@@ -137,8 +213,11 @@ const sendEmail = async (options) => {
             return info;
         } catch (error) {
             console.error(`❌ Email error on port ${ports[i]}:`, error.message);
-            if (!isConnectionError(error) || i === ports.length - 1) {
-                return null; // auth/content error, or all ports exhausted
+            if (!isConnectionError(error)) return null; // auth/content error — other ports won't help
+            if (i === ports.length - 1) {
+                _smtpDeadUntil = Date.now() + SMTP_COOLDOWN_MS;
+                console.error('🚨 All SMTP ports unreachable — cooling down for 5 minutes');
+                return null;
             }
         }
     }

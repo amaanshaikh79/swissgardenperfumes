@@ -437,7 +437,10 @@ export const forgotPassword = async (req, res, next) => {
         }
 
         try {
-            await sendEmail({
+            // sendEmail never throws — it returns null when every provider
+            // failed. Treat that as a hard failure so the user is not told
+            // "check your inbox" for an email that was never sent.
+            const sent = await sendEmail({
                 email: user.email,
                 subject: 'SwissGarden Perfumes - Password Reset Request',
                 html: `
@@ -471,6 +474,10 @@ export const forgotPassword = async (req, res, next) => {
                 `,
             });
 
+            if (!sent) {
+                throw new Error('All email providers failed');
+            }
+
             res.status(200).json({
                 success: true,
                 message: 'Password reset email sent. Please check your inbox.',
@@ -483,7 +490,7 @@ export const forgotPassword = async (req, res, next) => {
 
             return res.status(500).json({
                 success: false,
-                message: 'Email could not be sent. Please try again later.',
+                message: 'Email could not be sent. Please try again later or contact support@swissgardenperfumes.com.',
             });
         }
     } catch (error) {
