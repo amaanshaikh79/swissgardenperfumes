@@ -59,6 +59,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import connectDB from './config/db.js';
 import { getAllowedOrigins } from './config/urls.js';
 import { injectSeo } from './utils/seoMeta.js';
+import { verifySmtpTransport } from './utils/sendEmail.js';
 import errorHandler from './middleware/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
@@ -348,6 +349,12 @@ if (!process.env.VERCEL) {
       ║                                           ║
       ╚═══════════════════════════════════════════╝
       `);
+
+            // Boot-time SMTP reachability check (non-blocking): logs which port
+            // works from THIS network so platform logs reveal provider blocks.
+            verifySmtpTransport().catch((err) =>
+                console.error('SMTP verify crashed:', err.message)
+            );
         });
     });
 } else {

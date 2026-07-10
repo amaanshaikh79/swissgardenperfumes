@@ -3,24 +3,94 @@ import nodemailer from 'nodemailer';
 // Module-level transporter — initialized once, reused for every email (connection pooling).
 // This prevents opening a new TCP + TLS connection on every single send, which under
 // load causes connection exhaustion, latency spikes, and SMTP provider rate limiting.
+//
+// FAIL-FAST + PORT FALLBACK: hosting providers' networks (e.g. Render) can have a
+// given SMTP port silently black-holed to GoDaddy (connections hang with no error
+// until the platform's 5-minute proxy timeout kills the request). Every transporter
+// therefore uses short connection timeouts, and sends automatically retry across
+// GoDaddy's alternate submission ports (465 → 587 → 3535). The first port that
+// works is promoted for the lifetime of the process.
 let _transporter = null;
+let _activePort = null;
 
-const getTransporter = () => {
-    if (_transporter) return _transporter;
-    if (!process.env.SMTP_HOST || !process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
-        return null;
-    }
-    _transporter = nodemailer.createTransport({
+const smtpConfigured = () =>
+    Boolean(process.env.SMTP_HOST && process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD);
+
+const candidatePorts = () => {
+    const configured = Number(process.env.SMTP_PORT) || 465;
+    return [...new Set([configured, 465, 587, 3535])];
+};
+
+const buildTransporter = (port) =>
+    nodemailer.createTransport({
         host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        secure: process.env.SMTP_PORT === '465',
+        port,
+        secure: port === 465,
         pool: true, // Reuse SMTP connections
+        // Fail fast — a hung request must never wait minutes on a dead socket.
+        connectionTimeout: 8_000,
+        greetingTimeout: 8_000,
+        socketTimeout: 20_000,
         auth: {
             user: process.env.SMTP_EMAIL,
             pass: process.env.SMTP_PASSWORD,
         },
     });
+
+const getTransporter = () => {
+    if (_transporter) return _transporter;
+    if (!smtpConfigured()) return null;
+    _activePort = candidatePorts()[0];
+    _transporter = buildTransporter(_activePort);
     return _transporter;
+};
+
+// Network-level failures where trying another port makes sense. Auth failures
+// (EAUTH) are deliberately excluded — a wrong password fails on every port.
+const isConnectionError = (err) =>
+    ['ETIMEDOUT', 'ESOCKET', 'ECONNECTION', 'ECONNREFUSED', 'ECONNRESET', 'EHOSTUNREACH', 'ENETUNREACH', 'EDNS'].includes(err?.code) ||
+    /timed?\s*out|connection/i.test(err?.message || '');
+
+const promoteTransporter = (port) => {
+    try {
+        _transporter?.close();
+    } catch {
+        /* ignore */
+    }
+    _activePort = port;
+    _transporter = buildTransporter(port);
+    return _transporter;
+};
+
+/**
+ * Boot-time SMTP reachability check. Tries each candidate port with the
+ * fail-fast transporter and promotes the first one that verifies. Logs the
+ * outcome so platform logs (e.g. Render) show definitively whether the mail
+ * provider is reachable from THIS network. Never throws.
+ */
+export const verifySmtpTransport = async () => {
+    if (!smtpConfigured()) {
+        console.log('📧 SMTP not configured — emails disabled');
+        return { ok: false, reason: 'not_configured' };
+    }
+    for (const port of candidatePorts()) {
+        try {
+            const t = buildTransporter(port);
+            await t.verify();
+            t.close();
+            promoteTransporter(port);
+            console.log(`📧 SMTP reachable on ${process.env.SMTP_HOST}:${port} — emails enabled`);
+            return { ok: true, port };
+        } catch (err) {
+            console.warn(`📧 SMTP port ${port} failed from this network: ${err.message}`);
+        }
+    }
+    console.error(
+        '🚨 SMTP UNREACHABLE on all ports (465/587/3535). The mail provider is likely ' +
+        'blocking this host\'s IP range. Emails will fail fast instead of hanging; ' +
+        'switch to an HTTPS-based email service (e.g. Brevo/Resend) to restore email.'
+    );
+    return { ok: false, reason: 'unreachable' };
 };
 
 /**
@@ -37,11 +107,12 @@ export const escapeHTML = (str) => {
 };
 
 /**
- * Send email utility
+ * Send email utility. On network-level failures it retries once per alternate
+ * SMTP port (465/587/3535) and promotes the first working port. Never throws —
+ * email failure must not break the calling flow.
  */
 const sendEmail = async (options) => {
-    const transporter = getTransporter();
-    if (!transporter) {
+    if (!getTransporter()) {
         console.log('📧 Email skipped (SMTP not configured)');
         console.log('📧 To: ', options.email);
         console.log('📧 Subject: ', options.subject);
@@ -56,15 +127,22 @@ const sendEmail = async (options) => {
         html: options.html,
     };
 
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log('📧 Email sent:', info.messageId);
-        return info;
-    } catch (error) {
-        console.error('❌ Email error:', error.message);
-        // Don't throw - email failure shouldn't break the flow
-        return null;
+    // Try the active port first, then the remaining candidates on network errors.
+    const ports = [_activePort, ...candidatePorts().filter((p) => p !== _activePort)];
+    for (let i = 0; i < ports.length; i++) {
+        const transporter = i === 0 ? _transporter : promoteTransporter(ports[i]);
+        try {
+            const info = await transporter.sendMail(mailOptions);
+            console.log(`📧 Email sent (port ${ports[i]}):`, info.messageId);
+            return info;
+        } catch (error) {
+            console.error(`❌ Email error on port ${ports[i]}:`, error.message);
+            if (!isConnectionError(error) || i === ports.length - 1) {
+                return null; // auth/content error, or all ports exhausted
+            }
+        }
     }
+    return null;
 };
 
 /**
