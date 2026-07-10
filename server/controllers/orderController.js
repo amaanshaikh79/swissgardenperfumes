@@ -5,6 +5,7 @@ import Coupon from '../models/Coupon.js';
 import sendEmail, { orderConfirmationEmail } from '../utils/sendEmail.js';
 import { verifyRazorpaySignature } from '../utils/verifyRazorpay.js';
 import Razorpay from 'razorpay';
+import { createShiprocketOrder } from '../services/shiprocketService.js';
 
 // Lazy Razorpay client for server-side payment reconciliation in updateOrderToPaid.
 let _rzp = null;
@@ -228,6 +229,13 @@ export const createOrder = async (req, res, next) => {
             subject: `Order Confirmed - ${order.orderNumber} | SwissGarden Perfumes`,
             html: orderConfirmationEmail(populatedOrder, req.user),
         }).catch((err) => console.error('Email send failed:', err));
+
+        // ✅ CREATE SHIPROCKET ORDER FOR COD ORDERS (non-blocking)
+        if (paymentMethod === 'cod') {
+            createShiprocketOrderAsync(populatedOrder, req.user).catch((err) => {
+                console.error('❌ Shiprocket order creation failed for COD order (non-blocking):', err.message);
+            });
+        }
 
         res.status(201).json({ success: true, order: populatedOrder });
     } catch (error) {
@@ -456,9 +464,115 @@ export const updateOrderToPaid = async (req, res, next) => {
 
         await order.save();
 
+        // ✅ CREATE SHIPROCKET ORDER AUTOMATICALLY (non-blocking)
+        createShiprocketOrderAsync(order, req.user).catch((err) => {
+            console.error('❌ Shiprocket order creation failed (non-blocking):', err.message);
+        });
+
         res.status(200).json({ success: true, order });
     } catch (error) {
         next(error);
+    }
+};
+
+/**
+ * Helper function to create Shiprocket order asynchronously
+ * This runs in the background and doesn't block the payment confirmation
+ */
+const createShiprocketOrderAsync = async (order, user) => {
+    try {
+        // Populate order items
+        const populatedOrder = await Order.findById(order._id).populate('orderItems.product');
+
+        // Prepare shipping address
+        const shipping = populatedOrder.shippingAddress;
+        
+        // Extract user name (split first and last name)
+        const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+        const nameParts = fullName.split(' ');
+        const firstName = nameParts[0] || 'Customer';
+        const lastName = nameParts.slice(1).join(' ') || '';
+
+        // Calculate total weight (0.5kg per product as default)
+        const totalWeight = populatedOrder.orderItems.reduce((sum, item) => {
+            return sum + (0.5 * item.quantity); // 0.5kg per unit
+        }, 0);
+
+        // Prepare order data for Shiprocket
+        const shiprocketData = {
+            orderNumber: populatedOrder.orderNumber,
+            orderDate: populatedOrder.createdAt.toISOString().split('T')[0], // YYYY-MM-DD
+            pickupLocation: process.env.SHIPROCKET_PICKUP_LOCATION || 'Primary',
+            channelId: '',
+            comment: populatedOrder.notes || '',
+            billing: {
+                name: firstName,
+                lastName: lastName,
+                address: `${shipping.street}${shipping.landmark ? ', ' + shipping.landmark : ''}`,
+                address2: '',
+                city: shipping.city,
+                pincode: shipping.zipCode,
+                state: shipping.state,
+                country: shipping.country,
+                email: user.email,
+                phone: user.phone || '9999999999',
+            },
+            shipping: null, // Same as billing
+            items: populatedOrder.orderItems.map((item) => ({
+                name: item.name,
+                sku: `SKU-${item.product._id.toString().slice(-8)}`,
+                quantity: item.quantity,
+                price: item.price,
+                discount: 0,
+                tax: 0,
+                hsn: '',
+            })),
+            paymentMethod: populatedOrder.paymentMethod,
+            subTotal: populatedOrder.totalPrice,
+            shippingCharges: populatedOrder.shippingPrice,
+            discount: (populatedOrder.comboDiscount || 0) + (populatedOrder.couponDiscount || 0),
+            weight: totalWeight,
+            length: 15,
+            breadth: 12,
+            height: 8,
+        };
+
+        console.log(`📦 Creating Shiprocket order for: ${populatedOrder.orderNumber}`);
+
+        const shiprocketResponse = await createShiprocketOrder(shiprocketData);
+
+        if (shiprocketResponse.success) {
+            // Update order with Shiprocket details
+            populatedOrder.shiprocket = {
+                shiprocketOrderId: shiprocketResponse.shiprocketOrderId,
+                shiprocketShipmentId: shiprocketResponse.shiprocketShipmentId,
+                awbCode: shiprocketResponse.awbCode,
+                courierName: shiprocketResponse.courierName,
+                shippingStatus: 'pending',
+                createdAt: new Date(),
+            };
+
+            if (shiprocketResponse.awbCode) {
+                populatedOrder.trackingNumber = shiprocketResponse.awbCode;
+            }
+
+            await populatedOrder.save();
+
+            console.log(`✅ Shiprocket order created successfully: Order ID ${shiprocketResponse.shiprocketOrderId}`);
+        }
+    } catch (error) {
+        // Log error but don't fail the order
+        console.error(`❌ Failed to create Shiprocket order for ${order.orderNumber}:`, error.message);
+        
+        // Save error to order for admin review
+        try {
+            await Order.findByIdAndUpdate(order._id, {
+                'shiprocket.error': error.message,
+                'shiprocket.shippingStatus': 'pending',
+            });
+        } catch (updateErr) {
+            console.error('Failed to save Shiprocket error to order:', updateErr.message);
+        }
     }
 };
 

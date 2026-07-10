@@ -106,6 +106,30 @@ const orderSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'DeliveryPartner',
         },
+        // Shiprocket integration fields
+        shiprocket: {
+            shiprocketOrderId: { type: Number },
+            shiprocketShipmentId: { type: Number },
+            awbCode: { type: String },
+            courierName: { type: String },
+            courierCompanyId: { type: Number },
+            pickupScheduledDate: { type: Date },
+            trackingUrl: { type: String },
+            estimatedDeliveryDate: { type: Date },
+            shippingStatus: {
+                type: String,
+                enum: ['pending', 'pickup_scheduled', 'in_transit', 'out_for_delivery', 'delivered', 'cancelled', 'rto'],
+                default: 'pending',
+            },
+            statusHistory: [{
+                status: String,
+                timestamp: Date,
+                location: String,
+                remarks: String,
+            }],
+            createdAt: { type: Date },
+            error: { type: String }, // Store any Shiprocket API errors
+        },
         notes: String,
     },
     {
