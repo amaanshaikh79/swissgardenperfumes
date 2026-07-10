@@ -3,6 +3,18 @@ import User from '../models/User.js';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
 import { getOAuthCallbackUrl } from './urls.js';
+import sendEmail from '../utils/sendEmail.js';
+import { welcomeEmail } from '../utils/emailTemplates.js';
+
+// Fire-and-forget welcome email for first-time OAuth signups.
+// Lives only in the User.create branches, so re-logins never re-send.
+const sendWelcomeEmail = (user) => {
+    sendEmail({
+        email: user.email,
+        subject: 'Welcome to SwissGarden Perfumes ✨',
+        html: welcomeEmail(user),
+    }).catch((err) => console.error('Welcome email failed:', err.message));
+};
 
 /**
  * Initialize Passport strategies.
@@ -43,6 +55,8 @@ export function initializePassport() {
                             googleId: profile.id,
                             avatar: profile.photos[0]?.value,
                         });
+
+                        sendWelcomeEmail(user);
 
                         return done(null, user);
                     } catch (error) {
@@ -89,6 +103,11 @@ export function initializePassport() {
                             facebookId: profile.id,
                             avatar: profile.photos?.[0]?.value,
                         });
+
+                        // Guard: skip the synthetic fb_<id>@facebook.com fallback address
+                        if (profile.emails?.[0]?.value) {
+                            sendWelcomeEmail(user);
+                        }
 
                         return done(null, user);
                     } catch (error) {

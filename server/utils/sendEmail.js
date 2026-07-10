@@ -26,7 +26,7 @@ const getTransporter = () => {
 /**
  * Escape HTML special characters to prevent XSS in email templates.
  */
-const escapeHTML = (str) => {
+export const escapeHTML = (str) => {
     if (typeof str !== 'string') return String(str ?? '');
     return str
         .replace(/&/g, '&amp;')

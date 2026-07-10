@@ -4,6 +4,7 @@ import { FiX, FiGift, FiCopy } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import useModalA11y from '../../hooks/useModalA11y';
 import LazyImage from './LazyImage';
+import { newsletterAPI } from '../../services/api';
 import './ExitIntentPopup.css';
 
 const ExitIntentPopup = () => {
@@ -53,7 +54,9 @@ const ExitIntentPopup = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Here you would integrate with email marketing API
+        // Optimistic: capture the email server-side (also sends the welcome-code
+        // email) but never block or fail the code reveal on API errors/cold starts.
+        newsletterAPI.subscribe({ email: email.trim(), source: 'exit_intent' }).catch(() => {});
         setShowCode(true);
         toast.success('You have unlocked the discount!');
     };

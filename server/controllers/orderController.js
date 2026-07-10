@@ -3,6 +3,12 @@ import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import Coupon from '../models/Coupon.js';
 import sendEmail, { orderConfirmationEmail } from '../utils/sendEmail.js';
+import {
+    paymentReceiptEmail,
+    orderShippedEmail,
+    orderDeliveredEmail,
+    orderCancelledEmail,
+} from '../utils/emailTemplates.js';
 import { verifyRazorpaySignature } from '../utils/verifyRazorpay.js';
 import Razorpay from 'razorpay';
 import { createShiprocketOrder } from '../services/shiprocketService.js';
@@ -360,6 +366,16 @@ export const updateOrderStatus = async (req, res, next) => {
             await restoreStockAndCoupon(order);
         }
 
+        // Customer status email on real transitions only — fire-and-forget
+        if (
+            req.body.status !== previousStatus &&
+            ['Shipped', 'Delivered', 'Cancelled'].includes(req.body.status)
+        ) {
+            sendOrderStatusEmailAsync(order._id, req.body.status).catch((err) =>
+                console.error('Status email failed:', err.message)
+            );
+        }
+
         res.status(200).json({ success: true, order });
     } catch (error) {
         next(error);
@@ -470,6 +486,13 @@ export const updateOrderToPaid = async (req, res, next) => {
         order.orderStatus = 'Confirmed';
 
         await order.save();
+
+        // Payment receipt email — fire-and-forget, never blocks the response
+        sendEmail({
+            email: req.user.email,
+            subject: `Payment Received - ${order.orderNumber} | SwissGarden Perfumes`,
+            html: paymentReceiptEmail(order, req.user),
+        }).catch((err) => console.error('Payment receipt email failed:', err.message));
 
         // ✅ CREATE SHIPROCKET ORDER AUTOMATICALLY (non-blocking)
         createShiprocketOrderAsync(order, req.user).catch((err) => {
@@ -584,6 +607,40 @@ const createShiprocketOrderAsync = async (order, user) => {
 };
 
 /**
+ * Helper: send the right status email for an admin status change.
+ * Re-fetches the order with user + product slugs populated so the response
+ * document sent to the admin UI is never mutated.
+ */
+const sendOrderStatusEmailAsync = async (orderId, status) => {
+    const order = await Order.findById(orderId)
+        .populate('user', 'firstName lastName email')
+        .populate('orderItems.product', 'slug');
+
+    if (!order?.user?.email) return;
+
+    let subject;
+    let html;
+    switch (status) {
+        case 'Shipped':
+            subject = `Your Order Has Shipped - ${order.orderNumber} | SwissGarden Perfumes`;
+            html = orderShippedEmail(order, order.user);
+            break;
+        case 'Delivered':
+            subject = `Order Delivered - ${order.orderNumber} | SwissGarden Perfumes`;
+            html = orderDeliveredEmail(order, order.user);
+            break;
+        case 'Cancelled':
+            subject = `Order Cancelled - ${order.orderNumber} | SwissGarden Perfumes`;
+            html = orderCancelledEmail(order, order.user, { cancelledBy: 'store' });
+            break;
+        default:
+            return;
+    }
+
+    await sendEmail({ email: order.user.email, subject, html });
+};
+
+/**
  * @desc    Cancel order
  * @route   PUT /api/orders/:id/cancel
  * @access  Private
@@ -615,6 +672,13 @@ export const cancelOrder = async (req, res, next) => {
 
         // Restore stock and reverse coupon usage
         await restoreStockAndCoupon(order);
+
+        // Cancellation email — fire-and-forget (req.user is the order owner)
+        sendEmail({
+            email: req.user.email,
+            subject: `Order Cancelled - ${order.orderNumber} | SwissGarden Perfumes`,
+            html: orderCancelledEmail(order, req.user, { cancelledBy: 'customer' }),
+        }).catch((err) => console.error('Cancellation email failed:', err.message));
 
         res.status(200).json({ success: true, message: 'Order cancelled successfully', order });
     } catch (error) {

@@ -72,6 +72,7 @@ import deliveryPartnerRoutes from './routes/deliveryPartnerRoutes.js';
 import returnRoutes from './routes/returnRoutes.js';
 import sitemapRoutes from './routes/sitemapRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
+import newsletterRoutes from './routes/newsletterRoutes.js';
 import shiprocketRoutes from './routes/shiprocketRoutes.js';
 import shiprocketWebhookRoutes from './routes/shiprocketWebhookRoutes.js';
 import passport, { initializePassport } from './config/passport.js';
@@ -120,6 +121,14 @@ const chatLimiter = rateLimit({
     message: { success: false, reply: 'Too many chat requests — please wait a moment and try again.' },
 });
 app.use('/api/chat', chatLimiter);
+
+// Newsletter rate limiting — abuse control for the public subscribe endpoint
+const newsletterLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5,
+    message: { success: false, message: 'Too many subscription attempts — please try again later.' },
+});
+app.use('/api/newsletter', newsletterLimiter);
 
 // ─── Body & Cookie Parsing ─────────────────────────────────────
 // Webhook route needs raw body for Razorpay HMAC signature verification
@@ -200,6 +209,7 @@ app.use('/api/auth', oauthRoutes);
 app.use('/api/delivery-partners', deliveryPartnerRoutes);
 app.use('/api/returns', returnRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/shiprocket', shiprocketRoutes);
 app.use('/api/shiprocket', shiprocketWebhookRoutes);
 

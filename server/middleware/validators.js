@@ -57,6 +57,12 @@ export const contactRules = [
     body('message').trim().notEmpty().withMessage('Message is required'),
 ];
 
+// Newsletter validation rules
+export const newsletterRules = [
+    body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
+    body('source').optional().isIn(['exit_intent', 'home', 'other']).withMessage('Invalid source'),
+];
+
 // Order validation rules
 export const orderRules = [
     body('orderItems').isArray({ min: 1 }).withMessage('At least one order item is required'),

@@ -8,7 +8,7 @@ import {
 import ProductCard from '../components/product/ProductCard';
 import LazyImage from '../components/common/LazyImage';
 import LazyVideo from '../components/common/LazyVideo';
-import { productsAPI, contactAPI } from '../services/api';
+import { productsAPI, newsletterAPI } from '../services/api';
 import { getBackendMediaUrl } from '../utils/media';
 import './Home.css';
 
@@ -89,12 +89,9 @@ const Home = () => {
         e.preventDefault();
         if (email.trim()) {
             try {
-                await contactAPI.submit({
-                    name: 'Newsletter Subscriber',
-                    email: email.trim(),
-                    subject: 'Newsletter Subscription',
-                    message: 'User subscribed to newsletter from the home page.',
-                });
+                // Real newsletter endpoint — stores the subscriber and emails the
+                // welcome code (replaces the old fake Contact-form submission).
+                await newsletterAPI.subscribe({ email: email.trim(), source: 'home' });
                 setEmailSubmitted(true);
                 setEmail('');
                 setTimeout(() => setEmailSubmitted(false), 5000);

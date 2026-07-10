@@ -1,6 +1,12 @@
 import Return from '../models/Return.js';
 import Order from '../models/Order.js';
 import asyncHandler from 'express-async-handler';
+import sendEmail from '../utils/sendEmail.js';
+import {
+    returnRequestedEmail,
+    returnAdminAlertEmail,
+    returnStatusUpdateEmail,
+} from '../utils/emailTemplates.js';
 
 // @desc    Get all returns (admin)
 // @route   GET /api/returns
@@ -97,6 +103,19 @@ export const createReturn = asyncHandler(async (req, res) => {
         refundAmount,
     });
 
+    // Confirmation to customer + alert to store inbox — fire-and-forget
+    sendEmail({
+        email: req.user.email,
+        subject: `Return Request Received - ${order.orderNumber} | SwissGarden Perfumes`,
+        html: returnRequestedEmail(returnRequest, req.user, order),
+    }).catch((err) => console.error('Return confirmation email failed:', err.message));
+
+    sendEmail({
+        email: process.env.ADMIN_EMAIL || process.env.SMTP_EMAIL,
+        subject: `📥 New Return Request - ${order.orderNumber} | SwissGarden Perfumes`,
+        html: returnAdminAlertEmail(returnRequest, order),
+    }).catch((err) => console.error('Return admin alert failed:', err.message));
+
     res.status(201).json({
         success: true,
         return: returnRequest,
@@ -129,6 +148,26 @@ export const updateReturnStatus = asyncHandler(async (req, res) => {
     }
 
     await returnRequest.save();
+
+    // Notify the customer on decisive transitions — fire-and-forget
+    if (['approved', 'rejected', 'completed'].includes(status)) {
+        await returnRequest.populate([
+            { path: 'user', select: 'firstName lastName email' },
+            { path: 'order', select: 'orderNumber' },
+        ]);
+        if (returnRequest.user?.email) {
+            const subjectByStatus = {
+                approved: `Return Approved - ${returnRequest.order?.orderNumber} | SwissGarden Perfumes`,
+                rejected: `Return Request Update - ${returnRequest.order?.orderNumber} | SwissGarden Perfumes`,
+                completed: `Refund Processed - ${returnRequest.order?.orderNumber} | SwissGarden Perfumes`,
+            };
+            sendEmail({
+                email: returnRequest.user.email,
+                subject: subjectByStatus[status],
+                html: returnStatusUpdateEmail(returnRequest, returnRequest.user, returnRequest.order),
+            }).catch((err) => console.error('Return status email failed:', err.message));
+        }
+    }
 
     res.status(200).json({
         success: true,

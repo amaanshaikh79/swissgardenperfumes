@@ -90,6 +90,11 @@ export const contactAPI = {
     delete: (id) => API.delete(`/contact/${id}`),
 };
 
+// Newsletter API
+export const newsletterAPI = {
+    subscribe: (data) => API.post('/newsletter/subscribe', data),
+};
+
 // Payment API (Razorpay)
 export const paymentAPI = {
     getConfig: () => API.get('/payment/config'),

@@ -1,6 +1,33 @@
 import express from 'express';
 import Order from '../models/Order.js';
 import { restoreStockAndCoupon } from '../utils/orderHelper.js';
+import sendEmail from '../utils/sendEmail.js';
+import {
+    orderShippedEmail,
+    orderOutForDeliveryEmail,
+    orderDeliveredEmail,
+    rtoAdminAlertEmail,
+} from '../utils/emailTemplates.js';
+
+/**
+ * Populate order.user (and product slugs when needed) then send a customer
+ * email — fire-and-forget; webhook processing never fails on email errors.
+ */
+const emailCustomer = async (order, buildSubject, buildHtml, { withProductSlugs = false } = {}) => {
+    try {
+        const paths = [{ path: 'user', select: 'firstName lastName email' }];
+        if (withProductSlugs) paths.push({ path: 'orderItems.product', select: 'slug name' });
+        await order.populate(paths);
+        if (!order.user?.email) return;
+        await sendEmail({
+            email: order.user.email,
+            subject: buildSubject(order),
+            html: buildHtml(order, order.user),
+        });
+    } catch (err) {
+        console.error('Webhook email failed:', err.message);
+    }
+};
 
 const router = express.Router();
 
@@ -52,18 +79,22 @@ router.post('/webhook', verifyWebhookToken, async (req, res) => {
         // Get event type
         const eventType = event.event || event.type;
 
-        // Find order by Shiprocket order ID or shipment ID
-        const order = await Order.findOne({
-            $or: [
-                { 'shiprocket.shiprocketOrderId': event.order_id },
-                { 'shiprocket.shiprocketShipmentId': event.shipment_id },
-            ],
-        });
+        // Find order by Shiprocket order ID or shipment ID.
+        // Only include conditions whose value is present — Mongoose strips
+        // undefined query values, which would turn that $or branch into {}
+        // and match an arbitrary order.
+        const lookup = [];
+        if (event.order_id != null) lookup.push({ 'shiprocket.shiprocketOrderId': event.order_id });
+        if (event.shipment_id != null) lookup.push({ 'shiprocket.shiprocketShipmentId': event.shipment_id });
+        const order = lookup.length > 0 ? await Order.findOne({ $or: lookup }) : null;
 
         if (!order) {
             console.warn(`⚠️ Order not found for Shiprocket webhook: order_id=${event.order_id}`);
             return res.status(200).json({ success: true, message: 'Order not found' });
         }
+
+        // Pre-update status — used to dedup emails when Shiprocket retries a webhook
+        const prevShippingStatus = order.shiprocket?.shippingStatus;
 
         // Handle different event types
         switch (eventType) {
@@ -127,8 +158,15 @@ router.post('/webhook', verifyWebhookToken, async (req, res) => {
                 });
 
                 await order.save();
-                
-                // TODO: Send email/SMS notification to customer
+
+                // Shipped email — dedup on webhook retries via prior status
+                if (prevShippingStatus !== 'in_transit') {
+                    emailCustomer(
+                        order,
+                        (o) => `Your Order Has Shipped - ${o.orderNumber} | SwissGarden Perfumes`,
+                        (o, u) => orderShippedEmail(o, u)
+                    );
+                }
                 break;
             }
 
@@ -146,8 +184,15 @@ router.post('/webhook', verifyWebhookToken, async (req, res) => {
                 });
 
                 await order.save();
-                
-                // TODO: Send SMS alert to customer
+
+                // Out-for-delivery email — dedup on webhook retries
+                if (prevShippingStatus !== 'out_for_delivery') {
+                    emailCustomer(
+                        order,
+                        (o) => `Out for Delivery - ${o.orderNumber} | SwissGarden Perfumes`,
+                        (o, u) => orderOutForDeliveryEmail(o, u)
+                    );
+                }
                 break;
             }
 
@@ -169,8 +214,16 @@ router.post('/webhook', verifyWebhookToken, async (req, res) => {
                 });
 
                 await order.save();
-                
-                // TODO: Send thank you email + review request
+
+                // Thank-you + review-request email — dedup on webhook retries
+                if (prevShippingStatus !== 'delivered') {
+                    emailCustomer(
+                        order,
+                        (o) => `Order Delivered - ${o.orderNumber} | SwissGarden Perfumes`,
+                        (o, u) => orderDeliveredEmail(o, u),
+                        { withProductSlugs: true }
+                    );
+                }
                 break;
             }
 
@@ -189,8 +242,15 @@ router.post('/webhook', verifyWebhookToken, async (req, res) => {
                 });
 
                 await order.save();
-                
-                // TODO: Alert admin about RTO
+
+                // Admin alert — RTO needs manual follow-up; dedup on retries
+                if (prevShippingStatus !== 'rto') {
+                    sendEmail({
+                        email: process.env.ADMIN_EMAIL || process.env.SMTP_EMAIL,
+                        subject: `⚠️ RTO Initiated - ${order.orderNumber} | SwissGarden Perfumes`,
+                        html: rtoAdminAlertEmail(order, event),
+                    }).catch((err) => console.error('RTO admin alert failed:', err.message));
+                }
                 break;
             }
 

@@ -1,4 +1,10 @@
 import Contact from '../models/Contact.js';
+import sendEmail from '../utils/sendEmail.js';
+import {
+    contactAcknowledgementEmail,
+    contactAdminAlertEmail,
+    contactReplyEmail,
+} from '../utils/emailTemplates.js';
 
 /**
  * @desc    Submit contact form
@@ -9,6 +15,19 @@ export const submitContact = async (req, res, next) => {
     try {
         const { name, email, subject, message } = req.body;
         const contact = await Contact.create({ name, email, subject, message });
+
+        // Acknowledge the customer + alert the store inbox — fire-and-forget
+        sendEmail({
+            email: contact.email,
+            subject: 'We received your message | SwissGarden Perfumes',
+            html: contactAcknowledgementEmail(contact),
+        }).catch((err) => console.error('Contact acknowledgement email failed:', err.message));
+
+        sendEmail({
+            email: process.env.ADMIN_EMAIL || process.env.SMTP_EMAIL,
+            subject: `📨 New Contact Message: ${contact.subject}`,
+            html: contactAdminAlertEmail(contact),
+        }).catch((err) => console.error('Contact admin alert failed:', err.message));
 
         res.status(201).json({
             success: true,
@@ -54,14 +73,26 @@ export const getContacts = async (req, res, next) => {
  */
 export const updateContact = async (req, res, next) => {
     try {
-        const contact = await Contact.findByIdAndUpdate(
-            req.params.id,
-            { status: req.body.status, reply: req.body.reply },
-            { new: true }
-        );
+        // Fetch-compare-save so a status-only edit never re-sends the reply email
+        const contact = await Contact.findById(req.params.id);
 
         if (!contact) {
             return res.status(404).json({ success: false, message: 'Contact message not found' });
+        }
+
+        const previousReply = contact.reply;
+        if (req.body.status) contact.status = req.body.status;
+        if (req.body.reply !== undefined) contact.reply = req.body.reply;
+        await contact.save();
+
+        // Email the customer only when a NEW/changed reply was added
+        const newReply = req.body.reply?.trim();
+        if (newReply && newReply !== previousReply) {
+            sendEmail({
+                email: contact.email,
+                subject: `Re: ${contact.subject} | SwissGarden Perfumes`,
+                html: contactReplyEmail(contact),
+            }).catch((err) => console.error('Contact reply email failed:', err.message));
         }
 
         res.status(200).json({ success: true, contact });

@@ -64,6 +64,9 @@ services:
         value: SwissGarden Perfumes
       - key: FROM_EMAIL
         sync: false
+      # Store-alert recipient (contact form, RTO, new returns); falls back to SMTP_EMAIL
+      - key: ADMIN_EMAIL
+        value: support@swissgardenperfumes.com
 
       # ── AI Chatbot (OpenRouter) ──────────────────────────────────
       # Rotate the key at https://openrouter.ai/keys after first deploy

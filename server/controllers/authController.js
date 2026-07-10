@@ -1,6 +1,8 @@
 import User from '../models/User.js';
 import crypto from 'crypto';
 import sendEmail from '../utils/sendEmail.js';
+import { welcomeEmail } from '../utils/emailTemplates.js';
+import { getClientUrl } from '../config/urls.js';
 
 /**
  * Helper: Send token response with cookie
@@ -79,6 +81,14 @@ export const register = async (req, res, next) => {
         });
 
         console.log('✅ User created successfully:', user.email);
+
+        // Welcome email — fire-and-forget, never blocks registration
+        sendEmail({
+            email: user.email,
+            subject: 'Welcome to SwissGarden Perfumes ✨',
+            html: welcomeEmail(user),
+        }).catch((err) => console.error('Welcome email failed:', err.message));
+
         sendTokenResponse(user, 201, res);
     } catch (error) {
         console.error('❌ Registration error:', error.message);
@@ -400,8 +410,8 @@ export const forgotPassword = async (req, res, next) => {
         user.resetPasswordExpire = Date.now() + 30 * 60 * 1000; // 30 minutes
         await user.save({ validateBeforeSave: false });
 
-        // Create reset URL
-        const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
+        // Create reset URL (getClientUrl handles CLIENT_URL/RENDER_EXTERNAL_URL/localhost)
+        const resetUrl = `${getClientUrl()}/reset-password/${resetToken}`;
 
         // Check if SMTP is configured
         const smtpConfigured = process.env.SMTP_HOST && process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD && 
@@ -535,7 +545,7 @@ export const resetPassword = async (req, res, next) => {
                                 Your password has been successfully changed. You can now log in with your new password.
                             </p>
                             <div style="text-align: center; margin: 30px 0;">
-                                <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/login" style="display: inline-block; background: #D4AF37; color: #000; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">
+                                <a href="${getClientUrl()}/login" style="display: inline-block; background: #D4AF37; color: #000; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">
                                     Sign In
                                 </a>
                             </div>
