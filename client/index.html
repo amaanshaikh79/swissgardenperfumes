@@ -52,16 +52,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://checkout.razorpay.com" />
 
-    <!-- Fonts: loaded non-render-blocking (media-swap) with display=swap -->
+    <!-- Fonts: preload + stylesheet with display=swap. No inline onload handler —
+         the production CSP (script-src-attr 'none') blocks inline event handlers,
+         which silently left the media-swap variant stuck at media="print". -->
     <link rel="preload" as="style"
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" />
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
-        media="print" onload="this.media='all'" />
-    <noscript>
-        <link rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" />
-    </noscript>
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" />
 
     <!-- Preload LCP hero poster so the preload scanner fetches it before JS executes -->
     <link rel="preload" as="image" type="image/webp" href="/Images/Alpine%20Savage.webp" fetchpriority="high" />

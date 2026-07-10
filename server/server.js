@@ -90,8 +90,28 @@ app.set('trust proxy', 1);
 app.use(compression());
 
 // ─── Security Middleware ────────────────────────────────────────
+// CSP must allow the Razorpay checkout stack: helmet's default script-src
+// 'self' blocks checkout.razorpay.com, which silently breaks ALL online
+// payments in production (the SDK never loads, the modal iframe is refused).
 app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            baseUri: ["'self'"],
+            objectSrc: ["'none'"],
+            frameAncestors: ["'self'"],
+            formAction: ["'self'"],
+            scriptSrc: ["'self'", 'https://checkout.razorpay.com'],
+            frameSrc: ["'self'", 'https://api.razorpay.com', 'https://checkout.razorpay.com', 'https://*.razorpay.com'],
+            connectSrc: ["'self'", 'https://api.razorpay.com', 'https://lumberjack.razorpay.com', 'https://*.razorpay.com'],
+            imgSrc: ["'self'", 'data:', 'https://*.razorpay.com'],
+            styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
+            fontSrc: ["'self'", 'https:', 'data:'],
+            mediaSrc: ["'self'"],
+            upgradeInsecureRequests: [],
+        },
+    },
 }));
 
 // Rate limiting
