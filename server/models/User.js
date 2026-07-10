@@ -50,6 +50,18 @@ const userSchema = new mongoose.Schema(
             type: String,
             trim: true,
         },
+        countryCode: {
+            type: String,
+            trim: true,
+        },
+        otp: {
+            type: String,
+            select: false,
+        },
+        otpExpire: {
+            type: Date,
+            select: false,
+        },
         addresses: [
             {
                 label: { type: String, default: 'Home' },
@@ -110,6 +122,8 @@ userSchema.set('toJSON', {
         delete ret.facebookId;
         delete ret.resetPasswordToken;
         delete ret.resetPasswordExpire;
+        delete ret.otp;
+        delete ret.otpExpire;
         return ret;
     },
 });

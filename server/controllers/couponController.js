@@ -146,7 +146,18 @@ export const getAllCoupons = async (req, res, next) => {
  */
 export const updateCoupon = async (req, res, next) => {
     try {
-        const coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, {
+        // Whitelist allowed fields — usedCount and usedBy are managed by the
+        // order system and must not be directly overridable via the admin API.
+        const ALLOWED_FIELDS = [
+            'code', 'description', 'discountType', 'discountValue', 'maxDiscount',
+            'minOrderAmount', 'usageLimit', 'perUserLimit', 'startDate', 'expiryDate', 'isActive',
+        ];
+        const updateData = {};
+        ALLOWED_FIELDS.forEach((field) => {
+            if (req.body[field] !== undefined) updateData[field] = req.body[field];
+        });
+
+        const coupon = await Coupon.findByIdAndUpdate(req.params.id, updateData, {
             new: true,
             runValidators: true,
         });

@@ -26,6 +26,14 @@ export const AuthProvider = ({ children }) => {
             }
         }
         setLoading(false);
+
+        // Handle 401 responses from the API interceptor without a full page reload.
+        // The API interceptor dispatches this event instead of redirecting, so
+        // ProtectedRoute (which checks isAuthenticated) will navigate to /login via
+        // React Router, preserving the SPA session context.
+        const handleUnauthorized = () => setUser(null);
+        window.addEventListener('auth-unauthorized', handleUnauthorized);
+        return () => window.removeEventListener('auth-unauthorized', handleUnauthorized);
     }, []);
 
     /**

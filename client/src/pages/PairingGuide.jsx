@@ -108,7 +108,7 @@ const PairingGuide = () => {
                         >
                             <h1 className="pairing-hero-title">Your Attar. Your Rules.</h1>
                             <p className="pairing-hero-intro">
-                                Every fragrance in The Mood Collection is engineered to stand alone. And every one of them pairs with at least two others. 
+                                Every fragrance The Mood Collection is engineered to stand alone. And every one of them pairs with at least two others. 
                                 This guide shows you the recommended combinations — what they create together, how to wear them, and when they work best.
                             </p>
                             <p className="pairing-hero-note">

@@ -6,6 +6,7 @@ import sendEmail, { orderConfirmationEmail } from '../utils/sendEmail.js';
 import { verifyRazorpaySignature } from '../utils/verifyRazorpay.js';
 import Razorpay from 'razorpay';
 import { createShiprocketOrder } from '../services/shiprocketService.js';
+import { restoreStockAndCoupon } from '../utils/orderHelper.js';
 
 // Lazy Razorpay client for server-side payment reconciliation in updateOrderToPaid.
 let _rzp = null;
@@ -341,6 +342,7 @@ export const updateOrderStatus = async (req, res, next) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
+        const previousStatus = order.orderStatus;
         order.orderStatus = req.body.status;
 
         if (req.body.status === 'Delivered') {
@@ -352,6 +354,11 @@ export const updateOrderStatus = async (req, res, next) => {
         }
 
         await order.save();
+
+        // Restore stock and coupon if status transitions to Cancelled
+        if (req.body.status === 'Cancelled' && previousStatus !== 'Cancelled') {
+            await restoreStockAndCoupon(order);
+        }
 
         res.status(200).json({ success: true, order });
     } catch (error) {
@@ -515,7 +522,7 @@ const createShiprocketOrderAsync = async (order, user) => {
                 state: shipping.state,
                 country: shipping.country,
                 email: user.email,
-                phone: user.phone || '9999999999',
+                phone: shipping.phone || user.phone || '9999999999',
             },
             shipping: null, // Same as billing
             items: populatedOrder.orderItems.map((item) => ({
@@ -589,8 +596,13 @@ export const cancelOrder = async (req, res, next) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        if (order.user.toString() !== req.user._id.toString()) {
+        if (order.user.toString() !== req.user.id) {
             return res.status(403).json({ success: false, message: 'Not authorized to cancel this order' });
+        }
+
+        // Prevent double-cancellation
+        if (order.orderStatus === 'Cancelled') {
+            return res.status(400).json({ success: false, message: 'Order is already cancelled' });
         }
 
         // Only allow cancellation if order is not yet shipped
@@ -600,6 +612,9 @@ export const cancelOrder = async (req, res, next) => {
 
         order.orderStatus = 'Cancelled';
         await order.save();
+
+        // Restore stock and reverse coupon usage
+        await restoreStockAndCoupon(order);
 
         res.status(200).json({ success: true, message: 'Order cancelled successfully', order });
     } catch (error) {

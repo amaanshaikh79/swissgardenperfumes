@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMail, FiMapPin, FiPhone, FiSend, FiChevronDown, FiMessageSquare, FiClock, FiInstagram } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import { contactAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import './Contact.css';
@@ -83,7 +84,7 @@ const Contact = () => {
                                 { icon: <FiPhone size={22} />, title: 'Call Us', detail: '+91 9354936369', sub: 'Mon–Sun, 10AM–7PM' },
                                 { icon: <FiMail size={22} />, title: 'Email Us', detail: 'contact@swissgardenperfumes.com', sub: 'Reply within 24 hours' },
                                 { icon: <FiMapPin size={22} />, title: 'Visit Us', detail: 'C-589 DDA Flat, Pocket 11', sub: 'Jasola, New Delhi 110025' },
-                                { icon: <FiInstagram size={22} />, title: 'WhatsApp', detail: '+91 9354936369', sub: 'Quick support & orders' },
+                                { icon: <FaWhatsapp size={22} />, title: 'WhatsApp', detail: '+91 9354936369', sub: 'Quick support & orders' },
                             ].map((card, i) => (
                                 <motion.div
                                     key={card.title}

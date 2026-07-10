@@ -421,7 +421,11 @@ const ProductDetail = () => {
                                         <FiMinus size={16} />
                                     </button>
                                     <span>{quantity}</span>
-                                    <button onClick={() => setQuantity(quantity + 1)}>
+                                    <button
+                                        onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                                        disabled={quantity >= product.stock}
+                                        aria-label="Increase quantity"
+                                    >
                                         <FiPlus size={16} />
                                     </button>
                                 </div>

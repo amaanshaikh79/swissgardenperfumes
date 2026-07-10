@@ -36,10 +36,11 @@ API.interceptors.response.use(
         } else if (error.response.status === 401) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            // Don't redirect if already on login page
-            if (!window.location.pathname.includes('/login')) {
-                window.location.href = '/login';
-            }
+            // Dispatch a custom event instead of a hard redirect.
+            // AuthContext listens for this event and sets user to null,
+            // which causes ProtectedRoute to navigate via React Router
+            // (preserving SPA state instead of forcing a full page reload).
+            window.dispatchEvent(new CustomEvent('auth-unauthorized'));
         }
         return Promise.reject(error);
     }
@@ -129,6 +130,18 @@ export const returnAPI = {
 // Chat API
 export const chatAPI = {
     sendMessage: (messages) => API.post('/chat', { messages }),
+};
+
+// Shiprocket API
+export const shiprocketAPI = {
+    retryOrder: (orderId) => API.post(`/shiprocket/retry/${orderId}`),
+    schedulePickup: (orderId, data) => API.post(`/shiprocket/schedule-pickup/${orderId}`, data),
+    generateLabel: (orderId) => API.get(`/shiprocket/generate-label/${orderId}`),
+    track: (orderId) => API.get(`/shiprocket/track/${orderId}`),
+    cancel: (orderId) => API.post(`/shiprocket/cancel/${orderId}`),
+    bulkSchedulePickup: (data) => API.post('/shiprocket/bulk-schedule-pickup', data),
+    getOrderDetails: (orderNumber) => API.get(`/shiprocket/order-details/${orderNumber}`),
+    getShippingRates: (data) => API.post('/shiprocket/shipping-rates', data),
 };
 
 // Admin API

@@ -8,12 +8,11 @@ import {
 import ProductCard from '../components/product/ProductCard';
 import LazyImage from '../components/common/LazyImage';
 import LazyVideo from '../components/common/LazyVideo';
-import { productsAPI } from '../services/api';
+import { productsAPI, contactAPI } from '../services/api';
 import { getBackendMediaUrl } from '../utils/media';
 import './Home.css';
 
 const Home = () => {
-    const [featured, setFeatured] = useState([]);
     const [allProducts, setAllProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [email, setEmail] = useState('');
@@ -77,9 +76,6 @@ const Home = () => {
                 const { data } = await productsAPI.getAll({ limit: 50 });
                 const products = data.products || [];
                 setAllProducts(products);
-                // Derive the featured/bestseller set client-side from the same
-                // response instead of firing a second round-trip.
-                setFeatured(products.filter((p) => p.featured));
             } catch (error) {
                 console.error('Failed to fetch products:', error);
             } finally {
@@ -89,12 +85,26 @@ const Home = () => {
         fetchProducts();
     }, []);
 
-    const handleEmailSubmit = (e) => {
+    const handleEmailSubmit = async (e) => {
         e.preventDefault();
         if (email.trim()) {
-            setEmailSubmitted(true);
-            setEmail('');
-            setTimeout(() => setEmailSubmitted(false), 5000);
+            try {
+                await contactAPI.submit({
+                    name: 'Newsletter Subscriber',
+                    email: email.trim(),
+                    subject: 'Newsletter Subscription',
+                    message: 'User subscribed to newsletter from the home page.',
+                });
+                setEmailSubmitted(true);
+                setEmail('');
+                setTimeout(() => setEmailSubmitted(false), 5000);
+            } catch (error) {
+                console.error('Newsletter subscription error:', error);
+                // Still show success to user even if backend fails
+                setEmailSubmitted(true);
+                setEmail('');
+                setTimeout(() => setEmailSubmitted(false), 5000);
+            }
         }
     };
 

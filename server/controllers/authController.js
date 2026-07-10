@@ -29,10 +29,12 @@ const sendTokenResponse = (user, statusCode, res) => {
 };
 
 /**
- * Helper: Generate a 6-digit OTP
+ * Helper: Generate a cryptographically secure 6-digit OTP
  */
 const generateOTP = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+    // crypto.randomInt is available since Node.js 14.10 and is
+    // cryptographically secure (unlike Math.random)
+    return crypto.randomInt(100000, 1000000).toString();
 };
 
 /**
@@ -310,6 +312,14 @@ export const updateProfile = async (req, res, next) => {
 export const updatePassword = async (req, res, next) => {
     try {
         const user = await User.findById(req.user.id).select('+password');
+
+        // OAuth-only accounts have no password — prevent bcrypt crash
+        if (!user.password) {
+            return res.status(400).json({
+                success: false,
+                message: 'This account uses social login. Password cannot be changed here.',
+            });
+        }
 
         if (!(await user.matchPassword(req.body.currentPassword))) {
             return res.status(401).json({

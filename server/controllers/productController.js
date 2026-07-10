@@ -154,7 +154,21 @@ export const getProductById = async (req, res, next) => {
  */
 export const createProduct = async (req, res, next) => {
     try {
-        const product = await Product.create(req.body);
+        // Whitelist allowed fields to prevent mass assignment of computed fields
+        // (sold, rating, numReviews, reviews are managed by the system)
+        const ALLOWED_FIELDS = [
+            'name', 'brand', 'description', 'shortDescription', 'price', 'compareAtPrice',
+            'images', 'video', 'category', 'gender', 'size', 'fragranceNotes',
+            'fragranceFamily', 'stock', 'featured', 'isActive', 'tags', 'concentration',
+            'longevity', 'sillage', 'occasion', 'season', 'moodProfile', 'bestFor',
+            'perfumerNote', 'dryDown', 'pairsWith', 'format', 'metaDescription',
+            'wearFor', 'layeringStory',
+        ];
+        const productData = {};
+        ALLOWED_FIELDS.forEach((field) => {
+            if (req.body[field] !== undefined) productData[field] = req.body[field];
+        });
+        const product = await Product.create(productData);
         res.status(201).json({ success: true, product });
     } catch (error) {
         next(error);
@@ -168,7 +182,20 @@ export const createProduct = async (req, res, next) => {
  */
 export const updateProduct = async (req, res, next) => {
     try {
-        const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+        // Whitelist allowed update fields — same policy as createProduct
+        const ALLOWED_UPDATE_FIELDS = [
+            'name', 'brand', 'description', 'shortDescription', 'price', 'compareAtPrice',
+            'images', 'video', 'category', 'gender', 'size', 'fragranceNotes',
+            'fragranceFamily', 'stock', 'featured', 'isActive', 'tags', 'concentration',
+            'longevity', 'sillage', 'occasion', 'season', 'moodProfile', 'bestFor',
+            'perfumerNote', 'dryDown', 'pairsWith', 'format', 'metaDescription',
+            'wearFor', 'layeringStory',
+        ];
+        const updateData = {};
+        ALLOWED_UPDATE_FIELDS.forEach((field) => {
+            if (req.body[field] !== undefined) updateData[field] = req.body[field];
+        });
+        const product = await Product.findByIdAndUpdate(req.params.id, updateData, {
             new: true,
             runValidators: true,
         });

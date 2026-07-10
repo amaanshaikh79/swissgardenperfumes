@@ -63,7 +63,7 @@ const Footer = () => {
                             </div>
                             <div className="footer-contact-item">
                                 <FiMail size={14} />
-                                <span>Contact@swissgardenperfumes.com</span>
+                                <span>contact@swissgardenperfumes.com</span>
                             </div>
                             <div className="footer-contact-item">
                                 <FiMessageCircle size={14} />

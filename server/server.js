@@ -72,6 +72,8 @@ import deliveryPartnerRoutes from './routes/deliveryPartnerRoutes.js';
 import returnRoutes from './routes/returnRoutes.js';
 import sitemapRoutes from './routes/sitemapRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
+import shiprocketRoutes from './routes/shiprocketRoutes.js';
+import shiprocketWebhookRoutes from './routes/shiprocketWebhookRoutes.js';
 import passport, { initializePassport } from './config/passport.js';
 
 // Register OAuth strategies NOW (after dotenv has loaded env vars)
@@ -107,6 +109,9 @@ const authLimiter = rateLimit({
 });
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
+// OTP rate limiting — prevent brute-force of 6-digit codes
+app.use('/api/auth/send-otp', authLimiter);
+app.use('/api/auth/verify-otp', authLimiter);
 
 // Chat rate limiting — cost control for OpenRouter calls
 const chatLimiter = rateLimit({
@@ -195,6 +200,8 @@ app.use('/api/auth', oauthRoutes);
 app.use('/api/delivery-partners', deliveryPartnerRoutes);
 app.use('/api/returns', returnRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/shiprocket', shiprocketRoutes);
+app.use('/api/shiprocket', shiprocketWebhookRoutes);
 
 // ─── Dynamic XML Sitemap ────────────────────────────────────────
 // MUST be mounted before any SPA static/catch-all so the "/*" fallback

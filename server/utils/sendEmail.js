@@ -1,28 +1,53 @@
 import nodemailer from 'nodemailer';
 
+// Module-level transporter — initialized once, reused for every email (connection pooling).
+// This prevents opening a new TCP + TLS connection on every single send, which under
+// load causes connection exhaustion, latency spikes, and SMTP provider rate limiting.
+let _transporter = null;
+
+const getTransporter = () => {
+    if (_transporter) return _transporter;
+    if (!process.env.SMTP_HOST || !process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+        return null;
+    }
+    _transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        secure: process.env.SMTP_PORT === '465',
+        pool: true, // Reuse SMTP connections
+        auth: {
+            user: process.env.SMTP_EMAIL,
+            pass: process.env.SMTP_PASSWORD,
+        },
+    });
+    return _transporter;
+};
+
+/**
+ * Escape HTML special characters to prevent XSS in email templates.
+ */
+const escapeHTML = (str) => {
+    if (typeof str !== 'string') return String(str ?? '');
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+};
+
 /**
  * Send email utility
  */
 const sendEmail = async (options) => {
-    // Check if SMTP is configured
-    if (!process.env.SMTP_HOST || !process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+    const transporter = getTransporter();
+    if (!transporter) {
         console.log('📧 Email skipped (SMTP not configured)');
         console.log('📧 To: ', options.email);
         console.log('📧 Subject: ', options.subject);
         console.log('📧 To enable emails, configure SMTP_HOST, SMTP_EMAIL, and SMTP_PASSWORD in .env');
         return null;
     }
-
-    // Create transporter
-    const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        secure: process.env.SMTP_PORT === '465',
-        auth: {
-            user: process.env.SMTP_EMAIL,
-            pass: process.env.SMTP_PASSWORD,
-        },
-    });
 
     const mailOptions = {
         from: `"${process.env.FROM_NAME || 'SwissGarden Perfumes'}" <${process.env.FROM_EMAIL || process.env.SMTP_EMAIL}>`,
@@ -60,8 +85,8 @@ export const orderConfirmationEmail = (order, user) => {
             (item) => `
     <tr>
       <td style="padding: 12px; border-bottom: 1px solid #333;">
-        <strong style="color: #D4AF37;">${item.name}</strong>
-        ${item.size ? `<br><small style="color: #999;">${item.size}</small>` : ''}
+        <strong style="color: #D4AF37;">${escapeHTML(item.name)}</strong>
+        ${item.size ? `<br><small style="color: #999;">${escapeHTML(item.size)}</small>` : ''}
       </td>
       <td style="padding: 12px; border-bottom: 1px solid #333; text-align: center; color: #ccc;">${item.quantity}</td>
       <td style="padding: 12px; border-bottom: 1px solid #333; text-align: right; color: #D4AF37;">${formatINR(item.price)}</td>
@@ -69,6 +94,8 @@ export const orderConfirmationEmail = (order, user) => {
   `
         )
         .join('');
+
+    const addr = order.shippingAddress;
 
     return `
     <div style="max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #fff; font-family: 'Georgia', serif;">
@@ -80,8 +107,8 @@ export const orderConfirmationEmail = (order, user) => {
       <div style="padding: 40px 30px;">
         <h2 style="color: #D4AF37; font-size: 20px; margin-bottom: 20px;">Order Confirmed ✨</h2>
         <p style="color: #ccc; line-height: 1.6;">
-          Dear ${user.firstName},<br><br>
-          Thank you for your exquisite purchase. Your order <strong style="color: #D4AF37;">${order.orderNumber}</strong> has been confirmed.
+          Dear ${escapeHTML(user.firstName)},<br><br>
+          Thank you for your exquisite purchase. Your order <strong style="color: #D4AF37;">${escapeHTML(order.orderNumber)}</strong> has been confirmed.
         </p>
 
         <table style="width: 100%; border-collapse: collapse; margin: 30px 0;">
@@ -105,9 +132,9 @@ export const orderConfirmationEmail = (order, user) => {
         <div style="margin-top: 30px; padding: 20px; background: #111; border-radius: 8px;">
           <h3 style="color: #D4AF37; margin-bottom: 10px;">Shipping Address</h3>
           <p style="color: #ccc; line-height: 1.6;">
-            ${order.shippingAddress.street}<br>
-            ${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.zipCode}<br>
-            ${order.shippingAddress.country}
+            ${escapeHTML(addr.street)}<br>
+            ${escapeHTML(addr.city)}, ${escapeHTML(addr.state)} ${escapeHTML(addr.zipCode)}<br>
+            ${escapeHTML(addr.country)}
           </p>
         </div>
       </div>

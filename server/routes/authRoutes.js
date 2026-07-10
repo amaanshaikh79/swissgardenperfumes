@@ -9,6 +9,8 @@ import {
     toggleWishlist,
     forgotPassword,
     resetPassword,
+    sendOTP,
+    verifyOTP,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/auth.js';
 import { registerRules, loginRules, validate } from '../middleware/validators.js';
@@ -24,5 +26,7 @@ router.put('/password', protect, updatePassword);
 router.put('/wishlist/:productId', protect, toggleWishlist);
 router.post('/forgot-password', forgotPassword);
 router.put('/reset-password/:token', resetPassword);
+router.post('/send-otp', sendOTP);
+router.post('/verify-otp', verifyOTP);
 
 export default router;

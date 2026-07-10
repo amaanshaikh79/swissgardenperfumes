@@ -153,9 +153,9 @@ const Wishlist = () => {
                                                     <span className="wishlist-item-price">
                                                         ₹{product.price?.toLocaleString('en-IN')}
                                                     </span>
-                                                    {product.comparePrice && product.comparePrice > product.price && (
+                                                    {product.compareAtPrice && product.compareAtPrice > product.price && (
                                                         <span className="wishlist-item-compare">
-                                                            ₹{product.comparePrice?.toLocaleString('en-IN')}
+                                                            ₹{product.compareAtPrice?.toLocaleString('en-IN')}
                                                         </span>
                                                     )}
                                                 </div>

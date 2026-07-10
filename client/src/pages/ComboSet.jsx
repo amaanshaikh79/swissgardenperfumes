@@ -12,6 +12,7 @@ const ComboSet = () => {
     const [products, setProducts] = useState([]);
     const [selectedAttars, setSelectedAttars] = useState([null, null, null]);
     const [loading, setLoading] = useState(true);
+    const [addedToCart, setAddedToCart] = useState(false);
     const { addToCart } = useCart();
 
     const COMBO_PRICE = 2397;
@@ -58,22 +59,17 @@ const ComboSet = () => {
             return;
         }
 
-        // Create a combo product
-        const comboProduct = {
-            _id: `combo-${Date.now()}`,
-            name: 'SwissGarden Trio Combo',
-            price: COMBO_PRICE,
-            images: [{ url: selectedAttars[0].images?.[0]?.url || '', alt: 'Trio Combo' }],
-            isCombo: true,
-            comboItems: selectedAttars.map(attar => ({
-                id: attar._id,
-                name: attar.name,
-                image: attar.images?.[0]?.url || ''
-            }))
-        };
+        // Add each selected attar as an individual cart item.
+        // CartContext and the server both calculate the combo discount
+        // dynamically based on total cart quantity (≥3 items = ₹400 off),
+        // so there is no need for a fake composite product ID here.
+        // A fake ID would also break server-side product lookup at checkout.
+        selectedAttars.forEach((attar) => {
+            if (attar) addToCart(attar, 1);
+        });
 
-        addToCart(comboProduct);
-        toast.success('Trio combo added to cart!');
+        setAddedToCart(true);
+        toast.success('Trio added to cart — ₹400 combo discount applied!');
     };
 
     if (loading) {
@@ -178,8 +174,8 @@ const ComboSet = () => {
                                 <FiShoppingBag size={20} />
                                 Add to Cart ({allSlotsFilledCount}/3 selected)
                             </button>
-                            {canAddToCart && (
-                                <p className="combo-cart-confirmation">Your Signature Trio has been added.</p>
+                            {addedToCart && (
+                                <p className="combo-cart-confirmation">Your Signature Trio has been added to your cart.</p>
                             )}
                         </div>
                     </div>

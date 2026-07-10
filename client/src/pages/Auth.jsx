@@ -434,7 +434,7 @@ const ResetPassword = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { token } = useParams();
-    const { login } = useAuth();
+    const { loginWithToken } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -450,12 +450,12 @@ const ResetPassword = () => {
         try {
             const { data } = await authAPI.resetPassword(token, { password: form.password });
             if (data.success) {
-                // Store the token and user from response
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
+                // Use loginWithToken to properly update AuthContext React state
+                // instead of manually writing to localStorage and hard-reloading
+                await loginWithToken(data.token);
                 toast.success('Password reset successful! Logging you in...');
                 setTimeout(() => {
-                    window.location.href = '/';
+                    navigate('/');
                 }, 1000);
             }
         } catch (error) {

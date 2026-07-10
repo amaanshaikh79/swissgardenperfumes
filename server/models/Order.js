@@ -38,6 +38,7 @@ const orderSchema = new mongoose.Schema(
             state: { type: String, required: true },
             zipCode: { type: String, required: true },
             country: { type: String, required: true },
+            phone: { type: String, required: true },
         },
         paymentMethod: {
             type: String,

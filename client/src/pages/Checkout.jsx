@@ -56,7 +56,7 @@ const Checkout = () => {
     const [paymentMethod, setPaymentMethod] = useState('');
     const [paymentError, setPaymentError] = useState('');
     const [shipping, setShipping] = useState({
-        street: '', landmark: '', country: '', state: '', city: '', zipCode: '',
+        street: '', landmark: '', country: '', state: '', city: '', zipCode: '', phone: '',
     });
 
     // Coupon state
@@ -109,6 +109,15 @@ const Checkout = () => {
         if (!shipping.state) { toast.error('Please select your state'); return false; }
         if (!shipping.city) { toast.error('Please select your city'); return false; }
         if (!shipping.zipCode.trim()) { toast.error('Please enter your zip/postal code'); return false; }
+        if (!shipping.phone.trim()) { toast.error('Please enter your phone number'); return false; }
+        
+        // Validate phone number format (10 digits for India)
+        const phoneRegex = /^[6-9]\d{9}$/;
+        if (shipping.country === 'IN' && !phoneRegex.test(shipping.phone.replace(/\D/g, ''))) {
+            toast.error('Please enter a valid 10-digit Indian phone number');
+            return false;
+        }
+        
         return true;
     };
 
@@ -220,6 +229,7 @@ const Checkout = () => {
                 state: shipping.state,
                 zipCode: shipping.zipCode.trim(),
                 country: shipping.country,
+                phone: shipping.phone.trim(),
             },
             paymentMethod: paymentMethod === 'cod' ? 'cod' : 'razorpay',
             couponCode: appliedCoupon?.code || null,
@@ -430,14 +440,30 @@ const Checkout = () => {
                                                 </select>
                                             </div>
                                         </div>
-                                        <div className="form-group" style={{ maxWidth: '280px' }}>
-                                            <label className="form-label">Zip / Postal Code *</label>
-                                            <input
-                                                className="form-input"
-                                                placeholder="e.g. 400001"
-                                                value={shipping.zipCode}
-                                                onChange={(e) => setShipping({ ...shipping, zipCode: e.target.value })}
-                                            />
+                                        <div className="checkout-row">
+                                            <div className="form-group">
+                                                <label className="form-label">Zip / Postal Code *</label>
+                                                <input
+                                                    className="form-input"
+                                                    placeholder="e.g. 400001"
+                                                    value={shipping.zipCode}
+                                                    onChange={(e) => setShipping({ ...shipping, zipCode: e.target.value })}
+                                                />
+                                            </div>
+                                            <div className="form-group">
+                                                <label className="form-label">Phone Number *</label>
+                                                <input
+                                                    className="form-input"
+                                                    type="tel"
+                                                    placeholder="e.g. 9876543210"
+                                                    value={shipping.phone}
+                                                    maxLength="10"
+                                                    onChange={(e) => {
+                                                        const value = e.target.value.replace(/\D/g, '');
+                                                        setShipping({ ...shipping, phone: value });
+                                                    }}
+                                                />
+                                            </div>
                                         </div>
 
                                         <button className="btn btn-primary btn-lg" onClick={handleContinueToPayment}>

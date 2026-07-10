@@ -2,10 +2,6 @@ import axios from 'axios';
 
 /**
  * Shiprocket API Service
- * 
- * Credentials:
- * Email: adnan2015mohd@gmail.com
- * Password: swissgarden$100m
  */
 
 const SHIPROCKET_API_URL = 'https://apiv2.shiprocket.in/v1/external';
@@ -25,8 +21,12 @@ export const authenticateShiprocket = async () => {
             return authToken;
         }
 
-        const email = process.env.SHIPROCKET_EMAIL || 'adnan2015mohd@gmail.com';
-        const password = process.env.SHIPROCKET_PASSWORD || 'swissgarden$100m';
+        const email = process.env.SHIPROCKET_EMAIL;
+        const password = process.env.SHIPROCKET_PASSWORD;
+
+        if (!email || !password) {
+            throw new Error('SHIPROCKET_EMAIL and SHIPROCKET_PASSWORD must be set in environment variables');
+        }
 
         console.log('🔐 Authenticating with Shiprocket...');
 

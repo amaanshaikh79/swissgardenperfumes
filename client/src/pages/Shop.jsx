@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -53,7 +53,7 @@ const Shop = () => {
     const minPrice = searchParams.get('minPrice') || '';
     const maxPrice = searchParams.get('maxPrice') || '';
 
-    const fetchProducts = async () => {
+    const fetchProducts = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -86,10 +86,10 @@ const Shop = () => {
             }
             
             // Price filters
-            if (minPrice && !isNaN(minPrice) && minPrice > 0) {
+            if (minPrice && !isNaN(minPrice) && Number(minPrice) > 0) {
                 params.minPrice = minPrice;
             }
-            if (maxPrice && !isNaN(maxPrice) && maxPrice > 0) {
+            if (maxPrice && !isNaN(maxPrice) && Number(maxPrice) > 0) {
                 params.maxPrice = maxPrice;
             }
 
@@ -103,13 +103,14 @@ const Shop = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [searchParams, category, gender, family, occasion, search, minPrice, maxPrice, sort]);
 
     useEffect(() => {
         const urlPage = parseInt(searchParams.get('page')) || 1;
         setPage(urlPage);
         fetchProducts();
-    }, [searchParams, sort]);
+    // sort is derived from searchParams, so searchParams change is sufficient
+    }, [searchParams, fetchProducts]);
 
     const updateFilter = (key, value) => {
         const newParams = new URLSearchParams(searchParams);
@@ -179,7 +180,7 @@ const Shop = () => {
                                 {search ? `Results for \u201C${search}\u201D` : 'Six Attars. Six Moods. One Standard.'}
                             </h1>
                             <p className="shop-hero-mood">
-                                {search ? currentMood.mood : 'Every fragrance in The Mood Collection is formulated to the same uncompromising standard — a structured note pyramid, non-alcoholic precision base, and roll-on delivery — and expresses a completely distinct emotional register. There is no hierarchy in this collection. There is only the mood you choose to wear today.'}
+                                {search ? currentMood.mood : 'Every fragrance The Mood Collection is formulated to the same uncompromising standard — a structured note pyramid, non-alcoholic precision base, and roll-on delivery — and expresses a completely distinct emotional register. There is no hierarchy in this collection. There is only the mood you choose to wear today.'}
                             </p>
                         </motion.div>
                     </div>
