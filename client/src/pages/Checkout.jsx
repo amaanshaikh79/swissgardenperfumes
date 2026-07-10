@@ -208,6 +208,9 @@ const Checkout = () => {
             const rzp = new window.Razorpay(options);
             rzp.on('payment.failed', (resp) => {
                 const msg = resp.error?.description || 'Payment failed';
+                // Close the modal so an in-modal retry cannot succeed against an
+                // order the flow is about to cancel/release.
+                try { rzp.close(); } catch { /* already closed */ }
                 reject(new Error(`PAYMENT_FAILED:${msg}`));
             });
             rzp.open();
@@ -223,6 +226,9 @@ const Checkout = () => {
         // Tracks a verified-but-captured payment so a later failure (saving the
         // order / marking paid) does not tell the customer to pay again.
         let capturedPaymentId = null;
+        // The DB order created before the modal opens (order-first flow); used
+        // to release stock/coupon if the customer cancels before paying.
+        let dbOrderId = null;
 
         const orderPayload = {
             orderItems: cartItems.map((item) => ({
@@ -255,7 +261,12 @@ const Checkout = () => {
                 return;
             }
 
-            // ── Online Payment Flow (Razorpay) ────────────────────
+            // ── Online Payment Flow (Razorpay — ORDER-FIRST) ─────
+            // The DB order is created BEFORE the modal opens and linked to the
+            // Razorpay order via notes.orderId, so if the browser dies after the
+            // charge (e.g. on the bank OTP page) the server webhook still
+            // completes the order. The amount is derived server-side.
+
             // Step 1: Get live Razorpay key from backend
             const configRes = await paymentAPI.getConfig();
             if (!configRes.data.success) {
@@ -263,15 +274,15 @@ const Checkout = () => {
             }
             const keyId = configRes.data.keyId;
 
-            // Step 2: Create Razorpay order on backend (returns amount in paise)
-            const paymentRes = await paymentAPI.createOrder({
-                amount: finalOrderTotal,
-                currency: 'INR',
-                receipt: `rcpt_${Date.now()}`,
-            });
+            // Step 2: Create OUR order first (unpaid; reserves stock + coupon)
+            const { data: orderData } = await ordersAPI.create(orderPayload);
+            dbOrderId = orderData.order._id;
+
+            // Step 3: Create the linked Razorpay order (server-side amount)
+            const paymentRes = await paymentAPI.createOrder({ orderId: dbOrderId });
             const razorpayOrder = paymentRes.data.order;
 
-            // Step 3: Ensure the checkout SDK is loaded, then open the modal
+            // Step 4: Ensure the checkout SDK is loaded, then open the modal
             const sdkReady = await loadRazorpay();
             if (!sdkReady) {
                 throw new Error('Razorpay SDK failed to load. Please refresh the page.');
@@ -279,7 +290,12 @@ const Checkout = () => {
             const prefillMethod = paymentMethod === 'upi' ? 'upi' : paymentMethod === 'card' ? 'card' : null;
             const razorpayResponse = await launchRazorpay(keyId, razorpayOrder, prefillMethod);
 
-            // Step 4: Verify payment signature on backend
+            // Payment is captured. From here on, any failure must NOT release
+            // the order or prompt the customer to pay again — the server
+            // webhook completes the order automatically.
+            capturedPaymentId = razorpayResponse.razorpay_payment_id;
+
+            // Step 5: Verify payment signature on backend
             const verifyRes = await paymentAPI.verify({
                 razorpay_order_id: razorpayResponse.razorpay_order_id,
                 razorpay_payment_id: razorpayResponse.razorpay_payment_id,
@@ -290,24 +306,17 @@ const Checkout = () => {
                 throw new Error('Payment verification failed. Please contact support.');
             }
 
-            // Payment is captured and verified. From here on, any failure must NOT
-            // prompt the customer to pay again.
-            capturedPaymentId = razorpayResponse.razorpay_payment_id;
-
-            // Step 5: Create order in our database
-            const { data: orderData } = await ordersAPI.create(orderPayload);
-
-            // Step 6: Mark order as paid
-            await ordersAPI.updateToPaid(orderData.order._id, {
-                id: razorpayResponse.razorpay_payment_id,
-                status: 'completed',
-                updateTime: new Date().toISOString(),
-                emailAddress: user?.email,
+            // Step 6: Mark order as paid (server re-verifies signature + amount;
+            // idempotent if the webhook already completed the order)
+            await ordersAPI.updateToPaid(dbOrderId, {
+                razorpay_order_id: razorpayResponse.razorpay_order_id,
+                razorpay_payment_id: razorpayResponse.razorpay_payment_id,
+                razorpay_signature: razorpayResponse.razorpay_signature,
             });
 
             clearCart();
             toast.success('Payment successful! Order confirmed. 🎉');
-            navigate(`/order-success/${orderData.order._id}`, {
+            navigate(`/order-success/${dbOrderId}`, {
                 state: {
                     order: orderData.order,
                     paymentId: razorpayResponse.razorpay_payment_id,
@@ -317,21 +326,30 @@ const Checkout = () => {
             });
         } catch (error) {
             if (capturedPaymentId) {
-                // Payment already succeeded but order persistence / mark-paid failed.
-                // Tell the customer NOT to pay again and surface the payment id.
-                const supportMsg = `Your payment (ID: ${capturedPaymentId}) was received successfully, but we hit a problem saving your order. Please do NOT pay again. Contact support with this payment ID and we will confirm your order.`;
-                setPaymentError(supportMsg);
-                toast.error(supportMsg, { duration: 12000 });
-            } else if (error.message === 'PAYMENT_CANCELLED') {
-                toast('Payment cancelled', { icon: '🚫' });
-            } else if (error.message?.startsWith('PAYMENT_FAILED:')) {
-                const reason = error.message.replace('PAYMENT_FAILED:', '');
-                setPaymentError(reason);
-                toast.error(`Payment failed: ${reason}`);
+                // Money was captured but a post-payment step failed. The order
+                // already exists and the server webhook confirms it automatically
+                // — reassure the customer instead of alarming them.
+                clearCart();
+                const infoMsg = 'Your payment was received. Your order is being confirmed automatically — it will appear in My Orders within a few minutes. Please do NOT pay again.';
+                setPaymentError(infoMsg);
+                toast.success(infoMsg, { duration: 12000 });
             } else {
-                const msg = error.response?.data?.message || error.message || 'Something went wrong. Please try again.';
-                setPaymentError(msg);
-                toast.error(msg);
+                // No charge happened. Release the reserved order (stock + coupon)
+                // if it was created, then explain what went wrong.
+                if (dbOrderId) {
+                    ordersAPI.cancel(dbOrderId).catch(() => {});
+                }
+                if (error.message === 'PAYMENT_CANCELLED') {
+                    toast('Payment cancelled — your order was not placed', { icon: '🚫' });
+                } else if (error.message?.startsWith('PAYMENT_FAILED:')) {
+                    const reason = error.message.replace('PAYMENT_FAILED:', '');
+                    setPaymentError(`${reason}. Common fix: enable online/e-commerce transactions on your card in your bank's app, or try UPI.`);
+                    toast.error(`Payment failed: ${reason}`);
+                } else {
+                    const msg = error.response?.data?.message || error.message || 'Something went wrong. Please try again.';
+                    setPaymentError(msg);
+                    toast.error(msg);
+                }
             }
         } finally {
             setLoading(false);

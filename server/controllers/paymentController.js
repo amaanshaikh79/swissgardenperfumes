@@ -1,7 +1,11 @@
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import Order from '../models/Order.js';
+import User from '../models/User.js';
 import { safeCompareHex } from '../utils/verifyRazorpay.js';
+import sendEmail from '../utils/sendEmail.js';
+import { paymentReceiptEmail } from '../utils/emailTemplates.js';
+import { createShiprocketOrderAsync } from './orderController.js';
 
 // Helper to get keys lazily (only when actually needed)
 const getKeys = () => ({
@@ -73,29 +77,54 @@ export const getPaymentConfig = (req, res) => {
 // ─────────────────────────────────────────────────────────────────
 export const createRazorpayOrder = async (req, res, next) => {
     try {
-        const { amount, currency = 'INR', receipt } = req.body;
+        const { orderId, amount, currency = 'INR', receipt } = req.body;
 
-        if (!amount || isNaN(amount) || Number(amount) <= 0) {
-            return res.status(400).json({
-                success: false,
-                message: 'Please provide a valid amount greater than 0',
-            });
+        let amountInPaise;
+        const notes = { userId: req.user.id, userEmail: req.user.email };
+        let receiptId = receipt || `rcpt_${Date.now()}`;
+
+        if (orderId) {
+            // Order-first flow: the DB order already exists (unpaid). Derive the
+            // amount SERVER-SIDE from the order document — the client never
+            // dictates what is charged — and link the Razorpay order back to it
+            // via notes.orderId so the webhook can complete the order even if
+            // the customer's browser dies after the charge.
+            const dbOrder = await Order.findById(orderId);
+            if (!dbOrder) {
+                return res.status(404).json({ success: false, message: 'Order not found' });
+            }
+            if (dbOrder.user.toString() !== req.user.id) {
+                return res.status(403).json({ success: false, message: 'Not authorized' });
+            }
+            if (dbOrder.isPaid) {
+                return res.status(400).json({ success: false, message: 'Order is already paid' });
+            }
+            if (dbOrder.orderStatus === 'Cancelled') {
+                return res.status(400).json({ success: false, message: 'Order has been cancelled' });
+            }
+            amountInPaise = Math.round(dbOrder.totalPrice * 100);
+            receiptId = dbOrder.orderNumber;
+            notes.orderId = dbOrder._id.toString();
+            notes.orderNumber = dbOrder.orderNumber;
+        } else {
+            // Legacy flow (older cached client bundles): client-supplied amount.
+            // The captured amount is still verified against the order total in
+            // updateOrderToPaid before the order is confirmed.
+            if (!amount || isNaN(amount) || Number(amount) <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Please provide a valid amount greater than 0',
+                });
+            }
+            amountInPaise = Math.round(Number(amount) * 100);
         }
 
-        // Razorpay requires amount in paise (1 INR = 100 paise)
-        const amountInPaise = Math.round(Number(amount) * 100);
-
-        const options = {
+        const order = await getRazorpay().orders.create({
             amount: amountInPaise,
             currency,
-            receipt: receipt || `rcpt_${Date.now()}`,
-            notes: {
-                userId: req.user.id,
-                userEmail: req.user.email,
-            },
-        };
-
-        const order = await getRazorpay().orders.create(options);
+            receipt: receiptId,
+            notes,
+        });
 
         res.status(200).json({
             success: true,
@@ -172,6 +201,92 @@ export const verifyPayment = async (req, res, next) => {
     }
 };
 
+/**
+ * Complete an order from a verified payment.captured webhook. Idempotent and
+ * race-safe: the atomic isPaid:false claim ensures side effects (receipt
+ * email, Shiprocket) run exactly once even if the client's mark-paid call is
+ * happening concurrently. Never throws — reconciliation problems are logged
+ * loudly instead of failing the webhook acknowledgement.
+ */
+const completeOrderFromWebhook = async (payment) => {
+    try {
+        const orderId = payment.notes?.orderId;
+        if (!orderId) {
+            // Legacy-flow payment (no order linkage) — the client is the only
+            // completer. Log so captured-but-unlinked payments are traceable.
+            console.log(`ℹ️ payment.captured without notes.orderId (legacy flow): ${payment.id}`);
+            return;
+        }
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+            console.error(
+                `🚨 PAYMENT RECONCILIATION — captured payment references missing order. ` +
+                `payment=${payment.id} orderId=${orderId} amountPaise=${payment.amount}`
+            );
+            return;
+        }
+
+        if (order.orderStatus === 'Cancelled') {
+            console.error(
+                `🚨 PAYMENT RECONCILIATION — payment captured for a CANCELLED order (refund needed). ` +
+                `payment=${payment.id} orderNumber=${order.orderNumber} amountPaise=${payment.amount}`
+            );
+            return;
+        }
+
+        const expectedPaise = Math.round(order.totalPrice * 100);
+        if (Number(payment.amount) !== expectedPaise) {
+            console.error(
+                `🚨 PAYMENT RECONCILIATION — webhook amount mismatch. payment=${payment.id} ` +
+                `orderNumber=${order.orderNumber} capturedPaise=${payment.amount} expectedPaise=${expectedPaise}`
+            );
+            return;
+        }
+
+        // Atomic claim — loses gracefully if the client already marked it paid.
+        const claimed = await Order.findOneAndUpdate(
+            { _id: order._id, isPaid: false },
+            {
+                $set: {
+                    isPaid: true,
+                    paidAt: Date.now(),
+                    paymentResult: {
+                        id: payment.id,
+                        status: 'captured',
+                        updateTime: new Date().toISOString(),
+                        emailAddress: payment.email || '',
+                    },
+                    orderStatus: 'Confirmed',
+                },
+            },
+            { new: true }
+        );
+
+        if (!claimed) {
+            console.log(`ℹ️ Order ${order.orderNumber} already completed (client won the race)`);
+            return;
+        }
+
+        console.log(`🛟 Webhook completed order ${claimed.orderNumber} for payment ${payment.id}`);
+
+        const user = await User.findById(claimed.user).select('firstName lastName email phone');
+        if (user?.email) {
+            sendEmail({
+                email: user.email,
+                subject: `Payment Received - ${claimed.orderNumber} | SwissGarden Perfumes`,
+                html: paymentReceiptEmail(claimed, user),
+            }).catch((err) => console.error('Webhook receipt email failed:', err.message));
+
+            createShiprocketOrderAsync(claimed, user).catch((err) =>
+                console.error('Webhook Shiprocket creation failed (non-blocking):', err.message)
+            );
+        }
+    } catch (err) {
+        console.error('completeOrderFromWebhook error:', err.message);
+    }
+};
+
 // ─────────────────────────────────────────────────────────────────
 // @desc    Razorpay Webhook Handler (server-to-server event callbacks)
 // @route   POST /api/payment/webhook
@@ -212,16 +327,23 @@ export const webhookHandler = async (req, res, next) => {
             case 'payment.captured': {
                 const payment = event.payload.payment.entity;
                 console.log(`✅ Payment captured: ${payment.id} — ₹${payment.amount / 100}`);
-                // Auto-capture is the default on Razorpay for Indian accounts.
-                // Orders are already marked paid via the verify endpoint called from frontend.
-                // This webhook serves as a safety net for edge cases.
+                // Safety net: complete the order even when the customer's browser
+                // died after the charge (e.g. during the bank OTP step) and the
+                // client-side verify/mark-paid calls never happened.
+                await completeOrderFromWebhook(payment);
                 break;
             }
 
             case 'payment.failed': {
                 const payment = event.payload.payment.entity;
-                console.warn(`❌ Payment failed: ${payment.id} — ${payment.error_code}: ${payment.error_description}`);
-                // Optionally: mark associated order as payment-failed, alert admin, etc.
+                console.warn(
+                    `❌ Payment failed: ${payment.id} — ${payment.error_code}: ${payment.error_description}` +
+                    ` | reason=${payment.error_reason || '—'} source=${payment.error_source || '—'}` +
+                    ` step=${payment.error_step || '—'} order=${payment.notes?.orderNumber || payment.order_id}`
+                );
+                // Deliberately NOT auto-cancelling the DB order: the customer can
+                // retry payment for the same order, and the client cancels the
+                // order itself on modal dismissal.
                 break;
             }
 

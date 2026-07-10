@@ -409,8 +409,14 @@ export const updateOrderToPaid = async (req, res, next) => {
             return res.status(403).json({ success: false, message: 'Not authorized' });
         }
 
-        // Idempotency: never re-flip an already-paid order (prevents replays).
+        // Idempotency: if the webhook already completed this order with the SAME
+        // payment, report success so the client shows the confirmation instead
+        // of a scary error after a race it lost. Different payment id on an
+        // already-paid order is still rejected (prevents replays).
         if (order.isPaid) {
+            if (order.paymentResult?.id === razorpay_payment_id) {
+                return res.status(200).json({ success: true, order, alreadyPaid: true });
+            }
             return res.status(400).json({ success: false, message: 'Order is already paid' });
         }
 
@@ -474,32 +480,46 @@ export const updateOrderToPaid = async (req, res, next) => {
             }
         }
 
-        order.isPaid = true;
-        order.paidAt = Date.now();
-        // Store only the verified, gateway-issued identifiers for reconciliation.
-        order.paymentResult = {
-            id: razorpay_payment_id,
-            status: 'captured',
-            updateTime: new Date().toISOString(),
-            emailAddress: req.user.email,
-        };
-        order.orderStatus = 'Confirmed';
+        // Atomic claim: only ONE completer (this endpoint or the Razorpay
+        // webhook) may flip isPaid and run the side effects (email/Shiprocket).
+        const claimed = await Order.findOneAndUpdate(
+            { _id: order._id, isPaid: false },
+            {
+                $set: {
+                    isPaid: true,
+                    paidAt: Date.now(),
+                    // Store only the verified, gateway-issued identifiers.
+                    paymentResult: {
+                        id: razorpay_payment_id,
+                        status: 'captured',
+                        updateTime: new Date().toISOString(),
+                        emailAddress: req.user.email,
+                    },
+                    orderStatus: 'Confirmed',
+                },
+            },
+            { new: true }
+        );
 
-        await order.save();
+        if (!claimed) {
+            // The webhook won the race — the order is already completed.
+            const current = await Order.findById(order._id);
+            return res.status(200).json({ success: true, order: current, alreadyPaid: true });
+        }
 
         // Payment receipt email — fire-and-forget, never blocks the response
         sendEmail({
             email: req.user.email,
-            subject: `Payment Received - ${order.orderNumber} | SwissGarden Perfumes`,
-            html: paymentReceiptEmail(order, req.user),
+            subject: `Payment Received - ${claimed.orderNumber} | SwissGarden Perfumes`,
+            html: paymentReceiptEmail(claimed, req.user),
         }).catch((err) => console.error('Payment receipt email failed:', err.message));
 
         // ✅ CREATE SHIPROCKET ORDER AUTOMATICALLY (non-blocking)
-        createShiprocketOrderAsync(order, req.user).catch((err) => {
+        createShiprocketOrderAsync(claimed, req.user).catch((err) => {
             console.error('❌ Shiprocket order creation failed (non-blocking):', err.message);
         });
 
-        res.status(200).json({ success: true, order });
+        res.status(200).json({ success: true, order: claimed });
     } catch (error) {
         next(error);
     }
@@ -507,9 +527,11 @@ export const updateOrderToPaid = async (req, res, next) => {
 
 /**
  * Helper function to create Shiprocket order asynchronously
- * This runs in the background and doesn't block the payment confirmation
+ * This runs in the background and doesn't block the payment confirmation.
+ * Exported so the Razorpay webhook can also trigger fulfilment when it
+ * completes an order the client never got to mark paid.
  */
-const createShiprocketOrderAsync = async (order, user) => {
+export const createShiprocketOrderAsync = async (order, user) => {
     try {
         // Populate order items
         const populatedOrder = await Order.findById(order._id).populate('orderItems.product');
