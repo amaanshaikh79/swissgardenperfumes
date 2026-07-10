@@ -23,7 +23,9 @@ export default defineConfig({
         })
     ],
     server: {
-        port: 5173,
+        // PORT env lets tooling (preview harness) run a second instance on a
+        // free port; defaults to the standard dev port.
+        port: Number(process.env.PORT) || 5173,
         proxy: {
             '/api': {
                 target: 'http://localhost:5000',

@@ -142,13 +142,22 @@ const orderSchema = new mongoose.Schema(
 orderSchema.pre('save', async function (next) {
     if (this.isNew && !this.orderNumber) {
         try {
-            // Seed the counter base once (idempotent). Done separately from $inc
-            // because MongoDB rejects the same field in both $inc and $setOnInsert,
-            // and an upsert-with-$inc-only would otherwise start the sequence at 1
-            // (yielding GB-000001 and risking collisions with historical numbers).
+            // Self-heal: the counter must never lag behind the highest existing
+            // orderNumber (possible when the counter doc was reset or seeded low
+            // while orders already existed) — otherwise EVERY insert collides
+            // with the unique index and no customer can place an order.
+            // orderNumbers are zero-padded, so lexicographic max == numeric max.
+            const last = await this.constructor
+                .findOne({ orderNumber: { $exists: true } }, { orderNumber: 1 })
+                .sort({ orderNumber: -1 })
+                .lean();
+            const maxSeq = last?.orderNumber
+                ? parseInt(last.orderNumber.replace(/\D/g, ''), 10)
+                : 1000;
+
             await Counter.updateOne(
                 { _id: 'order' },
-                { $setOnInsert: { seq: 1000 } },
+                [{ $set: { seq: { $max: [{ $ifNull: ['$seq', maxSeq] }, maxSeq] } } }],
                 { upsert: true }
             );
             const c = await Counter.findOneAndUpdate(

@@ -129,19 +129,26 @@ const Checkout = () => {
     };
 
     // ── Lazy-load the Razorpay checkout SDK (only on this page) ─────
+    // The promise ALWAYS settles: if the script tag already exists but its
+    // load event fired before we attached listeners (or the SDK is blocked),
+    // the timeout fallback resolves instead of leaving the checkout button
+    // spinning forever.
     const loadRazorpay = () => new Promise((resolve) => {
         if (window.Razorpay) return resolve(true);
+        const settle = () => resolve(!!window.Razorpay);
         const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
         if (existing) {
-            existing.addEventListener('load', () => resolve(true));
+            existing.addEventListener('load', settle);
             existing.addEventListener('error', () => resolve(false));
+            setTimeout(settle, 5000);
             return;
         }
         const s = document.createElement('script');
         s.src = 'https://checkout.razorpay.com/v1/checkout.js';
-        s.onload = () => resolve(true);
+        s.onload = settle;
         s.onerror = () => resolve(false);
         document.body.appendChild(s);
+        setTimeout(settle, 10000);
     });
 
     // Warm the SDK on mount so it is ready by the time the user pays.

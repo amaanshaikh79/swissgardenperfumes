@@ -176,8 +176,16 @@ app.use(
             // Same-origin requests / curl / server-to-server have no Origin header.
             if (!origin) return cb(null, true);
             try {
-                const hostname = new URL(origin).hostname;
-                if (allowedOrigins.includes(origin) || vercelPreview.test(hostname)) {
+                const url = new URL(origin);
+                if (allowedOrigins.includes(origin) || vercelPreview.test(url.hostname)) {
+                    return cb(null, true);
+                }
+                // Dev convenience: allow any localhost port (Vite may pick a
+                // free port when 5173 is taken). Never applies in production.
+                if (
+                    process.env.NODE_ENV !== 'production' &&
+                    (url.hostname === 'localhost' || url.hostname === '127.0.0.1')
+                ) {
                     return cb(null, true);
                 }
             } catch {
