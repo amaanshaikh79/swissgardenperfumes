@@ -241,6 +241,9 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/shiprocket', shiprocketRoutes);
 app.use('/api/shiprocket', shiprocketWebhookRoutes);
+// Alias for the Shiprocket webhook: their panel REJECTS URLs containing the
+// words "shiprocket"/"sr"/"kr", so the registered URL uses this neutral path.
+app.use('/api/shipping', shiprocketWebhookRoutes);
 
 // ─── Dynamic XML Sitemap ────────────────────────────────────────
 // MUST be mounted before any SPA static/catch-all so the "/*" fallback

@@ -46,6 +46,7 @@ const verifyWebhookToken = (req, res, next) => {
     const provided =
         req.headers['x-shiprocket-token'] ||
         req.headers['x-api-token'] ||
+        req.headers['x-api-key'] || // header name used by Shiprocket's webhook panel
         req.query.token;
     if (!provided || provided !== webhookToken) {
         console.warn('[webhook] Unauthorized Shiprocket webhook attempt');
