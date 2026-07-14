@@ -50,7 +50,8 @@ export const retryShiprocketOrder = async (req, res, next) => {
             orderNumber: order.orderNumber,
             orderDate: order.createdAt.toISOString().split('T')[0],
             pickupLocation: process.env.SHIPROCKET_PICKUP_LOCATION || 'Primary',
-            channelId: '',
+            // Route orders through the configured CUSTOM sales channel
+            channelId: process.env.SHIPROCKET_CHANNEL_ID || '',
             comment: order.notes || '',
             billing: {
                 name: firstName,

@@ -555,7 +555,8 @@ export const createShiprocketOrderAsync = async (order, user) => {
             orderNumber: populatedOrder.orderNumber,
             orderDate: populatedOrder.createdAt.toISOString().split('T')[0], // YYYY-MM-DD
             pickupLocation: process.env.SHIPROCKET_PICKUP_LOCATION || 'Primary',
-            channelId: '',
+            // Route orders through the configured CUSTOM sales channel
+            channelId: process.env.SHIPROCKET_CHANNEL_ID || '',
             comment: populatedOrder.notes || '',
             billing: {
                 name: firstName,

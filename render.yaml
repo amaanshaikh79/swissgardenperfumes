@@ -74,6 +74,22 @@ services:
       - key: BREVO_API_KEY
         sync: false
 
+      # ── Shiprocket fulfilment ────────────────────────────────────
+      # API-user credentials (Settings → API → Configure user). The dashboard
+      # passes values raw, so special characters (# $) need no quoting here.
+      - key: SHIPROCKET_EMAIL
+        sync: false
+      - key: SHIPROCKET_PASSWORD
+        sync: false
+      - key: SHIPROCKET_CHANNEL_ID
+        value: "11393170"
+      - key: SHIPROCKET_PICKUP_LOCATION
+        value: Primary
+      - key: SHIPROCKET_PICKUP_PINCODE
+        value: "110025"
+      - key: SHIPROCKET_WEBHOOK_TOKEN
+        sync: false
+
       # ── AI Chatbot (OpenRouter) ──────────────────────────────────
       # Rotate the key at https://openrouter.ai/keys after first deploy
       - key: OPENROUTER_API_KEY
