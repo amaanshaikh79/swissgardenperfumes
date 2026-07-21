@@ -178,7 +178,7 @@ npm run seed
 
 This creates:
 - **12 luxury perfume products** with detailed fragrance notes
-- **Admin account**: `admin@goldbergperfumes.com` / `Admin@123`
+- **Admin account**: `admin@swissgardenperfumes.com` / `swissgarden$100m`
 - **Demo user**: `victoria@example.com` / `Demo@123`
 
 ### Step 4: Run the Application
@@ -207,7 +207,7 @@ Open your browser to **[http://localhost:5173](http://localhost:5173)** 🎉
 
 | Role | Email | Password |
 |---|---|---|
-| **Admin** | admin@goldbergperfumes.com | Admin@123 |
+| **Admin** | admin@swissgardenperfumes.com | swissgarden$100m |
 | **User** | victoria@example.com | Demo@123 |
 
 ---

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
@@ -44,12 +44,107 @@ const fadeSlide = {
 };
 
 // ═══════════════════════════════════════════════════════════
+//  EMAIL VERIFICATION STEP (shared by Register + Login)
+// ═══════════════════════════════════════════════════════════
+const EmailVerificationForm = ({ email, onVerified }) => {
+    const [code, setCode] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+    const [cooldown, setCooldown] = useState(60);
+    const { verifyEmail } = useAuth();
+
+    useEffect(() => {
+        if (cooldown <= 0) return undefined;
+        const t = setTimeout(() => setCooldown((c) => c - 1), 1000);
+        return () => clearTimeout(t);
+    }, [cooldown]);
+
+    const handleVerify = async (e) => {
+        e.preventDefault();
+        const trimmed = code.trim();
+        if (trimmed.length !== 6) {
+            toast.error('Enter the 6-digit code from your email');
+            return;
+        }
+        setSubmitting(true);
+        try {
+            await verifyEmail({ email, code: trimmed });
+            toast.success('Email verified — welcome to SwissGarden!');
+            onVerified();
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Verification failed. Please try again.');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleResend = async () => {
+        try {
+            const { data } = await authAPI.resendVerification({ email });
+            toast.success(data.message || 'A new code has been sent');
+            setCooldown(60);
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Could not resend the code');
+        }
+    };
+
+    return (
+        <motion.div {...fadeSlide}>
+            <div className="auth-header" style={{ marginBottom: 20 }}>
+                <h1 className="auth-title">Verify Your Email</h1>
+                <p className="auth-subtitle">
+                    We sent a 6-digit code to <strong>{email}</strong>
+                </p>
+            </div>
+            <form className="auth-form" onSubmit={handleVerify}>
+                <div className="form-group">
+                    <label className="form-label" htmlFor="verify-code">Verification Code *</label>
+                    <input
+                        id="verify-code"
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        className="form-input"
+                        placeholder="6-digit code"
+                        maxLength={6}
+                        value={code}
+                        onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                        style={{ textAlign: 'center', letterSpacing: '0.6em', fontSize: '1.25rem' }}
+                        autoFocus
+                    />
+                </div>
+                <button type="submit" className="btn btn-primary btn-lg auth-submit-btn" disabled={submitting}>
+                    {submitting ? 'Verifying…' : 'Verify & Continue'}
+                </button>
+                <p style={{ textAlign: 'center', marginTop: 16, fontSize: '0.875rem' }}>
+                    Didn&apos;t get the code?{' '}
+                    <button
+                        type="button"
+                        onClick={handleResend}
+                        disabled={cooldown > 0}
+                        style={{
+                            background: 'none', border: 'none', cursor: cooldown > 0 ? 'default' : 'pointer',
+                            color: cooldown > 0 ? '#999' : '#D4AF37', fontWeight: 600, padding: 0,
+                        }}
+                    >
+                        {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'}
+                    </button>
+                </p>
+                <p style={{ textAlign: 'center', marginTop: 4, fontSize: '0.75rem', color: '#999' }}>
+                    Check your spam folder if you don&apos;t see it. The code expires in 15 minutes.
+                </p>
+            </form>
+        </motion.div>
+    );
+};
+
+// ═══════════════════════════════════════════════════════════
 //  LOGIN PAGE
 // ═══════════════════════════════════════════════════════════
 const Login = () => {
     const [form, setForm] = useState({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [pendingEmail, setPendingEmail] = useState(null);
     const { login } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -63,7 +158,16 @@ const Login = () => {
             toast.success('Welcome back!');
             navigate(from, { replace: true });
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Login failed');
+            const resp = error.response;
+            if (resp?.status === 403 && resp?.data?.requiresVerification) {
+                // Unverified account — send a fresh code and show the verify step.
+                toast('Verify your email to continue', { icon: '🔐' });
+                const email = resp.data.email || form.email.trim();
+                authAPI.resendVerification({ email }).catch(() => {});
+                setPendingEmail(email);
+            } else {
+                toast.error(resp?.data?.message || 'Login failed');
+            }
         } finally {
             setLoading(false);
         }
@@ -78,6 +182,10 @@ const Login = () => {
             </Helmet>
             <div className="auth-page">
                 <motion.div className="auth-card" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                    {pendingEmail ? (
+                        <EmailVerificationForm email={pendingEmail} onVerified={() => navigate(from, { replace: true })} />
+                    ) : (
+                    <>
                     <div className="auth-header">
                         <Link to="/" className="auth-logo">
                             <span className="logo-text">swissgarden</span>
@@ -143,6 +251,8 @@ const Login = () => {
                     <div className="auth-footer">
                         <p>Don't have an account? <Link to="/register" className="auth-link">Create one</Link></p>
                     </div>
+                    </>
+                    )}
                 </motion.div>
             </div>
         </>
@@ -158,6 +268,7 @@ const Register = () => {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [pendingEmail, setPendingEmail] = useState(null);
     const { register } = useAuth();
     const navigate = useNavigate();
 
@@ -169,14 +280,19 @@ const Register = () => {
         }
         setLoading(true);
         try {
-            await register({
+            const data = await register({
                 firstName: form.firstName.trim(),
                 lastName: form.lastName.trim(),
                 email: form.email.trim(),
                 password: form.password,
             });
-            toast.success('Account created successfully!');
-            navigate('/');
+            if (data?.requiresVerification) {
+                toast.success('Almost there! Enter the code we emailed you.');
+                setPendingEmail(data.email || form.email.trim());
+            } else {
+                toast.success('Account created successfully!');
+                navigate('/');
+            }
         } catch (error) {
             const response = error.response?.data;
             const errorMessage =
@@ -198,6 +314,10 @@ const Register = () => {
             </Helmet>
             <div className="auth-page">
                 <motion.div className="auth-card" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                    {pendingEmail ? (
+                        <EmailVerificationForm email={pendingEmail} onVerified={() => navigate('/')} />
+                    ) : (
+                    <>
                     <div className="auth-header">
                         <Link to="/" className="auth-logo">
                             <span className="logo-text">swissgarden</span>
@@ -282,6 +402,8 @@ const Register = () => {
                     <div className="auth-footer">
                         <p>Already have an account? <Link to="/login" className="auth-link">Sign In</Link></p>
                     </div>
+                    </>
+                    )}
                 </motion.div>
             </div>
         </>

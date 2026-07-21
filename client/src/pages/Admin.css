@@ -761,6 +761,116 @@
     line-height: 1.6;
 }
 
+.admin-section-hint {
+    margin: 0.25rem 0 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.admin-awb-link {
+    color: var(--accent, #D4AF37);
+    text-decoration: none;
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.admin-awb-link:hover {
+    text-decoration: underline;
+}
+
+.admin-shiprocket-panel {
+    margin-top: var(--space-xl);
+    padding: var(--space-lg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-card, rgba(0, 0, 0, 0.2));
+}
+
+.admin-sr-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: var(--space-md);
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: rgba(231, 76, 60, 0.12);
+    color: #e74c3c;
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
+.admin-sr-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: var(--space-md);
+}
+
+.admin-sr-meta span {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+
+.admin-sr-meta strong {
+    font-size: 0.85rem;
+    color: var(--text-primary, #fff);
+    word-break: break-all;
+}
+
+.admin-sr-track {
+    margin-bottom: var(--space-md);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.admin-sr-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.admin-sr-history {
+    margin-top: var(--space-lg);
+}
+
+.admin-sr-history h5 {
+    margin: 0 0 8px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+}
+
+.admin-sr-history ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.admin-sr-history li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--divider);
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+}
+
+.admin-sr-history li:last-child {
+    border-bottom: none;
+}
+
+@media (max-width: 768px) {
+    .admin-order-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* ─── Coupons ─────────────────────────────────────────────── */
 .admin-coupon-form {
     background: var(--bg-card);

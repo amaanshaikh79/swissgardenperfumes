@@ -19,6 +19,7 @@ const statusIcons = {
     Processing: <FiClock size={16} />,
     Confirmed: <FiCheck size={16} />,
     Shipped: <FiTruck size={16} />,
+    'Out for Delivery': <FiMapPin size={16} />,
     Delivered: <FiPackage size={16} />,
 };
 
@@ -26,8 +27,41 @@ const statusColors = {
     Processing: 'gold',
     Confirmed: 'gold',
     Shipped: 'gold',
+    'Out for Delivery': 'gold',
     Delivered: 'success',
     Cancelled: 'error',
+};
+
+/** Public Shiprocket tracking / verify URL (AWB-based). */
+const getShiprocketTrackUrl = (order) => {
+    if (order.shiprocket?.trackingUrl) return order.shiprocket.trackingUrl;
+    const awb = order.trackingNumber || order.shiprocket?.awbCode;
+    if (awb) return `https://shiprocket.co/tracking/${encodeURIComponent(awb)}`;
+    return null;
+};
+
+/** Progress index for timeline — higher of orderStatus and Shiprocket shippingStatus */
+const getShipmentProgressIndex = (order) => {
+    const byOrderStatus = {
+        Processing: 0,
+        Confirmed: 0,
+        Shipped: 1,
+        'Out for Delivery': 2,
+        Delivered: 3,
+        Cancelled: -1,
+    };
+    const byShipping = {
+        pending: 0,
+        pickup_scheduled: 0,
+        in_transit: 1,
+        out_for_delivery: 2,
+        delivered: 3,
+        cancelled: -1,
+        rto: -1,
+    };
+    const a = byOrderStatus[order.orderStatus] ?? 0;
+    const b = byShipping[order.shiprocket?.shippingStatus] ?? 0;
+    return Math.max(a, b);
 };
 
 const Orders = () => {
@@ -47,7 +81,7 @@ const Orders = () => {
     const [returns, setReturns] = useState([]);
     const invoiceRef = useRef(null);
 
-    // Generate tracking timeline based on order status
+    // Generate tracking timeline based on order + Shiprocket status
     const getTrackingTimeline = (order) => {
         const steps = [
             { key: 'confirmed', label: 'Confirmed', icon: <FiCheck size={16} /> },
@@ -56,36 +90,30 @@ const Orders = () => {
             { key: 'delivered', label: 'Delivered', icon: <FiPackage size={16} /> },
         ];
 
-        const statusIndex = {
-            'Processing': 0,
-            'Confirmed': 1,
-            'Shipped': 2,
-            'Out for Delivery': 3,
-            'Delivered': 4,
-        };
-
-        const currentIndex = statusIndex[order.orderStatus] || 0;
-
-        // Calculate dates for each step (using createdAt as base)
-        const baseDate = new Date(order.createdAt);
-        const stepDates = steps.map((step, index) => {
-            if (index < currentIndex) {
-                // Past step - add some time to base date
-                const date = new Date(baseDate);
-                date.setDate(date.getDate() + index);
-                return date.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
-            } else if (index === currentIndex - 1 && order.orderStatus !== 'Processing') {
-                // Current step - use actual order date
-                return new Date(order.createdAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
-            }
-            return null;
+        const progress = getShipmentProgressIndex(order);
+        const placedDate = new Date(order.createdAt).toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
         });
+        const shippedDate = order.shiprocket?.statusHistory?.find((h) =>
+            ['shipped', 'in_transit'].includes(h.status)
+        )?.timestamp;
+        const ofdDate = order.shiprocket?.statusHistory?.find((h) => h.status === 'out_for_delivery')?.timestamp;
+        const deliveredDate = order.deliveredAt || order.shiprocket?.statusHistory?.find((h) => h.status === 'delivered')?.timestamp;
+
+        const dates = [
+            placedDate,
+            shippedDate ? new Date(shippedDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : null,
+            ofdDate ? new Date(ofdDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : null,
+            deliveredDate ? new Date(deliveredDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : null,
+        ];
 
         return steps.map((step, index) => ({
             ...step,
-            completed: index < currentIndex,
-            current: index === currentIndex - 1,
-            date: stepDates[index],
+            completed: progress > index,
+            current: progress === index,
+            date: progress >= index ? dates[index] : null,
         }));
     };
 
@@ -266,7 +294,11 @@ const Orders = () => {
                                         </div>
                                         <div className="order-footer-right">
                                             <span className={`badge ${order.isPaid ? 'badge-success' : 'badge-warning'}`}>
-                                                {order.isPaid ? '✓ Paid' : '⏳ Pending'}
+                                                {order.isPaid
+                                                    ? '✓ Paid'
+                                                    : order.paymentMethod === 'cod'
+                                                      ? '💵 Pay on delivery'
+                                                      : '⏳ Payment pending'}
                                             </span>
                                             {order.orderStatus !== 'Cancelled' && ['Processing', 'Confirmed'].includes(order.orderStatus) && (
                                                 <button
@@ -311,7 +343,35 @@ const Orders = () => {
                                                 transition={{ duration: 0.3 }}
                                             >
                                                 <div className="tracking-timeline">
-                                                    {getTrackingTimeline(order).map((step, index) => (
+                                                    <div style={{ marginBottom: 16, color: '#ccc', fontSize: 14, lineHeight: 1.6 }}>
+                                                        {(order.trackingNumber || order.shiprocket?.awbCode) && (
+                                                            <div>AWB: <strong style={{ color: '#D4AF37' }}>{order.trackingNumber || order.shiprocket.awbCode}</strong></div>
+                                                        )}
+                                                        {order.shiprocket?.courierName && (
+                                                            <div>Courier: {order.shiprocket.courierName}</div>
+                                                        )}
+                                                        {order.shiprocket?.shiprocketOrderId && (
+                                                            <div>Shiprocket ID: {order.shiprocket.shiprocketOrderId}</div>
+                                                        )}
+                                                        {getShiprocketTrackUrl(order) ? (
+                                                            <div style={{ marginTop: 8 }}>
+                                                                <a
+                                                                    href={getShiprocketTrackUrl(order)}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="btn btn-ghost btn-sm"
+                                                                    style={{ color: '#D4AF37', borderColor: '#D4AF37', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                                                                >
+                                                                    <FiTruck size={14} /> Track / verify on Shiprocket
+                                                                </a>
+                                                            </div>
+                                                        ) : order.shiprocket?.shiprocketOrderId ? (
+                                                            <div style={{ marginTop: 6, color: '#999', fontSize: 13 }}>
+                                                                Tracking link will appear once a courier AWB is assigned in Shiprocket.
+                                                            </div>
+                                                        ) : null}
+                                                    </div>
+                                                    {getTrackingTimeline(order).map((step, index, arr) => (
                                                         <div
                                                             key={step.key}
                                                             className={`timeline-step ${step.completed ? 'completed' : ''} ${step.current ? 'current' : ''}`}
@@ -320,7 +380,7 @@ const Orders = () => {
                                                                 <div className="timeline-icon">
                                                                     {step.completed || step.current ? step.icon : <FiClock size={16} />}
                                                                 </div>
-                                                                {index < getTrackingTimeline(order).length - 1 && (
+                                                                {index < arr.length - 1 && (
                                                                     <div className="timeline-line" />
                                                                 )}
                                                             </div>

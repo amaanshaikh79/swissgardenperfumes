@@ -88,18 +88,20 @@ export const retryShiprocketOrder = async (req, res, next) => {
         const shiprocketResponse = await createShiprocketOrder(shiprocketData);
 
         if (shiprocketResponse.success) {
+            const awb = shiprocketResponse.awbCode || null;
             order.shiprocket = {
                 shiprocketOrderId: shiprocketResponse.shiprocketOrderId,
                 shiprocketShipmentId: shiprocketResponse.shiprocketShipmentId,
-                awbCode: shiprocketResponse.awbCode,
+                awbCode: awb,
                 courierName: shiprocketResponse.courierName,
+                trackingUrl: awb ? `https://shiprocket.co/tracking/${encodeURIComponent(awb)}` : null,
                 shippingStatus: 'pending',
                 createdAt: new Date(),
                 error: null,
             };
 
-            if (shiprocketResponse.awbCode) {
-                order.trackingNumber = shiprocketResponse.awbCode;
+            if (awb) {
+                order.trackingNumber = awb;
             }
 
             await order.save();

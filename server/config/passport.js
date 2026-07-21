@@ -54,6 +54,7 @@ export function initializePassport() {
                             email: profile.emails[0].value,
                             googleId: profile.id,
                             avatar: profile.photos[0]?.value,
+                            isEmailVerified: true, // Google has already verified the address
                         });
 
                         sendWelcomeEmail(user);
@@ -102,6 +103,7 @@ export function initializePassport() {
                             email: profile.emails?.[0]?.value || `fb_${profile.id}@facebook.com`,
                             facebookId: profile.id,
                             avatar: profile.photos?.[0]?.value,
+                            isEmailVerified: true, // provider-verified (or synthetic, unreachable)
                         });
 
                         // Guard: skip the synthetic fb_<id>@facebook.com fallback address

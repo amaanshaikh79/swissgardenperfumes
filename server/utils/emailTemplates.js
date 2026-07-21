@@ -90,6 +90,24 @@ export const welcomeEmail = (user) =>
         ${ctaButton(`${getClientUrl()}/shop`, 'EXPLORE THE COLLECTION')}
     `);
 
+export const emailVerificationEmail = (user, code) =>
+    baseLayout(`
+        <h2 style="color: #D4AF37; font-size: 20px; margin-bottom: 20px;">Verify Your Email 🔐</h2>
+        <p style="color: #ccc; line-height: 1.6;">
+          Dear ${escapeHTML(user.firstName)},<br><br>
+          Welcome to SwissGarden Perfumes! Enter this verification code to activate
+          your account:
+        </p>
+        <div style="text-align: center; margin: 30px 0; padding: 24px; background: #111; border: 1px solid #D4AF37; border-radius: 8px;">
+          <span style="color: #D4AF37; font-size: 36px; letter-spacing: 12px; font-weight: bold;">${escapeHTML(String(code))}</span>
+          <p style="color: #999; font-size: 12px; margin-top: 12px;">This code expires in 15 minutes.</p>
+        </div>
+        <p style="color: #999; font-size: 13px; line-height: 1.6;">
+          If you did not create an account with us, you can safely ignore this email —
+          no account will be activated without this code.
+        </p>
+    `);
+
 // ─── Newsletter ───────────────────────────────────────────────────
 
 export const newsletterWelcomeEmail = () =>
@@ -125,10 +143,36 @@ export const paymentReceiptEmail = (order, user) =>
         ${ctaButton(`${getClientUrl()}/orders`, 'VIEW MY ORDER')}
     `);
 
+/** Internal alert for store owners whenever a confirmed order is placed. */
+export const adminNewOrderEmail = (order, user) => {
+    const addr = order.shippingAddress || {};
+    const customerName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Customer';
+    return baseLayout(`
+        <h2 style="color: #D4AF37; font-size: 20px; margin-bottom: 20px;">🛒 New Order — ${escapeHTML(order.orderNumber)}</h2>
+        <div style="margin: 24px 0; padding: 16px; background: #111; border-radius: 8px; color: #ccc; line-height: 1.8;">
+          <strong style="color: #D4AF37;">Customer:</strong> ${escapeHTML(customerName)}<br>
+          <strong style="color: #D4AF37;">Email:</strong> ${escapeHTML(user?.email || '—')}<br>
+          <strong style="color: #D4AF37;">Phone:</strong> ${escapeHTML(addr.phone || user?.phone || '—')}<br>
+          <strong style="color: #D4AF37;">Payment:</strong> ${escapeHTML(String(order.paymentMethod || '').toUpperCase())}${order.isPaid ? ' (paid)' : ''}<br>
+          <strong style="color: #D4AF37;">Total:</strong> ${formatINR(order.totalPrice)}
+        </div>
+        ${orderItemsTable(order)}
+        <div style="margin-top: 10px; padding: 16px; background: #111; border-radius: 8px; color: #ccc; line-height: 1.6;">
+          <strong style="color: #D4AF37;">Ship to</strong><br>
+          ${escapeHTML(addr.street || '')}${addr.landmark ? `<br>${escapeHTML(addr.landmark)}` : ''}<br>
+          ${escapeHTML(addr.city || '')}, ${escapeHTML(addr.state || '')} ${escapeHTML(addr.zipCode || '')}<br>
+          ${escapeHTML(addr.country || '')}
+        </div>
+        ${ctaButton(`${getClientUrl()}/admin`, 'OPEN ADMIN DASHBOARD')}
+    `);
+};
+
 export const orderShippedEmail = (order, user) => {
     const sr = order.shiprocket || {};
+    const awb = order.trackingNumber || sr.awbCode;
+    const trackUrl = sr.trackingUrl || (awb ? `https://shiprocket.co/tracking/${encodeURIComponent(awb)}` : null);
     const trackingRows = [
-        order.trackingNumber ? `Tracking number: <span style="color: #D4AF37;">${escapeHTML(order.trackingNumber)}</span>` : '',
+        awb ? `Tracking number: <span style="color: #D4AF37;">${escapeHTML(awb)}</span>` : '',
         sr.courierName ? `Courier: ${escapeHTML(sr.courierName)}` : '',
         sr.estimatedDeliveryDate ? `Estimated delivery: ${escapeHTML(String(sr.estimatedDeliveryDate))}` : '',
     ]
@@ -142,12 +186,16 @@ export const orderShippedEmail = (order, user) => {
           Great news — order <strong style="color: #D4AF37;">${escapeHTML(order.orderNumber)}</strong> has shipped.
         </p>
         ${trackingRows ? `<div style="margin: 24px 0; padding: 16px; background: #111; border-radius: 8px; color: #ccc; line-height: 1.8;">${trackingRows}</div>` : ''}
-        ${sr.trackingUrl ? ctaButton(sr.trackingUrl, 'TRACK MY SHIPMENT') : ctaButton(`${getClientUrl()}/orders`, 'VIEW MY ORDER')}
+        ${trackUrl ? ctaButton(trackUrl, 'TRACK / VERIFY ON SHIPROCKET') : ctaButton(`${getClientUrl()}/orders`, 'VIEW MY ORDER')}
     `);
 };
 
-export const orderOutForDeliveryEmail = (order, user) =>
-    baseLayout(`
+export const orderOutForDeliveryEmail = (order, user) => {
+    const awb = order.trackingNumber || order.shiprocket?.awbCode;
+    const trackUrl =
+        order.shiprocket?.trackingUrl ||
+        (awb ? `https://shiprocket.co/tracking/${encodeURIComponent(awb)}` : null);
+    return baseLayout(`
         <h2 style="color: #D4AF37; font-size: 20px; margin-bottom: 20px;">Out for Delivery 🚚</h2>
         <p style="color: #ccc; line-height: 1.6;">
           Dear ${escapeHTML(user.firstName)},<br><br>
@@ -155,8 +203,9 @@ export const orderOutForDeliveryEmail = (order, user) =>
           delivery and should reach you today. Please keep your phone reachable
           ${order.shiprocket?.courierName ? `— ${escapeHTML(order.shiprocket.courierName)} may call before delivery` : ''}.
         </p>
-        ${ctaButton(`${getClientUrl()}/orders`, 'VIEW MY ORDER')}
+        ${trackUrl ? ctaButton(trackUrl, 'TRACK / VERIFY ON SHIPROCKET') : ctaButton(`${getClientUrl()}/orders`, 'VIEW MY ORDER')}
     `);
+};
 
 export const orderDeliveredEmail = (order, user) => {
     const reviewLinks = (order.orderItems || [])

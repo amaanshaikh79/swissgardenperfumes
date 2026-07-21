@@ -287,8 +287,8 @@ const products = [
 const adminUser = {
     firstName: 'Admin',
     lastName: 'swissgarden',
-    email: 'adnanshaikh20@gmail.com',
-    password: 'Admin@123',
+    email: 'admin@swissgardenperfumes.com',
+    password: 'swissgarden$100m',
     role: 'admin',
 };
 

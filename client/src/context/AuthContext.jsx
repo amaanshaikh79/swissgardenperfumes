@@ -92,7 +92,10 @@ export const AuthProvider = ({ children }) => {
     const register = async (userData) => {
         try {
             const { data } = await authAPI.register(userData);
-            if (data.success) {
+            // With email verification enabled the server returns
+            // { requiresVerification: true } and NO token — the session starts
+            // only after the code is confirmed via verifyEmail below.
+            if (data.success && data.token) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
                 setUser(data.user);
@@ -101,6 +104,16 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             throw error;
         }
+    };
+
+    const verifyEmail = async (payload) => {
+        const { data } = await authAPI.verifyEmail(payload);
+        if (data.success && data.token) {
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            setUser(data.user);
+        }
+        return data;
     };
 
     const login = async (credentials) => {
@@ -177,6 +190,7 @@ export const AuthProvider = ({ children }) => {
                 isAuthenticated: !!user,
                 isAdmin: user?.role === 'admin',
                 register,
+                verifyEmail,
                 login,
                 loginWithToken,
                 logout,

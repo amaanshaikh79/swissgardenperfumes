@@ -131,6 +131,17 @@ const authLimiter = rateLimit({
 });
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
+
+// Verification endpoints get their OWN limiter (authLimiter shares one per-IP
+// counter across every path it is mounted on — a normal register → mistyped
+// code → resend → verify → login journey would exhaust a shared 10/15min).
+const verificationLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    message: { success: false, message: 'Too many verification attempts, please try again later.' },
+});
+app.use('/api/auth/verify-email', verificationLimiter);
+app.use('/api/auth/resend-verification', verificationLimiter);
 // OTP rate limiting — prevent brute-force of 6-digit codes
 app.use('/api/auth/send-otp', authLimiter);
 app.use('/api/auth/verify-otp', authLimiter);

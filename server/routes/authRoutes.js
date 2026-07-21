@@ -11,6 +11,8 @@ import {
     resetPassword,
     sendOTP,
     verifyOTP,
+    verifyEmail,
+    resendVerification,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/auth.js';
 import { registerRules, loginRules, validate } from '../middleware/validators.js';
@@ -28,5 +30,7 @@ router.post('/forgot-password', forgotPassword);
 router.put('/reset-password/:token', resetPassword);
 router.post('/send-otp', sendOTP);
 router.post('/verify-otp', verifyOTP);
+router.post('/verify-email', verifyEmail);
+router.post('/resend-verification', resendVerification);
 
 export default router;

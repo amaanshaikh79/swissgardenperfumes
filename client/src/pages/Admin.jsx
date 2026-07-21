@@ -5,9 +5,10 @@ import {
     FiPackage, FiUsers, FiShoppingBag, FiDollarSign, FiTrendingUp,
     FiTrash2, FiMail, FiCalendar, FiPhone, FiMapPin, FiShield,
     FiUserCheck, FiUserX, FiRefreshCw, FiMessageSquare, FiEye,
-    FiChevronDown, FiChevronUp, FiPlus, FiEdit2, FiTag, FiTruck
+    FiChevronDown, FiChevronUp, FiPlus, FiEdit2, FiTag, FiTruck,
+    FiExternalLink, FiAlertCircle, FiPrinter, FiNavigation
 } from 'react-icons/fi';
-import { adminAPI, productsAPI, ordersAPI, contactAPI, couponAPI, deliveryPartnerAPI } from '../services/api';
+import { adminAPI, productsAPI, ordersAPI, contactAPI, couponAPI, deliveryPartnerAPI, shiprocketAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import ProductModal from '../components/admin/ProductModal';
 import './Admin.css';
@@ -20,6 +21,34 @@ const formatINR = (amount) => {
         maximumFractionDigits: 0,
     }).format(amount || 0);
 };
+
+const ORDER_STATUSES = ['Processing', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
+
+const getShiprocketTrackUrl = (order) => {
+    if (order.shiprocket?.trackingUrl) return order.shiprocket.trackingUrl;
+    const awb = order.trackingNumber || order.shiprocket?.awbCode;
+    if (awb) return `https://shiprocket.co/tracking/${encodeURIComponent(awb)}`;
+    return null;
+};
+
+const shippingBadgeClass = (status) => {
+    switch (status) {
+        case 'delivered':
+            return 'badge-success';
+        case 'cancelled':
+        case 'rto':
+            return 'badge-error';
+        case 'in_transit':
+        case 'out_for_delivery':
+        case 'pickup_scheduled':
+            return 'badge-gold';
+        default:
+            return 'badge-warning';
+    }
+};
+
+const formatShippingStatus = (status) =>
+    (status || 'pending').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('overview');
@@ -38,6 +67,7 @@ const AdminDashboard = () => {
     const [showCouponForm, setShowCouponForm] = useState(false);
     const [showDeliveryPartnerForm, setShowDeliveryPartnerForm] = useState(false);
     const [editingDeliveryPartner, setEditingDeliveryPartner] = useState(null);
+    const [shiprocketBusy, setShiprocketBusy] = useState(null);
     const [couponForm, setCouponForm] = useState({
         code: '', description: '', discountType: 'percentage', discountValue: '',
         maxDiscount: '', minOrderAmount: '', usageLimit: '', perUserLimit: '1', expiryDate: '',
@@ -58,8 +88,12 @@ const AdminDashboard = () => {
                 const { data } = await productsAPI.getAll({ limit: 100 });
                 setProducts(data.products);
             } else if (tab === 'orders') {
-                const { data } = await ordersAPI.getAll();
-                setOrders(data.orders);
+                const [{ data: orderData }, { data: partnerData }] = await Promise.all([
+                    ordersAPI.getAll(),
+                    deliveryPartnerAPI.getAll().catch(() => ({ data: { deliveryPartners: [] } })),
+                ]);
+                setOrders(orderData.orders);
+                setDeliveryPartners(partnerData.deliveryPartners || []);
             } else if (tab === 'users') {
                 const { data } = await adminAPI.getUsers();
                 setUsers(data.users);
@@ -87,11 +121,15 @@ const AdminDashboard = () => {
 
     const handleRefresh = () => fetchData(activeTab);
 
+    const patchOrder = (orderId, patch) => {
+        setOrders((prev) => prev.map((o) => (o._id === orderId ? { ...o, ...patch } : o)));
+    };
+
     // Order actions
     const updateOrderStatus = async (orderId, status) => {
         try {
-            await ordersAPI.updateStatus(orderId, { status });
-            setOrders((prev) => prev.map((o) => o._id === orderId ? { ...o, orderStatus: status } : o));
+            const { data } = await ordersAPI.updateStatus(orderId, { status });
+            patchOrder(orderId, data.order || { orderStatus: status });
             toast.success(`Order updated to ${status}`);
         } catch {
             toast.error('Failed to update order');
@@ -100,11 +138,94 @@ const AdminDashboard = () => {
 
     const assignDeliveryPartner = async (orderId, partnerId) => {
         try {
-            await ordersAPI.updateStatus(orderId, { deliveryPartner: partnerId });
-            setOrders((prev) => prev.map((o) => o._id === orderId ? { ...o, deliveryPartner: partnerId } : o));
+            await ordersAPI.updateStatus(orderId, { deliveryPartner: partnerId, status: orders.find((o) => o._id === orderId)?.orderStatus });
+            patchOrder(orderId, { deliveryPartner: partnerId });
             toast.success('Delivery partner assigned');
         } catch {
             toast.error('Failed to assign delivery partner');
+        }
+    };
+
+    const runShiprocketAction = async (orderId, label, action) => {
+        setShiprocketBusy(orderId);
+        try {
+            const result = await action();
+            toast.success(label);
+            return result;
+        } catch (err) {
+            toast.error(err.response?.data?.message || `Failed: ${label}`);
+            return null;
+        } finally {
+            setShiprocketBusy(null);
+        }
+    };
+
+    const handleShiprocketRetry = async (orderId) => {
+        const result = await runShiprocketAction(orderId, 'Pushed to Shiprocket', () => shiprocketAPI.retryOrder(orderId));
+        if (result?.data?.shiprocket) {
+            patchOrder(orderId, { shiprocket: result.data.shiprocket, trackingNumber: result.data.shiprocket.awbCode || undefined });
+        } else if (result) {
+            fetchData('orders');
+        }
+    };
+
+    const handleSchedulePickup = async (orderId) => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const pickupDate = tomorrow.toISOString().slice(0, 10);
+        const result = await runShiprocketAction(orderId, `Pickup scheduled for ${pickupDate}`, () =>
+            shiprocketAPI.schedulePickup(orderId, { pickupDate })
+        );
+        if (result) {
+            patchOrder(orderId, {
+                shiprocket: {
+                    ...(orders.find((o) => o._id === orderId)?.shiprocket || {}),
+                    shippingStatus: 'pickup_scheduled',
+                    pickupScheduledDate: pickupDate,
+                },
+            });
+        }
+    };
+
+    const handleGenerateLabel = async (orderId) => {
+        const result = await runShiprocketAction(orderId, 'Label ready', () => shiprocketAPI.generateLabel(orderId));
+        const url = result?.data?.labelUrl;
+        if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    };
+
+    const handleSyncTracking = async (orderId) => {
+        const result = await runShiprocketAction(orderId, 'Tracking synced', () => shiprocketAPI.track(orderId));
+        if (result?.data?.order) {
+            const current = orders.find((o) => o._id === orderId);
+            patchOrder(orderId, {
+                shiprocket: {
+                    ...(current?.shiprocket || {}),
+                    awbCode: result.data.order.awbCode || current?.shiprocket?.awbCode,
+                    courierName: result.data.order.courierName || current?.shiprocket?.courierName,
+                    shippingStatus: result.data.order.shippingStatus || current?.shiprocket?.shippingStatus,
+                    trackingUrl:
+                        current?.shiprocket?.trackingUrl ||
+                        (result.data.order.awbCode
+                            ? `https://shiprocket.co/tracking/${encodeURIComponent(result.data.order.awbCode)}`
+                            : null),
+                },
+                trackingNumber: result.data.order.awbCode || current?.trackingNumber,
+            });
+        }
+        // Refresh full order list so webhook-driven status also appears
+        fetchData('orders');
+    };
+
+    const handleCancelShipment = async (orderId) => {
+        if (!window.confirm('Cancel this Shiprocket shipment?')) return;
+        const result = await runShiprocketAction(orderId, 'Shipment cancelled on Shiprocket', () =>
+            shiprocketAPI.cancel(orderId)
+        );
+        if (result) {
+            const current = orders.find((o) => o._id === orderId);
+            patchOrder(orderId, {
+                shiprocket: { ...(current?.shiprocket || {}), shippingStatus: 'cancelled' },
+            });
         }
     };
 
@@ -637,6 +758,7 @@ const AdminDashboard = () => {
                                         <h3 className="admin-section-title">
                                             All Orders <span className="admin-count-badge">{orders.length}</span>
                                         </h3>
+                                        <p className="admin-section-hint">Shiprocket fulfilment, AWB tracking, and courier status</p>
                                     </div>
                                     {orders.length === 0 ? (
                                         <div className="admin-empty">
@@ -647,29 +769,71 @@ const AdminDashboard = () => {
                                         <div className="admin-table-wrap">
                                             <table className="admin-table">
                                                 <thead>
-                                                    <tr><th>Order #</th><th>Customer</th><th className="admin-hide-sm">Email</th><th className="admin-hide-sm">Items</th><th>Total</th><th>Status</th><th>Payment</th><th className="admin-hide-sm">Date</th></tr>
+                                                    <tr>
+                                                        <th>Order #</th>
+                                                        <th>Customer</th>
+                                                        <th className="admin-hide-sm">Total</th>
+                                                        <th>Status</th>
+                                                        <th className="admin-hide-sm">Shipping</th>
+                                                        <th className="admin-hide-sm">AWB</th>
+                                                        <th>Payment</th>
+                                                        <th className="admin-hide-sm">Date</th>
+                                                    </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {orders.map((o) => (
+                                                    {orders.map((o) => {
+                                                        const sr = o.shiprocket || {};
+                                                        const awb = o.trackingNumber || sr.awbCode;
+                                                        const trackUrl = getShiprocketTrackUrl(o);
+                                                        const busy = shiprocketBusy === o._id;
+                                                        return (
                                                         <React.Fragment key={o._id}>
                                                             <tr className="admin-order-row" onClick={() => setExpandedOrder(expandedOrder === o._id ? null : o._id)} style={{ cursor: 'pointer' }}>
                                                                 <td className="admin-accent">
                                                                     {o.orderNumber}
                                                                     {expandedOrder === o._id ? <FiChevronUp size={14} style={{ marginLeft: '5px' }} /> : <FiChevronDown size={14} style={{ marginLeft: '5px' }} />}
+                                                                    {sr.error && !sr.shiprocketOrderId && (
+                                                                        <FiAlertCircle size={14} title={sr.error} style={{ marginLeft: 6, color: '#e74c3c', verticalAlign: 'middle' }} />
+                                                                    )}
                                                                 </td>
-                                                                <td>{o.user?.firstName} {o.user?.lastName}</td>
-                                                                <td className="admin-muted admin-hide-sm">{o.user?.email}</td>
-                                                                <td className="admin-hide-sm">{o.orderItems?.length || 0} items</td>
-                                                                <td className="admin-accent">{formatINR(o.totalPrice)}</td>
+                                                                <td>
+                                                                    <div>{o.user?.firstName} {o.user?.lastName}</div>
+                                                                    <div className="admin-muted admin-hide-sm" style={{ fontSize: 12 }}>{o.user?.email}</div>
+                                                                </td>
+                                                                <td className="admin-accent admin-hide-sm">{formatINR(o.totalPrice)}</td>
                                                                 <td onClick={(e) => e.stopPropagation()}>
                                                                     <select className="admin-status-select" value={o.orderStatus}
                                                                         onChange={(e) => updateOrderStatus(o._id, e.target.value)}>
-                                                                        {['Processing', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'].map((s) => (
+                                                                        {ORDER_STATUSES.map((s) => (
                                                                             <option key={s} value={s}>{s}</option>
                                                                         ))}
                                                                     </select>
                                                                 </td>
-                                                                <td><span className={`badge ${o.isPaid ? 'badge-success' : 'badge-warning'}`}>{o.isPaid ? 'Paid' : 'Pending'}</span></td>
+                                                                <td className="admin-hide-sm">
+                                                                    {sr.shiprocketOrderId ? (
+                                                                        <span className={`badge ${shippingBadgeClass(sr.shippingStatus)}`}>
+                                                                            {formatShippingStatus(sr.shippingStatus)}
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className="badge badge-warning">Not synced</span>
+                                                                    )}
+                                                                </td>
+                                                                <td className="admin-hide-sm" onClick={(e) => e.stopPropagation()}>
+                                                                    {awb ? (
+                                                                        trackUrl ? (
+                                                                            <a href={trackUrl} target="_blank" rel="noopener noreferrer" className="admin-awb-link">
+                                                                                {awb} <FiExternalLink size={12} />
+                                                                            </a>
+                                                                        ) : awb
+                                                                    ) : (
+                                                                        <span className="admin-muted">—</span>
+                                                                    )}
+                                                                </td>
+                                                                <td>
+                                                                    <span className={`badge ${o.isPaid ? 'badge-success' : 'badge-warning'}`}>
+                                                                        {o.isPaid ? 'Paid' : o.paymentMethod === 'cod' ? 'COD' : 'Unpaid'}
+                                                                    </span>
+                                                                </td>
                                                                 <td className="admin-muted admin-hide-sm">{formatDate(o.createdAt)}</td>
                                                             </tr>
                                                             {expandedOrder === o._id && (
@@ -693,6 +857,87 @@ const AdminDashboard = () => {
                                                                                             <span className="admin-order-item-price">{formatINR(item.price * item.quantity)}</span>
                                                                                         </div>
                                                                                     ))}
+
+                                                                                    <div className="admin-shiprocket-panel">
+                                                                                        <h4 className="admin-detail-label">
+                                                                                            <FiTruck size={14} style={{ marginRight: 6 }} />
+                                                                                            Shiprocket Fulfilment
+                                                                                        </h4>
+                                                                                        {sr.error && !sr.shiprocketOrderId && (
+                                                                                            <div className="admin-sr-error">
+                                                                                                <FiAlertCircle size={14} /> {sr.error}
+                                                                                            </div>
+                                                                                        )}
+                                                                                        <div className="admin-sr-meta">
+                                                                                            <div><span>SR Order</span><strong>{sr.shiprocketOrderId || '—'}</strong></div>
+                                                                                            <div><span>Shipment</span><strong>{sr.shiprocketShipmentId || '—'}</strong></div>
+                                                                                            <div><span>Courier</span><strong>{sr.courierName || '—'}</strong></div>
+                                                                                            <div><span>AWB</span><strong>{awb || '—'}</strong></div>
+                                                                                            <div><span>Shipping</span><strong>{formatShippingStatus(sr.shippingStatus)}</strong></div>
+                                                                                            <div>
+                                                                                                <span>Pickup</span>
+                                                                                                <strong>
+                                                                                                    {sr.pickupScheduledDate
+                                                                                                        ? formatDate(sr.pickupScheduledDate)
+                                                                                                        : 'Not scheduled'}
+                                                                                                </strong>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        {trackUrl && (
+                                                                                            <a
+                                                                                                href={trackUrl}
+                                                                                                target="_blank"
+                                                                                                rel="noopener noreferrer"
+                                                                                                className="btn btn-ghost btn-sm admin-sr-track"
+                                                                                            >
+                                                                                                <FiExternalLink size={14} /> Track / verify on Shiprocket
+                                                                                            </a>
+                                                                                        )}
+                                                                                        <div className="admin-sr-actions">
+                                                                                            {!sr.shiprocketOrderId && o.orderStatus !== 'Cancelled' && (
+                                                                                                <button
+                                                                                                    className="btn btn-primary btn-sm"
+                                                                                                    disabled={busy}
+                                                                                                    onClick={() => handleShiprocketRetry(o._id)}
+                                                                                                >
+                                                                                                    <FiRefreshCw size={14} /> {busy ? 'Working…' : 'Push to Shiprocket'}
+                                                                                                </button>
+                                                                                            )}
+                                                                                            {sr.shiprocketShipmentId && (
+                                                                                                <>
+                                                                                                    <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => handleSchedulePickup(o._id)}>
+                                                                                                        <FiCalendar size={14} /> Schedule pickup
+                                                                                                    </button>
+                                                                                                    <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => handleGenerateLabel(o._id)}>
+                                                                                                        <FiPrinter size={14} /> Label
+                                                                                                    </button>
+                                                                                                    <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => handleSyncTracking(o._id)}>
+                                                                                                        <FiNavigation size={14} /> Sync tracking
+                                                                                                    </button>
+                                                                                                    {sr.shippingStatus !== 'cancelled' && sr.shippingStatus !== 'delivered' && (
+                                                                                                        <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => handleCancelShipment(o._id)}>
+                                                                                                            Cancel shipment
+                                                                                                        </button>
+                                                                                                    )}
+                                                                                                </>
+                                                                                            )}
+                                                                                        </div>
+                                                                                        {Array.isArray(sr.statusHistory) && sr.statusHistory.length > 0 && (
+                                                                                            <div className="admin-sr-history">
+                                                                                                <h5>Status history</h5>
+                                                                                                <ul>
+                                                                                                    {[...sr.statusHistory].slice(-6).reverse().map((h, i) => (
+                                                                                                        <li key={i}>
+                                                                                                            <strong>{formatShippingStatus(h.status)}</strong>
+                                                                                                            {h.timestamp && <span> · {formatDateTime(h.timestamp)}</span>}
+                                                                                                            {h.location && <span> · {h.location}</span>}
+                                                                                                            {h.remarks && <div className="admin-muted">{h.remarks}</div>}
+                                                                                                        </li>
+                                                                                                    ))}
+                                                                                                </ul>
+                                                                                            </div>
+                                                                                        )}
+                                                                                    </div>
                                                                                 </div>
                                                                                 <div className="admin-order-sidebar">
                                                                                     <div className="admin-order-summary">
@@ -706,30 +951,32 @@ const AdminDashboard = () => {
                                                                                         <h4 className="admin-detail-label">Shipping Address</h4>
                                                                                         <div className="admin-address-text">
                                                                                             <p>{o.shippingAddress?.street}</p>
+                                                                                            {o.shippingAddress?.landmark && <p>{o.shippingAddress.landmark}</p>}
                                                                                             <p>{o.shippingAddress?.city}, {o.shippingAddress?.state} {o.shippingAddress?.zipCode}</p>
                                                                                             <p>{o.shippingAddress?.country}</p>
+                                                                                            {o.shippingAddress?.phone && <p>Phone: {o.shippingAddress.phone}</p>}
                                                                                         </div>
                                                                                     </div>
                                                                                     <div className="admin-order-address">
                                                                                         <h4 className="admin-detail-label">Payment</h4>
                                                                                         <div className="admin-address-text">
-                                                                                            <p>Method: {o.paymentMethod.toUpperCase()}</p>
-                                                                                            <p>Status: {o.isPaid ? 'Paid' : 'Unpaid'}</p>
+                                                                                            <p>Method: {(o.paymentMethod || '').toUpperCase()}</p>
+                                                                                            <p>Status: {o.isPaid ? 'Paid' : o.paymentMethod === 'cod' ? 'COD (pay on delivery)' : 'Unpaid'}</p>
                                                                                         </div>
                                                                                     </div>
                                                                                     <div className="admin-order-address">
-                                                                                        <h4 className="admin-detail-label">Delivery Partner</h4>
+                                                                                        <h4 className="admin-detail-label">Manual Delivery Partner</h4>
                                                                                         <div className="admin-address-text">
                                                                                             <select
                                                                                                 className="admin-status-select"
-                                                                                                value={o.deliveryPartner || ''}
+                                                                                                value={o.deliveryPartner?._id || o.deliveryPartner || ''}
                                                                                                 onChange={(e) => assignDeliveryPartner(o._id, e.target.value)}
                                                                                                 style={{ width: '100%', marginTop: '8px' }}
                                                                                             >
-                                                                                                <option value="">Select Partner</option>
-                                                                                                {deliveryPartners.filter(p => p.isActive).map((partner) => (
+                                                                                                <option value="">Select Partner (optional)</option>
+                                                                                                {deliveryPartners.filter((p) => p.isActive).map((partner) => (
                                                                                                     <option key={partner._id} value={partner._id}>
-                                                                                                        {partner.company}
+                                                                                                        {partner.company || partner.name}
                                                                                                     </option>
                                                                                                 ))}
                                                                                             </select>
@@ -742,7 +989,8 @@ const AdminDashboard = () => {
                                                                 </tr>
                                                             )}
                                                         </React.Fragment>
-                                                    ))}
+                                                        );
+                                                    })}
                                                 </tbody>
                                             </table>
                                         </div>

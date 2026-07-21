@@ -6,13 +6,14 @@ import sendEmail, { orderConfirmationEmail } from '../utils/sendEmail.js';
 import {
     paymentReceiptEmail,
     orderShippedEmail,
+    orderOutForDeliveryEmail,
     orderDeliveredEmail,
     orderCancelledEmail,
 } from '../utils/emailTemplates.js';
 import { verifyRazorpaySignature } from '../utils/verifyRazorpay.js';
 import Razorpay from 'razorpay';
 import { createShiprocketOrder } from '../services/shiprocketService.js';
-import { restoreStockAndCoupon } from '../utils/orderHelper.js';
+import { restoreStockAndCoupon, notifyAdminsOfNewOrder } from '../utils/orderHelper.js';
 
 // Lazy Razorpay client for server-side payment reconciliation in updateOrderToPaid.
 let _rzp = null;
@@ -205,6 +206,8 @@ export const createOrder = async (req, res, next) => {
                 orderItems: verifiedItems,
                 shippingAddress,
                 paymentMethod,
+                // COD is accepted immediately; online stays Processing until Razorpay confirms
+                orderStatus: paymentMethod === 'cod' ? 'Confirmed' : 'Processing',
                 itemsPrice,
                 taxPrice,
                 shippingPrice,
@@ -239,6 +242,7 @@ export const createOrder = async (req, res, next) => {
 
         // ✅ CREATE SHIPROCKET ORDER FOR COD ORDERS (non-blocking)
         if (paymentMethod === 'cod') {
+            notifyAdminsOfNewOrder(populatedOrder, req.user);
             createShiprocketOrderAsync(populatedOrder, req.user).catch((err) => {
                 console.error('❌ Shiprocket order creation failed for COD order (non-blocking):', err.message);
             });
@@ -337,7 +341,7 @@ export const getAllOrders = async (req, res, next) => {
  */
 export const updateOrderStatus = async (req, res, next) => {
     try {
-        const allowed = ['Processing', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'];
+        const allowed = ['Processing', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
         if (!allowed.includes(req.body.status)) {
             return res.status(400).json({ success: false, message: 'Invalid or missing order status' });
         }
@@ -357,6 +361,15 @@ export const updateOrderStatus = async (req, res, next) => {
 
         if (req.body.trackingNumber) {
             order.trackingNumber = req.body.trackingNumber;
+            if (!order.shiprocket) order.shiprocket = {};
+            order.shiprocket.awbCode = req.body.trackingNumber;
+            if (!order.shiprocket.trackingUrl) {
+                order.shiprocket.trackingUrl = `https://shiprocket.co/tracking/${encodeURIComponent(req.body.trackingNumber)}`;
+            }
+        }
+
+        if (req.body.deliveryPartner) {
+            order.deliveryPartner = req.body.deliveryPartner;
         }
 
         await order.save();
@@ -369,7 +382,7 @@ export const updateOrderStatus = async (req, res, next) => {
         // Customer status email on real transitions only — fire-and-forget
         if (
             req.body.status !== previousStatus &&
-            ['Shipped', 'Delivered', 'Cancelled'].includes(req.body.status)
+            ['Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'].includes(req.body.status)
         ) {
             sendOrderStatusEmailAsync(order._id, req.body.status).catch((err) =>
                 console.error('Status email failed:', err.message)
@@ -514,6 +527,8 @@ export const updateOrderToPaid = async (req, res, next) => {
             html: paymentReceiptEmail(claimed, req.user),
         }).catch((err) => console.error('Payment receipt email failed:', err.message));
 
+        notifyAdminsOfNewOrder(claimed, req.user);
+
         // ✅ CREATE SHIPROCKET ORDER AUTOMATICALLY (non-blocking)
         createShiprocketOrderAsync(claimed, req.user).catch((err) => {
             console.error('❌ Shiprocket order creation failed (non-blocking):', err.message);
@@ -596,17 +611,19 @@ export const createShiprocketOrderAsync = async (order, user) => {
 
         if (shiprocketResponse.success) {
             // Update order with Shiprocket details
+            const awb = shiprocketResponse.awbCode || null;
             populatedOrder.shiprocket = {
                 shiprocketOrderId: shiprocketResponse.shiprocketOrderId,
                 shiprocketShipmentId: shiprocketResponse.shiprocketShipmentId,
-                awbCode: shiprocketResponse.awbCode,
+                awbCode: awb,
                 courierName: shiprocketResponse.courierName,
+                trackingUrl: awb ? `https://shiprocket.co/tracking/${encodeURIComponent(awb)}` : null,
                 shippingStatus: 'pending',
                 createdAt: new Date(),
             };
 
-            if (shiprocketResponse.awbCode) {
-                populatedOrder.trackingNumber = shiprocketResponse.awbCode;
+            if (awb) {
+                populatedOrder.trackingNumber = awb;
             }
 
             await populatedOrder.save();
@@ -647,6 +664,10 @@ const sendOrderStatusEmailAsync = async (orderId, status) => {
         case 'Shipped':
             subject = `Your Order Has Shipped - ${order.orderNumber} | SwissGarden Perfumes`;
             html = orderShippedEmail(order, order.user);
+            break;
+        case 'Out for Delivery':
+            subject = `Out for Delivery - ${order.orderNumber} | SwissGarden Perfumes`;
+            html = orderOutForDeliveryEmail(order, order.user);
             break;
         case 'Delivered':
             subject = `Order Delivered - ${order.orderNumber} | SwissGarden Perfumes`;

@@ -31,6 +31,71 @@ const emailCustomer = async (order, buildSubject, buildHtml, { withProductSlugs 
 
 const router = express.Router();
 
+/** Only push Number queries when the value is actually numeric — Shiprocket often
+ *  sends merchant `order_id` like "GB-001018", which must NOT hit Number paths. */
+const asNumberIfNumeric = (value) => {
+    if (value == null || value === '') return null;
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    const s = String(value).trim();
+    if (/^\d+$/.test(s)) return Number(s);
+    return null;
+};
+
+/**
+ * Map Shiprocket tracking payloads (event / current_status / sr-status-label)
+ * onto our internal shipping + order statuses.
+ */
+const resolveShiprocketStatusKey = (event = {}) => {
+    const raw = [
+        event.event,
+        event.type,
+        event.current_status,
+        event.shipment_status,
+        event['sr-status-label'],
+        event.sr_status_label,
+    ]
+        .filter(Boolean)
+        .map((v) => String(v).trim().toUpperCase().replace(/[_-]+/g, ' '))
+        .join(' | ');
+
+    if (!raw) return null;
+    if (/CANCEL/.test(raw)) return 'cancelled';
+    if (/\bRTO\b/.test(raw)) return 'rto';
+    if (/DELIVERED/.test(raw)) return 'delivered';
+    if (/OUT FOR DELIVERY|OFD/.test(raw)) return 'out_for_delivery';
+    if (/SHIPPED|IN TRANSIT|PICKED UP|PICKUP DONE/.test(raw)) return 'shipped';
+    if (/PICKUP SCHEDULED|MANIFEST|AWB ASSIGNED/.test(raw)) return 'pickup_scheduled';
+    if (/IN TRANSIT/.test(raw)) return 'in_transit';
+    return null;
+};
+
+const findOrderFromWebhook = async (event = {}) => {
+    const lookup = [];
+
+    const srOrderId = asNumberIfNumeric(event.sr_order_id ?? event.shiprocket_order_id);
+    if (srOrderId != null) lookup.push({ 'shiprocket.shiprocketOrderId': srOrderId });
+
+    const shipmentId = asNumberIfNumeric(event.shipment_id ?? event.sr_shipment_id);
+    if (shipmentId != null) lookup.push({ 'shiprocket.shiprocketShipmentId': shipmentId });
+
+    // Merchant/channel order id — what we sent as order_id when creating the shipment
+    if (event.order_id != null && String(event.order_id).trim()) {
+        const oid = String(event.order_id).trim();
+        lookup.push({ orderNumber: oid });
+        const asNum = asNumberIfNumeric(oid);
+        if (asNum != null) lookup.push({ 'shiprocket.shiprocketOrderId': asNum });
+    }
+
+    const awb = event.awb || event.awb_code;
+    if (awb) {
+        lookup.push({ 'shiprocket.awbCode': String(awb) });
+        lookup.push({ trackingNumber: String(awb) });
+    }
+
+    if (lookup.length === 0) return null;
+    return Order.findOne({ $or: lookup });
+};
+
 /**
  * Lightweight token-based authentication for Shiprocket webhooks.
  * Set SHIPROCKET_WEBHOOK_TOKEN in your environment and configure the
@@ -69,56 +134,74 @@ const verifyWebhookToken = (req, res, next) => {
  */
 router.post('/webhook', verifyWebhookToken, async (req, res) => {
     try {
-        const event = req.body;
+        const event = req.body || {};
 
         console.log('📦 Shiprocket Webhook received:', {
-            event: event.event || event.type,
+            event: event.event || event.type || event.current_status || event['sr-status-label'],
             order_id: event.order_id,
+            sr_order_id: event.sr_order_id,
             shipment_id: event.shipment_id,
+            awb: event.awb || event.awb_code,
         });
 
-        // Get event type
-        const eventType = event.event || event.type;
+        // Prefer explicit event names; fall back to Shiprocket tracking status fields
+        const eventType =
+            event.event ||
+            event.type ||
+            resolveShiprocketStatusKey(event) ||
+            null;
 
-        // Find order by Shiprocket order ID or shipment ID.
-        // Only include conditions whose value is present — Mongoose strips
-        // undefined query values, which would turn that $or branch into {}
-        // and match an arbitrary order.
-        const lookup = [];
-        if (event.order_id != null) lookup.push({ 'shiprocket.shiprocketOrderId': event.order_id });
-        if (event.shipment_id != null) lookup.push({ 'shiprocket.shiprocketShipmentId': event.shipment_id });
-        const order = lookup.length > 0 ? await Order.findOne({ $or: lookup }) : null;
+        const order = await findOrderFromWebhook(event);
 
         if (!order) {
-            console.warn(`⚠️ Order not found for Shiprocket webhook: order_id=${event.order_id}`);
+            console.warn(
+                `⚠️ Order not found for Shiprocket webhook: order_id=${event.order_id} sr_order_id=${event.sr_order_id} awb=${event.awb || event.awb_code}`
+            );
             return res.status(200).json({ success: true, message: 'Order not found' });
+        }
+
+        if (!order.shiprocket) order.shiprocket = {};
+        if (!Array.isArray(order.shiprocket.statusHistory)) order.shiprocket.statusHistory = [];
+
+        // Enrich from common Shiprocket tracking fields
+        const awb = event.awb || event.awb_code;
+        if (awb) {
+            order.shiprocket.awbCode = String(awb);
+            order.trackingNumber = String(awb);
+        }
+        if (event.courier_name) order.shiprocket.courierName = event.courier_name;
+        if (event.tracking_url) {
+            order.shiprocket.trackingUrl = event.tracking_url;
+        } else if (awb && !order.shiprocket.trackingUrl) {
+            order.shiprocket.trackingUrl = `https://shiprocket.co/tracking/${encodeURIComponent(String(awb))}`;
+        }
+        if (event.etd || event.estimated_delivery_date || event.edd) {
+            order.shiprocket.estimatedDeliveryDate = new Date(
+                event.etd || event.estimated_delivery_date || event.edd
+            );
         }
 
         // Pre-update status — used to dedup emails when Shiprocket retries a webhook
         const prevShippingStatus = order.shiprocket?.shippingStatus;
 
+        // Normalize to our switch keys
+        const statusKey = resolveShiprocketStatusKey({ ...event, event: eventType }) || eventType;
+
         // Handle different event types
-        switch (eventType) {
+        switch (statusKey) {
             case 'pickup_scheduled':
             case 'PICKUP_SCHEDULED': {
                 console.log(`✅ Pickup scheduled for order: ${order.orderNumber}`);
                 
                 order.shiprocket.shippingStatus = 'pickup_scheduled';
-                order.shiprocket.pickupScheduledDate = new Date(event.pickup_scheduled_date || event.scheduled_date);
-                
-                if (event.awb_code && !order.shiprocket.awbCode) {
-                    order.shiprocket.awbCode = event.awb_code;
-                    order.trackingNumber = event.awb_code;
-                }
-                
-                if (event.courier_name && !order.shiprocket.courierName) {
-                    order.shiprocket.courierName = event.courier_name;
+                if (event.pickup_scheduled_date || event.scheduled_date) {
+                    order.shiprocket.pickupScheduledDate = new Date(event.pickup_scheduled_date || event.scheduled_date);
                 }
 
                 order.shiprocket.statusHistory.push({
                     status: 'pickup_scheduled',
                     timestamp: new Date(),
-                    location: event.pickup_location || '',
+                    location: event.pickup_location || event.current_location || '',
                     remarks: 'Pickup scheduled',
                 });
 
@@ -128,34 +211,21 @@ router.post('/webhook', verifyWebhookToken, async (req, res) => {
 
             case 'order_shipped':
             case 'ORDER_SHIPPED':
-            case 'shipped': {
-                console.log(`✅ Order shipped: ${order.orderNumber}`);
+            case 'shipped':
+            case 'in_transit':
+            case 'IN_TRANSIT': {
+                console.log(`✅ Order shipped / in transit: ${order.orderNumber}`);
                 
                 order.shiprocket.shippingStatus = 'in_transit';
-                order.orderStatus = 'Shipped';
-                
-                if (event.awb_code) {
-                    order.shiprocket.awbCode = event.awb_code;
-                    order.trackingNumber = event.awb_code;
-                }
-                
-                if (event.courier_name) {
-                    order.shiprocket.courierName = event.courier_name;
-                }
-                
-                if (event.tracking_url) {
-                    order.shiprocket.trackingUrl = event.tracking_url;
-                }
-                
-                if (event.estimated_delivery_date || event.edd) {
-                    order.shiprocket.estimatedDeliveryDate = new Date(event.estimated_delivery_date || event.edd);
+                if (!['Shipped', 'Out for Delivery', 'Delivered'].includes(order.orderStatus)) {
+                    order.orderStatus = 'Shipped';
                 }
 
                 order.shiprocket.statusHistory.push({
                     status: 'shipped',
                     timestamp: new Date(),
-                    location: event.current_location || '',
-                    remarks: event.status_message || 'Order shipped',
+                    location: event.current_location || event.scan_location || '',
+                    remarks: event.status_message || event.current_status || 'Order shipped',
                 });
 
                 await order.save();
@@ -176,6 +246,9 @@ router.post('/webhook', verifyWebhookToken, async (req, res) => {
                 console.log(`✅ Order out for delivery: ${order.orderNumber}`);
                 
                 order.shiprocket.shippingStatus = 'out_for_delivery';
+                if (order.orderStatus !== 'Delivered') {
+                    order.orderStatus = 'Out for Delivery';
+                }
 
                 order.shiprocket.statusHistory.push({
                     status: 'out_for_delivery',
@@ -206,6 +279,10 @@ router.post('/webhook', verifyWebhookToken, async (req, res) => {
                 order.shiprocket.shippingStatus = 'delivered';
                 order.orderStatus = 'Delivered';
                 order.deliveredAt = new Date(event.delivered_date || Date.now());
+                if (order.paymentMethod === 'cod' && !order.isPaid) {
+                    order.isPaid = true;
+                    order.paidAt = order.deliveredAt;
+                }
 
                 order.shiprocket.statusHistory.push({
                     status: 'delivered',
@@ -282,33 +359,16 @@ router.post('/webhook', verifyWebhookToken, async (req, res) => {
                 break;
             }
 
-            case 'in_transit':
-            case 'IN_TRANSIT': {
-                console.log(`📦 Order in transit: ${order.orderNumber}`);
-                
-                order.shiprocket.shippingStatus = 'in_transit';
-
-                order.shiprocket.statusHistory.push({
-                    status: 'in_transit',
-                    timestamp: new Date(),
-                    location: event.current_location || event.scan_location || '',
-                    remarks: event.status_message || 'Shipment in transit',
-                });
-
-                await order.save();
-                break;
-            }
-
             default:
-                console.log(`ℹ️ Unhandled Shiprocket event: ${eventType}`);
+                console.log(`ℹ️ Unhandled Shiprocket event: ${eventType || statusKey}`);
                 
                 // Store unhandled events for debugging
-                if (eventType) {
+                if (eventType || statusKey || event.current_status) {
                     order.shiprocket.statusHistory.push({
-                        status: eventType,
+                        status: String(statusKey || eventType || event.current_status),
                         timestamp: new Date(),
                         location: event.current_location || '',
-                        remarks: event.status_message || JSON.stringify(event),
+                        remarks: event.status_message || JSON.stringify(event).slice(0, 500),
                     });
                     await order.save();
                 }

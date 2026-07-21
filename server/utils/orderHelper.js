@@ -1,5 +1,36 @@
 import Product from '../models/Product.js';
 import Coupon from '../models/Coupon.js';
+import sendEmail from './sendEmail.js';
+import { adminNewOrderEmail } from './emailTemplates.js';
+
+/** Default store-owner inboxes for new-order alerts (overridable via ORDER_NOTIFY_EMAILS). */
+const DEFAULT_ORDER_NOTIFY_EMAILS = [
+    'Goldenbuckprfm@gmail.com',
+    'shaikhamaan2304@gmail.com',
+];
+
+export const getOrderNotifyEmails = () => {
+    const fromEnv = (process.env.ORDER_NOTIFY_EMAILS || '')
+        .split(',')
+        .map((e) => e.trim())
+        .filter(Boolean);
+    return fromEnv.length > 0 ? fromEnv : DEFAULT_ORDER_NOTIFY_EMAILS;
+};
+
+/**
+ * Fire-and-forget alert to store owners when an order is confirmed
+ * (COD at create time, prepaid after successful payment).
+ */
+export const notifyAdminsOfNewOrder = (order, user) => {
+    if (!order?.orderNumber) return;
+    const html = adminNewOrderEmail(order, user || {});
+    const subject = `New Order ${order.orderNumber} — ${order.paymentMethod === 'cod' ? 'COD' : 'Paid'} | SwissGarden`;
+    for (const email of getOrderNotifyEmails()) {
+        sendEmail({ email, subject, html }).catch((err) =>
+            console.error(`Admin order notify failed (${email}):`, err.message)
+        );
+    }
+};
 
 /**
  * Restores product stock and reverses coupon usage when an order is cancelled.

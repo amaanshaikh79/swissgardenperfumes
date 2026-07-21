@@ -1,7 +1,7 @@
 import User from '../models/User.js';
 import crypto from 'crypto';
 import sendEmail from '../utils/sendEmail.js';
-import { welcomeEmail } from '../utils/emailTemplates.js';
+import { welcomeEmail, emailVerificationEmail } from '../utils/emailTemplates.js';
 import { getClientUrl } from '../config/urls.js';
 
 /**
@@ -37,6 +37,34 @@ const generateOTP = () => {
     // crypto.randomInt is available since Node.js 14.10 and is
     // cryptographically secure (unlike Math.random)
     return crypto.randomInt(100000, 1000000).toString();
+};
+
+const hashCode = (code) => crypto.createHash('sha256').update(String(code)).digest('hex');
+
+const VERIFICATION_TTL_MS = 15 * 60 * 1000; // code valid 15 minutes
+const VERIFICATION_MAX_ATTEMPTS = 5;        // wrong-code tries before requiring a resend
+const VERIFICATION_RESEND_COOLDOWN_MS = 60 * 1000;
+
+/**
+ * Helper: issue (or re-issue) an email verification code for a user and email
+ * it. Stores only the SHA256 hash. Returns { sent, code } — `code` is exposed
+ * to callers ONLY so development responses can surface it; never log or return
+ * it in production.
+ */
+const issueEmailVerification = async (user) => {
+    const code = generateOTP();
+    user.emailVerificationCode = hashCode(code);
+    user.emailVerificationExpire = new Date(Date.now() + VERIFICATION_TTL_MS);
+    user.emailVerificationAttempts = 0;
+    user.emailVerificationLastSentAt = new Date();
+    await user.save({ validateBeforeSave: false });
+
+    const sent = await sendEmail({
+        email: user.email,
+        subject: `${code} is your SwissGarden verification code`,
+        html: emailVerificationEmail(user, code),
+    });
+    return { sent: Boolean(sent), code };
 };
 
 /**
@@ -78,18 +106,26 @@ export const register = async (req, res, next) => {
             email,
             password,
             phone: phone || undefined,
+            isEmailVerified: false,
         });
 
-        console.log('✅ User created successfully:', user.email);
+        console.log('✅ User created successfully (pending verification):', user.email);
 
-        // Welcome email — fire-and-forget, never blocks registration
-        sendEmail({
+        // Email a 6-digit activation code; the account cannot log in until the
+        // code is confirmed via POST /api/auth/verify-email. The welcome email
+        // is sent after successful verification instead of here.
+        const { sent, code } = await issueEmailVerification(user);
+
+        res.status(201).json({
+            success: true,
+            requiresVerification: true,
             email: user.email,
-            subject: 'Welcome to SwissGarden Perfumes ✨',
-            html: welcomeEmail(user),
-        }).catch((err) => console.error('Welcome email failed:', err.message));
-
-        sendTokenResponse(user, 201, res);
+            message: sent
+                ? 'Account created. We have emailed you a 6-digit verification code.'
+                : 'Account created, but the verification email could not be sent. Use "Resend code" in a moment.',
+            // Development convenience only — mirrors forgotPassword's dev resetUrl.
+            ...(process.env.NODE_ENV === 'development' && { devCode: code }),
+        });
     } catch (error) {
         console.error('❌ Registration error:', error.message);
         next(error);
@@ -121,7 +157,142 @@ export const login = async (req, res, next) => {
             });
         }
 
+        // Block sign-in until the email is verified. Strict === false so legacy
+        // accounts (field absent) and OAuth accounts are unaffected.
+        if (user.isEmailVerified === false) {
+            return res.status(403).json({
+                success: false,
+                requiresVerification: true,
+                email: user.email,
+                message: 'Please verify your email to activate your account. Check your inbox for the 6-digit code.',
+            });
+        }
+
         sendTokenResponse(user, 200, res);
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Verify email with the 6-digit code and activate the account
+ * @route   POST /api/auth/verify-email
+ * @access  Public
+ */
+export const verifyEmail = async (req, res, next) => {
+    try {
+        const { email, code } = req.body;
+        if (!email || !code) {
+            return res.status(400).json({ success: false, message: 'Email and verification code are required' });
+        }
+
+        const user = await User.findOne({ email }).select(
+            '+emailVerificationCode +emailVerificationExpire +emailVerificationAttempts'
+        );
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'No account found with this email' });
+        }
+
+        if (user.isEmailVerified !== false) {
+            // Already verified (or legacy account) — sign them in.
+            return sendTokenResponse(user, 200, res);
+        }
+
+        if ((user.emailVerificationAttempts || 0) >= VERIFICATION_MAX_ATTEMPTS) {
+            return res.status(429).json({
+                success: false,
+                message: 'Too many incorrect attempts. Please request a new code.',
+            });
+        }
+
+        if (
+            !user.emailVerificationCode ||
+            !user.emailVerificationExpire ||
+            Date.now() > new Date(user.emailVerificationExpire).getTime()
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: 'This code has expired. Please request a new one.',
+            });
+        }
+
+        if (hashCode(code) !== user.emailVerificationCode) {
+            user.emailVerificationAttempts = (user.emailVerificationAttempts || 0) + 1;
+            await user.save({ validateBeforeSave: false });
+            const remaining = VERIFICATION_MAX_ATTEMPTS - user.emailVerificationAttempts;
+            return res.status(400).json({
+                success: false,
+                message:
+                    remaining > 0
+                        ? `Incorrect code. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.`
+                        : 'Too many incorrect attempts. Please request a new code.',
+            });
+        }
+
+        user.isEmailVerified = true;
+        user.emailVerificationCode = undefined;
+        user.emailVerificationExpire = undefined;
+        user.emailVerificationAttempts = 0;
+        await user.save({ validateBeforeSave: false });
+
+        // Welcome email now that the address is confirmed — fire-and-forget.
+        sendEmail({
+            email: user.email,
+            subject: 'Welcome to SwissGarden Perfumes ✨',
+            html: welcomeEmail(user),
+        }).catch((err) => console.error('Welcome email failed:', err.message));
+
+        // Activate the session immediately.
+        sendTokenResponse(user, 200, res);
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Resend the email verification code (60s cooldown)
+ * @route   POST /api/auth/resend-verification
+ * @access  Public
+ */
+export const resendVerification = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ success: false, message: 'Email is required' });
+        }
+
+        const user = await User.findOne({ email }).select('+emailVerificationLastSentAt');
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'No account found with this email' });
+        }
+        if (user.isEmailVerified !== false) {
+            return res.status(400).json({ success: false, message: 'This account is already verified. Please sign in.' });
+        }
+
+        const lastSent = user.emailVerificationLastSentAt
+            ? new Date(user.emailVerificationLastSentAt).getTime()
+            : 0;
+        const waitMs = VERIFICATION_RESEND_COOLDOWN_MS - (Date.now() - lastSent);
+        if (waitMs > 0) {
+            return res.status(429).json({
+                success: false,
+                message: `Please wait ${Math.ceil(waitMs / 1000)}s before requesting another code.`,
+            });
+        }
+
+        const { sent, code } = await issueEmailVerification(user);
+        if (!sent) {
+            return res.status(500).json({
+                success: false,
+                message: 'Verification email could not be sent. Please try again later.',
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'A new verification code has been sent to your email.',
+            ...(process.env.NODE_ENV === 'development' && { devCode: code }),
+        });
     } catch (error) {
         next(error);
     }

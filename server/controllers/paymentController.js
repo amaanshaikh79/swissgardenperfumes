@@ -5,6 +5,7 @@ import User from '../models/User.js';
 import { safeCompareHex } from '../utils/verifyRazorpay.js';
 import sendEmail from '../utils/sendEmail.js';
 import { paymentReceiptEmail } from '../utils/emailTemplates.js';
+import { notifyAdminsOfNewOrder } from '../utils/orderHelper.js';
 import { createShiprocketOrderAsync } from './orderController.js';
 
 // Helper to get keys lazily (only when actually needed)
@@ -271,12 +272,16 @@ const completeOrderFromWebhook = async (payment) => {
         console.log(`🛟 Webhook completed order ${claimed.orderNumber} for payment ${payment.id}`);
 
         const user = await User.findById(claimed.user).select('firstName lastName email phone');
-        if (user?.email) {
-            sendEmail({
-                email: user.email,
-                subject: `Payment Received - ${claimed.orderNumber} | SwissGarden Perfumes`,
-                html: paymentReceiptEmail(claimed, user),
-            }).catch((err) => console.error('Webhook receipt email failed:', err.message));
+        if (user) {
+            if (user.email) {
+                sendEmail({
+                    email: user.email,
+                    subject: `Payment Received - ${claimed.orderNumber} | SwissGarden Perfumes`,
+                    html: paymentReceiptEmail(claimed, user),
+                }).catch((err) => console.error('Webhook receipt email failed:', err.message));
+            }
+
+            notifyAdminsOfNewOrder(claimed, user);
 
             createShiprocketOrderAsync(claimed, user).catch((err) =>
                 console.error('Webhook Shiprocket creation failed (non-blocking):', err.message)

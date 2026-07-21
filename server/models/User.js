@@ -62,6 +62,28 @@ const userSchema = new mongoose.Schema(
             type: Date,
             select: false,
         },
+        // Email verification (signup activation). undefined = legacy/OAuth user
+        // (treated as verified); false = pending; true = verified.
+        isEmailVerified: {
+            type: Boolean,
+        },
+        emailVerificationCode: {
+            type: String, // SHA256 hash of the 6-digit code
+            select: false,
+        },
+        emailVerificationExpire: {
+            type: Date,
+            select: false,
+        },
+        emailVerificationAttempts: {
+            type: Number,
+            default: 0,
+            select: false,
+        },
+        emailVerificationLastSentAt: {
+            type: Date,
+            select: false,
+        },
         addresses: [
             {
                 label: { type: String, default: 'Home' },
@@ -124,6 +146,10 @@ userSchema.set('toJSON', {
         delete ret.resetPasswordExpire;
         delete ret.otp;
         delete ret.otpExpire;
+        delete ret.emailVerificationCode;
+        delete ret.emailVerificationExpire;
+        delete ret.emailVerificationAttempts;
+        delete ret.emailVerificationLastSentAt;
         return ret;
     },
 });
