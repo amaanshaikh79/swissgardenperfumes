@@ -25,6 +25,9 @@ scripts/node_modules
 # Claude Code local tooling config (dev-preview launch config, etc.)
 .claude/
 
+# Kiro IDE local spec/workspace metadata (per-developer, not shipped)
+.kiro/
+
 # One-off audit/fix workflow scratch artifacts (kept locally, not shipped)
 scripts/FIX_INDEX.txt
 scripts/FIX_PLAN.json
