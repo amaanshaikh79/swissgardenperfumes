@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { FiPackage, FiClock, FiCheck, FiTruck, FiFileText, FiX, FiDownload, FiPrinter, FiChevronDown, FiChevronUp, FiMapPin, FiRotateCcw, FiXCircle } from 'react-icons/fi';
 import { ordersAPI, returnAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import './Orders.css';
 
 const formatINR = (amount) => {
@@ -13,6 +14,33 @@ const formatINR = (amount) => {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
     }).format(amount || 0);
+};
+
+// Seller details printed on the tax invoice. GSTIN is left blank until the
+// company registration number is available — set it to display on invoices.
+const SELLER = {
+    legalName: 'Golden Buck Private Limited',
+    brand: 'SwissGarden Perfumes',
+    address: 'C-589 DDA Flat, Pocket 11, Jasola, New Delhi 110025, India',
+    email: 'support@swissgardenperfumes.com',
+    phone: '+91 9354936369',
+    gstin: '', // TODO: set company GSTIN to print on tax invoices
+    hsn: '3303', // HSN for perfumes & toilet waters
+};
+
+/**
+ * Reverse-calculate the GST already contained in a GST-inclusive total.
+ * Store prices include 18% GST, so the invoice must EXTRACT the tax component
+ * (never add it on top) — the grand total always equals the amount charged.
+ * Integer-rupee rounding keeps the breakdown reconciling exactly to the total.
+ */
+const computeGST = (order) => {
+    const grand = Math.round(order.totalPrice || 0);
+    const taxable = Math.round(grand / 1.18);
+    const gstTotal = grand - taxable;
+    const cgst = Math.round(gstTotal / 2);
+    const sgst = gstTotal - cgst;
+    return { grand, taxable, gstTotal, cgst, sgst };
 };
 
 const statusIcons = {
@@ -65,6 +93,7 @@ const getShipmentProgressIndex = (order) => {
 };
 
 const Orders = () => {
+    const { user } = useAuth();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [invoiceOrder, setInvoiceOrder] = useState(null);
@@ -195,29 +224,49 @@ const Orders = () => {
                 <title>Invoice - ${invoiceOrder.orderNumber}</title>
                 <style>
                     * { margin: 0; padding: 0; box-sizing: border-box; }
-                    body { font-family: 'Segoe UI', sans-serif; padding: 40px; color: #1a1a1a; }
-                    .invoice-container { max-width: 700px; margin: 0 auto; }
-                    .invoice-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; border-bottom: 2px solid #1a1a2e; padding-bottom: 20px; }
-                    .invoice-brand { font-size: 1.6rem; font-weight: 700; color: #1a1a2e; letter-spacing: -0.5px; }
-                    .invoice-brand-sub { font-size: 0.7rem; letter-spacing: 3px; color: #666; text-transform: uppercase; }
-                    .invoice-title { text-align: right; }
-                    .invoice-title h2 { font-size: 1.4rem; color: #1a1a2e; }
-                    .invoice-title p { font-size: 0.8rem; color: #666; margin-top: 4px; }
-                    .invoice-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
-                    .invoice-meta-box h4 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: #999; margin-bottom: 6px; }
-                    .invoice-meta-box p { font-size: 0.85rem; line-height: 1.6; }
+                    body { font-family: 'Segoe UI', -apple-system, Roboto, sans-serif; padding: 48px 40px; color: #1f2430; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    .invoice-container { max-width: 760px; margin: 0 auto; }
+                    .invoice-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; margin-bottom: 30px; border-bottom: 3px solid #C8A02A; padding-bottom: 22px; }
+                    .invoice-brand { font-size: 1.7rem; font-weight: 800; color: #14141c; letter-spacing: -0.5px; line-height: 1; }
+                    .invoice-brand-sub { font-size: 0.66rem; letter-spacing: 4px; color: #C8A02A; text-transform: uppercase; margin-top: 3px; font-weight: 700; }
+                    .invoice-seller-meta { font-size: 0.72rem; line-height: 1.7; color: #6b7180; margin-top: 12px; }
+                    .invoice-title { text-align: right; flex-shrink: 0; }
+                    .invoice-title h2 { font-size: 1.25rem; color: #14141c; letter-spacing: 2px; font-weight: 800; margin-bottom: 12px; }
+                    .invoice-title-meta { display: grid; grid-template-columns: auto auto; gap: 4px 12px; font-size: 0.8rem; justify-content: end; }
+                    .invoice-title-label { color: #9aa0ac; text-align: right; }
+                    .invoice-title-value { color: #1f2430; font-weight: 600; text-align: right; }
+                    .invoice-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 26px; }
+                    .invoice-meta-box { background: #f7f8fa; border: 1px solid #eceef2; border-radius: 10px; padding: 16px 18px; }
+                    .invoice-meta-box h4 { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: #9aa0ac; margin-bottom: 8px; font-weight: 700; }
+                    .invoice-meta-box p { font-size: 0.82rem; line-height: 1.7; color: #4a5060; }
                     .invoice-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-                    .invoice-table th { background: #f5f5f7; padding: 10px 12px; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: #666; border-bottom: 1px solid #e0e0e0; }
-                    .invoice-table td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 0.85rem; }
+                    .invoice-table th { background: #14141c; padding: 11px 12px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.6px; color: #fff; font-weight: 600; }
+                    .invoice-table th:first-child { border-radius: 8px 0 0 8px; }
+                    .invoice-table th:last-child { border-radius: 0 8px 8px 0; }
+                    .invoice-table td { padding: 12px; border-bottom: 1px solid #eef0f3; font-size: 0.84rem; vertical-align: top; }
                     .invoice-table .text-right { text-align: right; }
-                    .invoice-totals { margin-left: auto; width: 260px; }
-                    .invoice-totals-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.85rem; color: #555; }
-                    .invoice-totals-row.total { border-top: 2px solid #1a1a2e; margin-top: 8px; padding-top: 10px; font-size: 1.05rem; font-weight: 700; color: #1a1a2e; }
-                    .invoice-totals-row.discount { color: #2ecc71; }
-                    .invoice-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; font-size: 0.75rem; color: #999; }
-                    .invoice-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; }
-                    .badge-paid { background: #e8f8f0; color: #27ae60; }
-                    .badge-pending { background: #fef5e7; color: #f39c12; }
+                    .invoice-table .col-num { width: 34px; color: #9aa0ac; }
+                    .invoice-table .col-hsn { width: 64px; color: #6b7180; }
+                    .invoice-table .col-qty { width: 52px; }
+                    .invoice-item-name { display: block; font-weight: 600; color: #1f2430; }
+                    .invoice-item-sub { display: block; font-size: 0.74rem; color: #9aa0ac; margin-top: 2px; }
+                    .invoice-summary { display: flex; justify-content: flex-end; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+                    .invoice-gst { width: 280px; background: #f7f8fa; border: 1px solid #eceef2; border-radius: 10px; padding: 14px 16px; }
+                    .invoice-gst-title { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.6px; color: #9aa0ac; font-weight: 700; margin-bottom: 8px; }
+                    .invoice-totals { width: 280px; }
+                    .invoice-totals-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.84rem; color: #4a5060; }
+                    .invoice-totals-row.discount { color: #16a34a; }
+                    .invoice-totals-row.grand { border-top: 2px solid #14141c; margin-top: 6px; padding-top: 10px; font-size: 1.02rem; font-weight: 800; color: #14141c; }
+                    .invoice-totals-row.gst-total { border-top: 1px solid #dfe2e8; margin-top: 4px; padding-top: 8px; font-weight: 700; color: #1f2430; }
+                    .invoice-amount-due { display: flex; justify-content: space-between; align-items: center; background: #14141c; color: #fff; padding: 16px 22px; border-radius: 10px; margin-bottom: 28px; }
+                    .invoice-amount-due span:first-child { font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; color: #C8A02A; font-weight: 600; }
+                    .invoice-amount-due span:last-child { font-size: 1.4rem; font-weight: 800; }
+                    .invoice-footer { text-align: center; font-size: 0.74rem; color: #9aa0ac; line-height: 1.8; border-top: 1px solid #eef0f3; padding-top: 18px; }
+                    .invoice-thanks { font-weight: 600; color: #4a5060; }
+                    .invoice-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.5px; }
+                    .badge-paid { background: #e8f8f0; color: #16a34a; }
+                    .badge-pending { background: #fef5e7; color: #d97706; }
+                    @media print { body { padding: 0; } }
                 </style>
             </head>
             <body>${printContent.innerHTML}</body>
@@ -448,7 +497,11 @@ const Orders = () => {
 
             {/* ═══ Invoice Modal ═══ */}
             <AnimatePresence>
-                {invoiceOrder && (
+                {invoiceOrder && (() => {
+                  const gst = computeGST(invoiceOrder);
+                  const addr = invoiceOrder.shippingAddress || {};
+                  const customerName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Customer';
+                  return (
                     <>
                         <motion.div
                             className="invoice-overlay"
@@ -478,115 +531,165 @@ const Orders = () => {
                             </div>
                             <div className="invoice-modal-body" ref={invoiceRef}>
                                 <div className="invoice-container">
-                                    {/* Header */}
+                                    {/* ── Header: brand + tax-invoice label ── */}
                                     <div className="invoice-header">
-                                        <div>
+                                        <div className="invoice-seller">
                                             <div className="invoice-brand">SwissGarden</div>
                                             <div className="invoice-brand-sub">PERFUMES</div>
+                                            <div className="invoice-seller-meta">
+                                                {SELLER.legalName}<br />
+                                                {SELLER.address}<br />
+                                                {SELLER.email} · {SELLER.phone}
+                                                {SELLER.gstin && <><br />GSTIN: {SELLER.gstin}</>}
+                                            </div>
                                         </div>
                                         <div className="invoice-title">
-                                            <h2>INVOICE</h2>
-                                            <p>{invoiceOrder.orderNumber}</p>
-                                            <p>{new Date(invoiceOrder.createdAt).toLocaleDateString('en-IN', {
-                                                year: 'numeric', month: 'short', day: 'numeric',
-                                            })}</p>
+                                            <h2>TAX INVOICE</h2>
+                                            <div className="invoice-title-meta">
+                                                <span className="invoice-title-label">Invoice No.</span>
+                                                <span className="invoice-title-value">{invoiceOrder.orderNumber}</span>
+                                                <span className="invoice-title-label">Date</span>
+                                                <span className="invoice-title-value">{new Date(invoiceOrder.createdAt).toLocaleDateString('en-IN', {
+                                                    year: 'numeric', month: 'short', day: 'numeric',
+                                                })}</span>
+                                                <span className="invoice-title-label">Status</span>
+                                                <span className="invoice-title-value">
+                                                    <span className={`invoice-badge ${invoiceOrder.isPaid ? 'badge-paid' : 'badge-pending'}`}>
+                                                        {invoiceOrder.isPaid ? 'PAID' : 'PENDING'}
+                                                    </span>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {/* Meta */}
+                                    {/* ── Parties: Bill To / Payment ── */}
                                     <div className="invoice-meta">
                                         <div className="invoice-meta-box">
-                                            <h4>Shipping Address</h4>
+                                            <h4>Bill To</h4>
                                             <p>
-                                                {invoiceOrder.shippingAddress.street}<br />
-                                                {invoiceOrder.shippingAddress.landmark && <>{invoiceOrder.shippingAddress.landmark}<br /></>}
-                                                {invoiceOrder.shippingAddress.city}, {invoiceOrder.shippingAddress.state} {invoiceOrder.shippingAddress.zipCode}<br />
-                                                {invoiceOrder.shippingAddress.country}
+                                                <strong>{customerName}</strong><br />
+                                                {addr.street}<br />
+                                                {addr.landmark && <>{addr.landmark}<br /></>}
+                                                {addr.city}, {addr.state} {addr.zipCode}<br />
+                                                {addr.country}
+                                                {addr.phone && <><br />Phone: {addr.phone}</>}
                                             </p>
                                         </div>
                                         <div className="invoice-meta-box">
-                                            <h4>Payment</h4>
+                                            <h4>Payment Details</h4>
                                             <p>
                                                 Method: {invoiceOrder.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online (Razorpay)'}<br />
-                                                Status: <span className={`invoice-badge ${invoiceOrder.isPaid ? 'badge-paid' : 'badge-pending'}`}>
-                                                    {invoiceOrder.isPaid ? 'Paid' : 'Pending'}
-                                                </span>
-                                                {invoiceOrder.paidAt && <><br />Paid on: {new Date(invoiceOrder.paidAt).toLocaleDateString('en-IN')}</>}
+                                                {invoiceOrder.paidAt && <>Paid on: {new Date(invoiceOrder.paidAt).toLocaleDateString('en-IN')}<br /></>}
+                                                Place of Supply: {addr.state || '—'}<br />
+                                                HSN: {SELLER.hsn}
                                             </p>
                                         </div>
                                     </div>
 
-                                    {/* Items Table */}
+                                    {/* ── Items ── */}
                                     <table className="invoice-table">
                                         <thead>
                                             <tr>
-                                                <th>#</th>
-                                                <th>Item</th>
-                                                <th>Size</th>
-                                                <th className="text-right">Price</th>
-                                                <th className="text-right">Qty</th>
+                                                <th className="col-num">#</th>
+                                                <th>Item Description</th>
+                                                <th className="col-hsn">HSN</th>
+                                                <th className="text-right">Rate</th>
+                                                <th className="text-right col-qty">Qty</th>
                                                 <th className="text-right">Amount</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {invoiceOrder.orderItems.map((item, idx) => (
                                                 <tr key={item._id}>
-                                                    <td>{idx + 1}</td>
-                                                    <td>{item.name}</td>
-                                                    <td>{item.size || '—'}</td>
+                                                    <td className="col-num">{idx + 1}</td>
+                                                    <td>
+                                                        <span className="invoice-item-name">{item.name}</span>
+                                                        {item.size && <span className="invoice-item-sub">{item.size}</span>}
+                                                    </td>
+                                                    <td className="col-hsn">{SELLER.hsn}</td>
                                                     <td className="text-right">{formatINR(item.price)}</td>
-                                                    <td className="text-right">{item.quantity}</td>
+                                                    <td className="text-right col-qty">{item.quantity}</td>
                                                     <td className="text-right">{formatINR(item.price * item.quantity)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
                                     </table>
 
-                                    {/* Totals */}
-                                    <div className="invoice-totals">
-                                        <div className="invoice-totals-row">
-                                            <span>Subtotal</span>
-                                            <span>{formatINR(invoiceOrder.itemsPrice)}</span>
-                                        </div>
-                                        <div className="invoice-totals-row">
-                                            <span>Shipping</span>
-                                            <span>{invoiceOrder.shippingPrice === 0 ? 'FREE' : formatINR(invoiceOrder.shippingPrice)}</span>
-                                        </div>
-                                        {(invoiceOrder.comboDiscount > 0) && (
-                                            <div className="invoice-totals-row discount">
-                                                <span>Combo Discount</span>
-                                                <span>−{formatINR(invoiceOrder.comboDiscount)}</span>
-                                            </div>
-                                        )}
-                                        {(invoiceOrder.codCharge > 0) && (
+                                    {/* ── Totals + GST breakdown ── */}
+                                    <div className="invoice-summary">
+                                        {/* GST is included in the grand total, shown here as a breakdown */}
+                                        <div className="invoice-gst">
+                                            <div className="invoice-gst-title">Tax Summary — GST included in total (18%)</div>
                                             <div className="invoice-totals-row">
-                                                <span>COD Charge</span>
-                                                <span>+{formatINR(invoiceOrder.codCharge)}</span>
+                                                <span>Taxable Value</span>
+                                                <span>{formatINR(gst.taxable)}</span>
                                             </div>
-                                        )}
-                                        {(invoiceOrder.couponDiscount > 0) && (
-                                            <div className="invoice-totals-row discount">
-                                                <span>Coupon ({invoiceOrder.couponCode})</span>
-                                                <span>−{formatINR(invoiceOrder.couponDiscount)}</span>
+                                            <div className="invoice-totals-row">
+                                                <span>CGST @ 9%</span>
+                                                <span>{formatINR(gst.cgst)}</span>
                                             </div>
-                                        )}
-                                        <div className="invoice-totals-row total">
-                                            <span>Total</span>
-                                            <span>{formatINR(invoiceOrder.totalPrice)}</span>
+                                            <div className="invoice-totals-row">
+                                                <span>SGST @ 9%</span>
+                                                <span>{formatINR(gst.sgst)}</span>
+                                            </div>
+                                            <div className="invoice-totals-row gst-total">
+                                                <span>Total GST</span>
+                                                <span>{formatINR(gst.gstTotal)}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="invoice-totals">
+                                            <div className="invoice-totals-row">
+                                                <span>Subtotal (incl. GST)</span>
+                                                <span>{formatINR(invoiceOrder.itemsPrice)}</span>
+                                            </div>
+                                            {(invoiceOrder.comboDiscount > 0) && (
+                                                <div className="invoice-totals-row discount">
+                                                    <span>Combo Discount</span>
+                                                    <span>−{formatINR(invoiceOrder.comboDiscount)}</span>
+                                                </div>
+                                            )}
+                                            {(invoiceOrder.couponDiscount > 0) && (
+                                                <div className="invoice-totals-row discount">
+                                                    <span>Coupon ({invoiceOrder.couponCode})</span>
+                                                    <span>−{formatINR(invoiceOrder.couponDiscount)}</span>
+                                                </div>
+                                            )}
+                                            <div className="invoice-totals-row">
+                                                <span>Shipping</span>
+                                                <span>{invoiceOrder.shippingPrice === 0 ? 'FREE' : formatINR(invoiceOrder.shippingPrice)}</span>
+                                            </div>
+                                            {(invoiceOrder.codCharge > 0) && (
+                                                <div className="invoice-totals-row">
+                                                    <span>COD Charge</span>
+                                                    <span>+{formatINR(invoiceOrder.codCharge)}</span>
+                                                </div>
+                                            )}
+                                            <div className="invoice-totals-row grand">
+                                                <span>Grand Total</span>
+                                                <span>{formatINR(gst.grand)}</span>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {/* Footer */}
+                                    {/* ── Amount in words / footer ── */}
+                                    <div className="invoice-amount-due">
+                                        <span>Amount {invoiceOrder.isPaid ? 'Paid' : 'Payable'}</span>
+                                        <span>{formatINR(gst.grand)}</span>
+                                    </div>
+
                                     <div className="invoice-footer">
-                                        <p>Thank you for shopping with SwissGarden Perfumes!</p>
-                                        <p style={{ marginTop: '4px' }}>GST included in MRP • All prices in INR (₹)</p>
+                                        <p className="invoice-thanks">Thank you for shopping with SwissGarden Perfumes.</p>
+                                        <p>This is a computer-generated tax invoice and does not require a physical signature.</p>
+                                        <p>Prices are inclusive of 18% GST · All amounts in INR (₹) · HSN 3303 (Perfumes)</p>
                                     </div>
                                 </div>
                             </div>
                             </motion.div>
                         </div>
                     </>
-                )}
+                  );
+                })()}
             </AnimatePresence>
 
             {/* ═══ Return Request Modal ═══ */}

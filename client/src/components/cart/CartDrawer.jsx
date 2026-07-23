@@ -144,44 +144,81 @@ const CartDrawer = () => {
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, x: 100 }}
                                         >
-                                            <Link
-                                                to={`/product/${item.slug || item._id}`}
-                                                className="cart-item-image"
-                                                onClick={() => setIsCartOpen(false)}
-                                            >
-                                                <img src={item.image} alt={item.name} />
-                                            </Link>
-                                            <div className="cart-item-info">
-                                                <h4 className="cart-item-name">{item.name}</h4>
-                                                <span className="cart-item-size">{item.size}</span>
-                                                <span className="cart-item-unit-price">{formatINR(item.price)} each</span>
-                                                <div className="cart-item-bottom">
-                                                    <div className="cart-qty-controls">
-                                                        <button
-                                                            onClick={() => updateQuantity(item._id, item.quantity - 1)}
-                                                            disabled={item.quantity <= 1}
-                                                            aria-label="Decrease quantity"
-                                                        >
-                                                            <FiMinus size={14} />
-                                                        </button>
-                                                        <span>{item.quantity}</span>
-                                                        <button onClick={() => updateQuantity(item._id, item.quantity + 1)} aria-label="Increase quantity">
-                                                            <FiPlus size={14} />
-                                                        </button>
+                                            {item.isComboSet ? (
+                                                // Combo Set Display
+                                                <>
+                                                    <div className="cart-item-image">
+                                                        <img src={item.image} alt={item.name} />
                                                     </div>
-                                                    <span className="cart-item-price">
-                                                        {formatINR(item.price * item.quantity)}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <button
-                                                className="cart-item-remove"
-                                                onClick={() => removeFromCart(item._id)}
-                                                title="Remove item"
-                                                aria-label="Remove item"
-                                            >
-                                                <FiTrash2 size={14} />
-                                            </button>
+                                                    <div className="cart-item-info">
+                                                        <h4 className="cart-item-name">{item.name}</h4>
+                                                        <div className="cart-combo-products">
+                                                            {item.selectedProducts?.map((prod, idx) => (
+                                                                <div key={idx} className="cart-combo-product-item">
+                                                                    <img src={prod.image} alt={prod.name} />
+                                                                    <span>{prod.name}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                        <span className="cart-item-size">{item.size}</span>
+                                                        <div className="cart-item-bottom">
+                                                            <span className="cart-item-price">
+                                                                {formatINR(item.price)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        className="cart-item-remove"
+                                                        onClick={() => removeFromCart(item._id)}
+                                                        title="Remove item"
+                                                        aria-label="Remove item"
+                                                    >
+                                                        <FiTrash2 size={14} />
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                // Regular Product Display
+                                                <>
+                                                    <Link
+                                                        to={`/product/${item.slug || item._id}`}
+                                                        className="cart-item-image"
+                                                        onClick={() => setIsCartOpen(false)}
+                                                    >
+                                                        <img src={item.image} alt={item.name} />
+                                                    </Link>
+                                                    <div className="cart-item-info">
+                                                        <h4 className="cart-item-name">{item.name}</h4>
+                                                        <span className="cart-item-size">{item.size}</span>
+                                                        <span className="cart-item-unit-price">{formatINR(item.price)} each</span>
+                                                        <div className="cart-item-bottom">
+                                                            <div className="cart-qty-controls">
+                                                                <button
+                                                                    onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                                                                    disabled={item.quantity <= 1}
+                                                                    aria-label="Decrease quantity"
+                                                                >
+                                                                    <FiMinus size={14} />
+                                                                </button>
+                                                                <span>{item.quantity}</span>
+                                                                <button onClick={() => updateQuantity(item._id, item.quantity + 1)} aria-label="Increase quantity">
+                                                                    <FiPlus size={14} />
+                                                                </button>
+                                                            </div>
+                                                            <span className="cart-item-price">
+                                                                {formatINR(item.price * item.quantity)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        className="cart-item-remove"
+                                                        onClick={() => removeFromCart(item._id)}
+                                                        title="Remove item"
+                                                        aria-label="Remove item"
+                                                    >
+                                                        <FiTrash2 size={14} />
+                                                    </button>
+                                                </>
+                                            )}
                                         </motion.div>
                                     ))}
                                 </div>

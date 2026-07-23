@@ -1,23 +1,38 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FiCheck, FiShoppingBag, FiX } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { productsAPI } from '../services/api';
-import LazyVideo from '../components/common/LazyVideo';
 import toast from 'react-hot-toast';
 import './ComboSet.css';
 
 const ComboSet = () => {
     const [products, setProducts] = useState([]);
-    const [selectedAttars, setSelectedAttars] = useState([null, null, null]);
+    const [selectedAttars, setSelectedAttars] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [addedToCart, setAddedToCart] = useState(false);
+    const [currentSlide, setCurrentSlide] = useState(0);
     const { addToCart } = useCart();
 
     const COMBO_PRICE = 2397;
     const SINGLE_PRICE = 799;
     const SAVINGS = (SINGLE_PRICE * 3) - COMBO_PRICE;
+
+    // Hero slideshow images
+    const heroImages = [
+        '/Images/Combo%20Set(3).png',
+        '/Images/Combo%20Set(4).png',
+        '/Images/Combo%20Set(5).png',
+        '/Images/Combo%20Set(6).png',
+    ];
+
+    // Auto-advance slideshow
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+        }, 4000); // Change image every 4 seconds
+        return () => clearInterval(interval);
+    }, [heroImages.length]);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -34,42 +49,54 @@ const ComboSet = () => {
         fetchProducts();
     }, []);
 
-    const handleSelectAttar = (slotIndex, product) => {
-        const newSelection = [...selectedAttars];
-        newSelection[slotIndex] = product;
-        setSelectedAttars(newSelection);
-    };
-
-    const handleRemoveAttar = (slotIndex) => {
-        const newSelection = [...selectedAttars];
-        newSelection[slotIndex] = null;
-        setSelectedAttars(newSelection);
+    const handleToggleAttar = (product) => {
+        const isSelected = selectedAttars.some(attar => attar._id === product._id);
+        
+        if (isSelected) {
+            // Remove from selection
+            setSelectedAttars(selectedAttars.filter(attar => attar._id !== product._id));
+        } else {
+            // Add to selection if less than 3
+            if (selectedAttars.length < 3) {
+                setSelectedAttars([...selectedAttars, product]);
+            } else {
+                toast.error('You can only select 3 attars');
+            }
+        }
     };
 
     const isProductSelected = (productId) => {
-        return selectedAttars.some(attar => attar?._id === productId);
+        return selectedAttars.some(attar => attar._id === productId);
     };
 
-    const allSlotsFilledCount = selectedAttars.filter(attar => attar !== null).length;
-    const canAddToCart = allSlotsFilledCount === 3;
+    const canAddToCart = selectedAttars.length === 3;
 
     const handleAddToCart = () => {
         if (!canAddToCart) {
-            toast.error('Please select all 3 attars');
+            toast.error('Please select 3 attars');
             return;
         }
 
-        // Add each selected attar as an individual cart item.
-        // CartContext and the server both calculate the combo discount
-        // dynamically based on total cart quantity (≥3 items = ₹400 off),
-        // so there is no need for a fake composite product ID here.
-        // A fake ID would also break server-side product lookup at checkout.
-        selectedAttars.forEach((attar) => {
-            if (attar) addToCart(attar, 1);
-        });
+        // Create combo set item with Close Box image
+        const comboSetItem = {
+            _id: 'combo-set-' + Date.now(),
+            name: 'Signature Trio Combo Set',
+            image: '/Images/Close%20Box.jpeg',
+            price: COMBO_PRICE,
+            size: '3 × 10ml',
+            slug: 'combo-set',
+            quantity: 1,
+            isComboSet: true,
+            selectedProducts: selectedAttars.map(attar => ({
+                id: attar._id,
+                name: attar.name,
+                image: attar.images?.[0]?.url
+            }))
+        };
 
-        setAddedToCart(true);
-        toast.success('Trio added to cart — ₹400 combo discount applied!');
+        addToCart(comboSetItem, 1);
+        toast.success('Combo Set added to cart!');
+        setSelectedAttars([]);
     };
 
     if (loading) {
@@ -89,18 +116,24 @@ const ComboSet = () => {
             </Helmet>
 
             <div className="combo-page">
-                {/* Hero Section */}
+                {/* Hero Section with Slideshow */}
                 <section className="combo-hero">
-                    <div className="combo-hero-bg">
-                        <LazyVideo
-                            src="/Video/Combo%20Set.mov"
-                            className="combo-hero-video"
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                        />
-                    </div>
+                    <AnimatePresence mode="sync">
+                        <motion.div
+                            key={currentSlide}
+                            className="combo-hero-bg"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 1.2, ease: 'easeInOut' }}
+                        >
+                            <img
+                                src={heroImages[currentSlide]}
+                                alt={`Swiss Garden Perfumes Combo Set ${currentSlide + 1}`}
+                                className="combo-hero-video"
+                            />
+                        </motion.div>
+                    </AnimatePresence>
                     <div className="combo-hero-overlay"></div>
                     <div className="container">
                         <motion.div
@@ -110,80 +143,40 @@ const ComboSet = () => {
                             transition={{ duration: 0.6 }}
                         >
                             <h1 className="combo-hero-title">Build Your Signature Trio</h1>
-                            <p className="combo-hero-subtitle">Three attars. One identity. Choose any three from the collection and make the combination yours.</p>
+                            <p className="combo-hero-subtitle">Choose any three attars from our collection to create your perfect combination.</p>
                         </motion.div>
                     </div>
-                </section>
-
-                {/* Selection Slots */}
-                <section className="combo-selection">
-                    <div className="container">
-                        <div className="combo-slots">
-                            {[0, 1, 2].map((slotIndex) => (
-                                <motion.div
-                                    key={slotIndex}
-                                    className="combo-slot"
-                                    initial={{ opacity: 0, y: 30 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: slotIndex * 0.1, duration: 0.5 }}
-                                >
-                                    <div className="combo-slot-header">
-                                        <span className="combo-slot-label">ATTAR {String(slotIndex + 1).padStart(2, '0')}</span>
-                                        <span className="combo-slot-instruction">Select Your Three Attars</span>
-                                    </div>
-                                    <div className="combo-slot-content">
-                                        {selectedAttars[slotIndex] ? (
-                                            <div className="combo-selected-attar">
-                                                <button
-                                                    className="combo-remove-btn"
-                                                    onClick={() => handleRemoveAttar(slotIndex)}
-                                                >
-                                                    <FiX size={16} />
-                                                </button>
-                                                <img
-                                                    src={selectedAttars[slotIndex].images?.[0]?.url || 'https://via.placeholder.com/400x500?text=Attar'}
-                                                    alt={selectedAttars[slotIndex].name}
-                                                    className="combo-selected-image"
-                                                    width="400"
-                                                    height="500"
-                                                />
-                                                <h4 className="combo-selected-name">{selectedAttars[slotIndex].name}</h4>
-                                            </div>
-                                        ) : (
-                                            <div className="combo-empty-slot">
-                                                <div className="combo-empty-icon">+</div>
-                                                <p>Select an attar</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-
-                        {/* Add to Cart Button */}
-                        <div className="combo-add-section">
-                            <div className="combo-price-info">
-                                <div className="combo-price-main">₹{COMBO_PRICE.toLocaleString('en-IN')}</div>
-                                <div className="combo-price-detail">₹{SINGLE_PRICE} × 3</div>
-                            </div>
+                    
+                    {/* Slideshow Indicators */}
+                    <div className="combo-hero-indicators">
+                        {heroImages.map((_, index) => (
                             <button
-                                className={`btn btn-primary btn-lg combo-add-btn ${!canAddToCart ? 'disabled' : ''}`}
-                                onClick={handleAddToCart}
-                                disabled={!canAddToCart}
-                            >
-                                <FiShoppingBag size={20} />
-                                Add to Cart ({allSlotsFilledCount}/3 selected)
-                            </button>
-                            {addedToCart && (
-                                <p className="combo-cart-confirmation">Your Signature Trio has been added to your cart.</p>
-                            )}
-                        </div>
+                                key={index}
+                                className={`combo-hero-indicator ${currentSlide === index ? 'active' : ''}`}
+                                onClick={() => setCurrentSlide(index)}
+                                aria-label={`Go to slide ${index + 1}`}
+                            />
+                        ))}
                     </div>
                 </section>
 
                 {/* Product Grid */}
                 <section className="combo-products">
                     <div className="container">
+                        {/* Selection Counter */}
+                        <div className="combo-selection-counter">
+                            <h2>Choose Your 3 Attars ({selectedAttars.length}/3 selected)</h2>
+                            {canAddToCart && (
+                                <button
+                                    className="btn btn-primary btn-lg"
+                                    onClick={handleAddToCart}
+                                >
+                                    <FiShoppingBag size={20} />
+                                    Add to Cart — ₹{COMBO_PRICE.toLocaleString('en-IN')}
+                                </button>
+                            )}
+                        </div>
+
                         <div className="combo-products-grid">
                             {products.map((product, index) => (
                                 <motion.div
@@ -214,24 +207,18 @@ const ComboSet = () => {
                                                 <span key={i} className="combo-note-tag">{note}</span>
                                             ))}
                                         </div>
-                                        <div className="combo-product-actions">
-                                            {[0, 1, 2].map((slotIndex) => (
-                                                <button
-                                                    key={slotIndex}
-                                                    className={`combo-select-btn ${selectedAttars[slotIndex]?._id === product._id ? 'active' : ''}`}
-                                                    onClick={() => handleSelectAttar(slotIndex, product)}
-                                                    disabled={isProductSelected(product._id) && selectedAttars[slotIndex]?._id !== product._id}
-                                                >
-                                                    {selectedAttars[slotIndex]?._id === product._id ? (
-                                                        <>
-                                                            <FiCheck size={14} /> Slot {slotIndex + 1}
-                                                        </>
-                                                    ) : (
-                                                        `Select for Slot ${slotIndex + 1}`
-                                                    )}
-                                                </button>
-                                            ))}
-                                        </div>
+                                        <button
+                                            className={`btn ${isProductSelected(product._id) ? 'btn-outline' : 'btn-primary'} btn-block combo-choose-btn`}
+                                            onClick={() => handleToggleAttar(product)}
+                                        >
+                                            {isProductSelected(product._id) ? (
+                                                <>
+                                                    <FiCheck size={16} /> Selected
+                                                </>
+                                            ) : (
+                                                'Choose'
+                                            )}
+                                        </button>
                                     </div>
                                 </motion.div>
                             ))}

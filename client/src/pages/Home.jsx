@@ -272,16 +272,13 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* ─── Combo Set Video Section ──────────────────────────── */}
+            {/* ─── Combo Set Image Section ──────────────────────────── */}
             <section className="home-combo-video-section">
                 <div className="home-combo-video-bg">
-                    <LazyVideo
-                        src="/Video/Combo%20Set.mov"
+                    <LazyImage
+                        src="/Images/Combo%20Set(2).jpeg"
+                        alt="Swiss Garden Perfumes Signature Trio Combo Set"
                         className="home-combo-video"
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
                     />
                     <div className="home-combo-video-overlay"></div>
                 </div>

@@ -38,6 +38,13 @@ export const CartProvider = ({ children }) => {
                 );
             }
             toast.success('Added to cart');
+            
+            // If it's a combo set, preserve all properties
+            if (product.isComboSet) {
+                return [...prev, { ...product, quantity }];
+            }
+            
+            // For regular products, extract only needed fields
             return [
                 ...prev,
                 {
@@ -48,6 +55,7 @@ export const CartProvider = ({ children }) => {
                     size: product.size,
                     brand: product.brand,
                     stock: product.stock,
+                    slug: product.slug,
                     quantity,
                 },
             ];

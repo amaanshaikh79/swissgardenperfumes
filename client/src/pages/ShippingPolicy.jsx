@@ -111,8 +111,6 @@ const ShippingPolicy = () => (
                     <ul className="policy-list">
                         <li>Delhivery</li>
                         <li>Blue Dart</li>
-                        <li>India Post (for remote areas)</li>
-                        <li>DTDC</li>
                     </ul>
                     <p className="policy-text">
                         Once your order is shipped, you'll receive a <strong>tracking ID via SMS and email</strong>. You can also track your order anytime from your <Link to="/orders" style={{ color: 'var(--accent)', fontWeight: 600 }}>Orders page</Link>.

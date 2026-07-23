@@ -10,7 +10,7 @@
 /* ─── Hero Section ───────────────────────────────────────── */
 .combo-hero {
     position: relative;
-    min-height: 420px;
+    min-height: 500px;
     padding: var(--space-5xl) 0;
     text-align: center;
     color: var(--white);
@@ -18,20 +18,25 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    background: #1a3a2a;
 }
 
 .combo-hero-bg {
     position: absolute;
     inset: 0;
     z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .combo-hero-video {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     object-position: center;
     display: block;
+    max-height: 500px;
 }
 
 .combo-hero-overlay {
@@ -39,8 +44,8 @@
     inset: 0;
     background: linear-gradient(
         to bottom,
-        rgba(26, 58, 42, 0.7) 0%,
-        rgba(13, 31, 23, 0.85) 100%
+        rgba(26, 58, 42, 0.3) 0%,
+        rgba(13, 31, 23, 0.5) 100%
     );
     z-index: 2;
 }
@@ -62,16 +67,51 @@
     letter-spacing: -0.5px;
     margin-bottom: var(--space-md);
     color: var(--white);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .combo-hero-subtitle {
     font-size: clamp(0.85rem, 1.8vw, 1rem);
     letter-spacing: 0.3px;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.95);
     font-weight: 400;
     line-height: 1.6;
     max-width: 600px;
     margin: 0 auto;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Slideshow Indicators */
+.combo-hero-indicators {
+    position: absolute;
+    bottom: var(--space-xl);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.combo-hero-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    padding: 0;
+}
+
+.combo-hero-indicator:hover {
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(1.2);
+}
+
+.combo-hero-indicator.active {
+    background: var(--white);
+    width: 28px;
+    border-radius: 5px;
 }
 
 /* ─── Selection Slots ────────────────────────────────────── */
@@ -254,6 +294,33 @@
 /* ─── Products Grid ──────────────────────────────────────── */
 .combo-products {
     padding: var(--space-5xl) 0;
+}
+
+.combo-selection-counter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-3xl);
+    padding: var(--space-xl);
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+}
+
+.combo-selection-counter h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.combo-choose-btn {
+    margin-top: var(--space-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
 }
 
 .combo-products-grid {
@@ -540,6 +607,16 @@
     .combo-add-btn {
         width: 100%;
     }
+
+    .combo-selection-counter {
+        flex-direction: column;
+        gap: var(--space-lg);
+        text-align: center;
+    }
+
+    .combo-selection-counter .btn {
+        width: 100%;
+    }
 }
 
 @media (max-width: 768px) {
@@ -573,6 +650,10 @@
     .combo-price-main {
         font-size: 2rem;
     }
+
+    .combo-selection-counter h2 {
+        font-size: 1.2rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -587,5 +668,9 @@
 
     .combo-hero-subtitle {
         font-size: 0.8rem;
+    }
+
+    .combo-selection-counter h2 {
+        font-size: 1rem;
     }
 }
