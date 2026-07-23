@@ -81,6 +81,9 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 function App() {
     const location = useLocation();
     const isAuthPage = ['/login', '/register', '/forgot-password', '/auth/callback'].includes(location.pathname) || location.pathname.startsWith('/reset-password');
+    // The admin console is a self-contained app shell — suppress all storefront
+    // chrome (navbar, footer, chatbox, exit-intent popup, splash) on it.
+    const isBareLayout = isAuthPage || location.pathname.startsWith('/admin');
     const [showSplash, setShowSplash] = useState(() => !sessionStorage.getItem('sg_splash_shown'));
 
     const handleSplashComplete = useCallback(() => {
@@ -98,10 +101,12 @@ function App() {
                 )}
             </AnimatePresence>
             <ScrollToTop />
-            <Suspense fallback={null}>
-                <ExitIntentPopup />
-            </Suspense>
-            {!isAuthPage && <Navbar />}
+            {!isBareLayout && (
+                <Suspense fallback={null}>
+                    <ExitIntentPopup />
+                </Suspense>
+            )}
+            {!isBareLayout && <Navbar />}
             <CartDrawer />
             <main>
                 <Suspense fallback={<PageLoader />}>
@@ -154,8 +159,8 @@ function App() {
                     </ErrorBoundary>
                 </Suspense>
             </main>
-            {!isAuthPage && <Footer />}
-            {!isAuthPage && (
+            {!isBareLayout && <Footer />}
+            {!isBareLayout && (
                 <Suspense fallback={null}>
                     <AIChatbox />
                 </Suspense>

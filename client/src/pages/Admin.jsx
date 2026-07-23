@@ -52,6 +52,7 @@ const formatShippingStatus = (status) =>
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('overview');
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const [stats, setStats] = useState(null);
     const [products, setProducts] = useState([]);
     const [orders, setOrders] = useState([]);
@@ -443,29 +444,71 @@ const AdminDashboard = () => {
                 <title>Admin Dashboard | SwissGarden Perfumes</title>
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
-            <div className="admin-page">
-                <div className="container">
-                    <div className="admin-header">
-                        <h1 className="page-title">Admin Dashboard</h1>
-                        <button className="btn btn-ghost btn-sm" onClick={handleRefresh}>
+            <div className="admin-shell">
+                {/* Backdrop for mobile drawer */}
+                <div
+                    className={`admin-backdrop ${sidebarOpen ? 'show' : ''}`}
+                    onClick={() => setSidebarOpen(false)}
+                />
+
+                {/* ─── Sidebar ─── */}
+                <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
+                    <div className="admin-brand">
+                        <span className="admin-brand-mark">SG</span>
+                        <span className="admin-brand-text">
+                            <span className="admin-brand-name">SwissGarden</span>
+                            <span className="admin-brand-sub">Admin Console</span>
+                        </span>
+                    </div>
+
+                    <nav className="admin-nav">
+                        {tabs.map((tab) => {
+                            const count = tab.key === 'users'
+                                ? users.length
+                                : tab.key === 'contacts'
+                                    ? contacts.filter((c) => c.status === 'unread').length
+                                    : 0;
+                            return (
+                                <button
+                                    key={tab.key}
+                                    className={`admin-nav-item ${activeTab === tab.key ? 'active' : ''}`}
+                                    onClick={() => { setActiveTab(tab.key); setSidebarOpen(false); }}
+                                >
+                                    <span className="admin-nav-icon">{tab.icon}</span>
+                                    <span className="admin-nav-label">{tab.label}</span>
+                                    {count > 0 && <span className="admin-nav-count">{count}</span>}
+                                </button>
+                            );
+                        })}
+                    </nav>
+
+                    <div className="admin-sidebar-foot">
+                        <a href="/" className="admin-nav-item admin-nav-store">
+                            <span className="admin-nav-icon"><FiExternalLink size={16} /></span>
+                            <span className="admin-nav-label">View Store</span>
+                        </a>
+                    </div>
+                </aside>
+
+                {/* ─── Main ─── */}
+                <div className="admin-main">
+                    <header className="admin-topbar">
+                        <button
+                            className="admin-menu-toggle"
+                            onClick={() => setSidebarOpen((v) => !v)}
+                            aria-label="Toggle menu"
+                        >
+                            <FiChevronDown size={18} />
+                        </button>
+                        <h1 className="admin-topbar-title">
+                            {tabs.find((t) => t.key === activeTab)?.label || 'Dashboard'}
+                        </h1>
+                        <button className="btn btn-ghost btn-sm admin-refresh-btn" onClick={handleRefresh}>
                             <FiRefreshCw size={14} /> Refresh
                         </button>
-                    </div>
+                    </header>
 
-                    <div className="admin-tabs">
-                        {tabs.map((tab) => (
-                            <button key={tab.key}
-                                className={`admin-tab ${activeTab === tab.key ? 'active' : ''}`}
-                                onClick={() => setActiveTab(tab.key)}
-                            >
-                                {tab.icon} {tab.label}
-                                {tab.key === 'users' && users.length > 0 && (
-                                    <span className="admin-tab-count">{users.length}</span>
-                                )}
-                            </button>
-                        ))}
-                    </div>
-
+                    <div className="admin-content-wrap">
                     {loading ? (
                         <div className="page-loader"><div className="spinner" /></div>
                     ) : (
@@ -1285,6 +1328,7 @@ const AdminDashboard = () => {
 
                         </div>
                     )}
+                    </div>
                 </div>
             </div>
             <ProductModal
