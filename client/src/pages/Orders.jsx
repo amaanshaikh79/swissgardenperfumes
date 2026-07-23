@@ -22,25 +22,35 @@ const SELLER = {
     legalName: 'Golden Buck Private Limited',
     brand: 'SwissGarden Perfumes',
     address: 'C-589 DDA Flat, Pocket 11, Jasola, New Delhi 110025, India',
+    state: 'Delhi', // seller's place of business — decides intra- vs inter-state GST
     email: 'support@swissgardenperfumes.com',
     phone: '+91 9354936369',
     gstin: '', // TODO: set company GSTIN to print on tax invoices
     hsn: '3303', // HSN for perfumes & toilet waters
 };
 
+const normState = (s) => (s || '').trim().toLowerCase();
+
 /**
  * Reverse-calculate the GST already contained in a GST-inclusive total.
  * Store prices include 18% GST, so the invoice must EXTRACT the tax component
  * (never add it on top) — the grand total always equals the amount charged.
  * Integer-rupee rounding keeps the breakdown reconciling exactly to the total.
+ *
+ * Place of supply decides the split: an intra-state supply (buyer in the
+ * seller's state) is CGST 9% + SGST 9%; an inter-state supply is IGST 18%.
  */
 const computeGST = (order) => {
     const grand = Math.round(order.totalPrice || 0);
     const taxable = Math.round(grand / 1.18);
     const gstTotal = grand - taxable;
+    const interState = normState(order.shippingAddress?.state) !== normState(SELLER.state);
+    if (interState) {
+        return { grand, taxable, gstTotal, interState, igst: gstTotal, cgst: 0, sgst: 0 };
+    }
     const cgst = Math.round(gstTotal / 2);
     const sgst = gstTotal - cgst;
-    return { grand, taxable, gstTotal, cgst, sgst };
+    return { grand, taxable, gstTotal, interState, igst: 0, cgst, sgst };
 };
 
 const statusIcons = {
@@ -624,14 +634,23 @@ const Orders = () => {
                                                 <span>Taxable Value</span>
                                                 <span>{formatINR(gst.taxable)}</span>
                                             </div>
-                                            <div className="invoice-totals-row">
-                                                <span>CGST @ 9%</span>
-                                                <span>{formatINR(gst.cgst)}</span>
-                                            </div>
-                                            <div className="invoice-totals-row">
-                                                <span>SGST @ 9%</span>
-                                                <span>{formatINR(gst.sgst)}</span>
-                                            </div>
+                                            {gst.interState ? (
+                                                <div className="invoice-totals-row">
+                                                    <span>IGST @ 18%</span>
+                                                    <span>{formatINR(gst.igst)}</span>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div className="invoice-totals-row">
+                                                        <span>CGST @ 9%</span>
+                                                        <span>{formatINR(gst.cgst)}</span>
+                                                    </div>
+                                                    <div className="invoice-totals-row">
+                                                        <span>SGST @ 9%</span>
+                                                        <span>{formatINR(gst.sgst)}</span>
+                                                    </div>
+                                                </>
+                                            )}
                                             <div className="invoice-totals-row gst-total">
                                                 <span>Total GST</span>
                                                 <span>{formatINR(gst.gstTotal)}</span>
