@@ -61,6 +61,13 @@ const Navbar = () => {
         };
     }, []);
 
+    // Lock background scroll and hide floating widgets (chat bubble) while the
+    // mobile drawer is open — prevents the classic scroll-bleed and overlap glitches.
+    useEffect(() => {
+        document.body.classList.toggle('sg-drawer-open', mobileOpen);
+        return () => document.body.classList.remove('sg-drawer-open');
+    }, [mobileOpen]);
+
     const handleSearch = (e) => {
         e.preventDefault();
         if (searchQuery.trim()) {

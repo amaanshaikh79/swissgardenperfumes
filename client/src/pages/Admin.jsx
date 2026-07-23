@@ -6,7 +6,7 @@ import {
     FiTrash2, FiMail, FiCalendar, FiPhone, FiMapPin, FiShield,
     FiUserCheck, FiUserX, FiRefreshCw, FiMessageSquare, FiEye,
     FiChevronDown, FiChevronUp, FiPlus, FiEdit2, FiTag, FiTruck,
-    FiExternalLink, FiAlertCircle, FiPrinter, FiNavigation
+    FiExternalLink, FiAlertCircle, FiPrinter, FiNavigation, FiMenu, FiX
 } from 'react-icons/fi';
 import { adminAPI, productsAPI, ordersAPI, contactAPI, couponAPI, deliveryPartnerAPI, shiprocketAPI } from '../services/api';
 import toast from 'react-hot-toast';
@@ -119,6 +119,12 @@ const AdminDashboard = () => {
     useEffect(() => {
         fetchData(activeTab);
     }, [activeTab]);
+
+    // Lock background scroll while the mobile sidebar drawer is open.
+    useEffect(() => {
+        document.body.classList.toggle('sg-drawer-open', sidebarOpen);
+        return () => document.body.classList.remove('sg-drawer-open');
+    }, [sidebarOpen]);
 
     const handleRefresh = () => fetchData(activeTab);
 
@@ -497,8 +503,9 @@ const AdminDashboard = () => {
                             className="admin-menu-toggle"
                             onClick={() => setSidebarOpen((v) => !v)}
                             aria-label="Toggle menu"
+                            aria-expanded={sidebarOpen}
                         >
-                            <FiChevronDown size={18} />
+                            {sidebarOpen ? <FiX size={20} /> : <FiMenu size={20} />}
                         </button>
                         <h1 className="admin-topbar-title">
                             {tabs.find((t) => t.key === activeTab)?.label || 'Dashboard'}

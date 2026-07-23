@@ -354,6 +354,17 @@
     display: none;
 }
 
+/* While a mobile drawer is open: lock background scroll and hide floating
+   widgets (chat bubble, its window) so they never overlap the menu. */
+body.sg-drawer-open {
+    overflow: hidden;
+}
+
+body.sg-drawer-open .chatbox-toggle,
+body.sg-drawer-open .chatbox-window {
+    display: none !important;
+}
+
 /* ═══════════════════════════════════════════════════════════
    Responsive
    ═══════════════════════════════════════════════════════════ */
@@ -484,14 +495,22 @@
     }
 
     .mobile-menu-link--featured {
-        background: linear-gradient(135deg, var(--accent-light), var(--accent));
+        background: linear-gradient(135deg, var(--accent-400), var(--accent-600));
         color: var(--white) !important;
         font-weight: 600;
     }
 
-    .mobile-menu-link--featured:hover {
+    .mobile-menu-link--featured .mobile-menu-icon,
+    .mobile-menu-link--featured svg {
+        color: var(--white);
+    }
+
+    .mobile-menu-link--featured:hover,
+    .mobile-menu-link--featured:active {
         transform: translateX(4px) scale(1.02);
-        box-shadow: 0 4px 12px rgba(255, 119, 0, 0.3);
+        box-shadow: 0 4px 12px rgba(200, 160, 42, 0.35);
+        background: linear-gradient(135deg, var(--accent-400), var(--accent-600));
+        color: var(--white) !important;
     }
 
     .mobile-menu-icon {
