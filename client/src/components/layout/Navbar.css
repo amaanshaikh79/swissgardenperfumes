@@ -182,6 +182,18 @@
     cursor: pointer;
     transition: all var(--transition-fast);
     position: relative;
+    padding: 0;
+    line-height: 0;
+    flex-shrink: 0;
+}
+
+/* Render icons as blocks so the inline-SVG text baseline can never nudge them
+   off-centre — guarantees identical vertical centring across mobile browsers. */
+.navbar-action-btn svg,
+.navbar-mobile-toggle svg,
+.search-icon,
+.search-close svg {
+    display: block;
 }
 
 .navbar-action-btn:hover {
