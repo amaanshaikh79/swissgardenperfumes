@@ -20,10 +20,10 @@ const ComboSet = () => {
 
     // Hero slideshow images
     const heroImages = [
-        '/Images/Combo%20Set(3).png',
-        '/Images/Combo%20Set(4).png',
-        '/Images/Combo%20Set(5).png',
-        '/Images/Combo%20Set(6).png',
+        '/Images/Combo Set(3).png',
+        '/Images/Combo Set(4).PNG',
+        '/Images/Combo Set(5).png',
+        '/Images/Combo Set(6).PNG',
     ];
 
     // Auto-advance slideshow
